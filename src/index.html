@@ -140,6 +140,7 @@
               <span class="wizard-hint" id="wizard-install-hint">Se abre a pantalla completa y funciona sin conexión.</span>
             </p>
             <p class="wizard-hint" id="wizard-install-ios" hidden>En iPhone y iPad: abre la app en Safari, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>.</p>
+            <p class="wizard-note" id="wizard-install-remembered" hidden>Ya añadiste la app a este dispositivo. Puedes abrirla desde su icono. Si lo has quitado, en Ayuda puedes volver a instalarla.</p>
             <p class="wizard-installed" id="wizard-installed" hidden>🎉 <b>Ya la tienes instalada.</b> Ábrela desde su icono: entra directa, a pantalla completa, y funciona sin conexión.</p>
             <ol class="wizard-cycle">
               <li><span class="wizard-cycle-step">1</span><span><b>Elige películas.</b> Lo que quieres ver, lo que estás dudando y lo que descartas.</span></li>
@@ -385,6 +386,7 @@
           <div class="help-replay" id="help-instalar">
             <h3 id="help-install-title">Instalar la app</h3>
             <p id="help-installed" class="help-installed" role="status" hidden><strong>Ya la tienes instalada.</strong><span>Puedes abrirla desde su icono y consultar el programa sin conexión.</span></p>
+            <p id="help-install-remembered" hidden><b>Ya añadiste la app a este dispositivo.</b> Puedes abrirla desde su icono. Si lo has quitado, puedes volver a instalarla.</p>
             <p id="help-install-intro">Tenla a mano con un icono propio y consulta el programa sin conexión, también cuando estés entre salas.</p>
             <p id="help-install-ios" hidden>Para instalarla en iPhone o iPad, abre esta página en Safari, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>.</p>
             <p id="help-install-other" hidden>Busca «Instalar app» o «Añadir a pantalla de inicio» en el menú con el que abriste esta página. Si no aparece, prueba a abrirla en Chrome o Safari, según tu dispositivo.</p>
@@ -576,7 +578,17 @@
     const isIosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent)
       || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     let installPrompt = null;
-    let installedThisSession = false;
+    const installAcceptedKey = "ficx64-install-accepted-v1";
+    let installRemembered = false;
+    if (!usingLocalFile) {
+      try { installRemembered = localStorage.getItem(installAcceptedKey) === "true"; }
+      catch (_) { /* Si no hay almacenamiento, el recuerdo dura esta sesión. */ }
+    }
+    function rememberInstallation() {
+      installRemembered = true;
+      try { localStorage.setItem(installAcceptedKey, "true"); }
+      catch (_) { /* El estado de sesión sigue funcionando. */ }
+    }
     let relatedAppInstalled = false;
     const appDisplay = window.matchMedia("(display-mode: standalone)");
     const minimalDisplay = window.matchMedia("(display-mode: minimal-ui)");
@@ -584,27 +596,33 @@
     const installButton = document.querySelector("#wizard-install-button");
     const installedNote = document.querySelector("#wizard-installed");
     const helpInstallButton = document.querySelector("#help-install-button");
-    const isInstalled = () => installedThisSession || relatedAppInstalled || appDisplay.matches
+    const isInstalled = () => relatedAppInstalled || appDisplay.matches
       || minimalDisplay.matches || Boolean(navigator.standalone);
     function syncInstallation() {
       const installed = isInstalled();
+      if (!usingLocalFile && installed && !installRemembered) rememberInstallation();
+      const remembered = !usingLocalFile && !installed && installRemembered;
       const available = !usingLocalFile && !installed && Boolean(installPrompt);
+      const offerInstallation = available && !remembered;
+      document.querySelector("#help-install-remembered").hidden = !remembered;
+      document.querySelector("#wizard-install-remembered").hidden = !remembered;
+      helpInstallButton.textContent = remembered ? "Volver a instalar" : "Instalar la app";
       document.querySelector("#help-install-title").textContent = usingLocalFile
-        ? "La app en un archivo" : installed ? "La app en tu dispositivo" : "Instalar la app";
-      document.querySelector("#help-install-intro").hidden = installed || usingLocalFile;
+        ? "La app en un archivo" : (installed || remembered) ? "La app en tu dispositivo" : "Instalar la app";
+      document.querySelector("#help-install-intro").hidden = installed || remembered || usingLocalFile;
       document.querySelector("#help-app-updates").hidden = usingLocalFile;
-      document.querySelector("#help-download-description").textContent = installed
+      document.querySelector("#help-download-description").textContent = (installed || remembered)
         ? "Puedes descargar una copia independiente de la app. No incluye tus listas ni tu parrilla y no recibe actualizaciones. Para guardar tus elecciones, usa Exportar tu programa en Ajustes."
         : "Otra forma de usarla sin conexión, sin instalarla. El archivo incluye el catálogo, pero no tus listas ni tu parrilla, y no se actualiza automáticamente. Tus elecciones se exportan por separado desde Ajustes.";
-      installBox.hidden = !available;
-      installButton.disabled = !available;
+      installBox.hidden = !offerInstallation;
+      installButton.disabled = !offerInstallation;
       installedNote.hidden = !installed;
       helpInstallButton.hidden = !available;
       helpInstallButton.disabled = !available;
-      document.querySelector("#help-install-state").hidden = !available;
+      document.querySelector("#help-install-state").hidden = !offerInstallation;
       document.querySelector("#help-installed").hidden = !installed;
       document.querySelector("#help-install-ios").hidden = usingLocalFile || installed || available || !isIosDevice;
-      document.querySelector("#wizard-install-ios").hidden = usingLocalFile || installed || available || !isIosDevice;
+      document.querySelector("#wizard-install-ios").hidden = usingLocalFile || installed || remembered || available || !isIosDevice;
       document.querySelector("#help-install-other").hidden = usingLocalFile || installed || available || isIosDevice;
     }
     window.addEventListener("beforeinstallprompt", (event) => {
@@ -613,7 +631,7 @@
       syncInstallation();
     });
     window.addEventListener("appinstalled", () => {
-      installedThisSession = true;
+      rememberInstallation();
       installPrompt = null;
       syncInstallation();
     });
@@ -626,7 +644,8 @@
       syncInstallation();
       try {
         await prompt.prompt();
-        await prompt.userChoice;
+        const choice = await prompt.userChoice;
+        if (choice.outcome === "accepted") rememberInstallation();
       } catch (_) { /* La ayuda manual sigue disponible si el navegador falla. */ }
       finally { syncInstallation(); }
     }
