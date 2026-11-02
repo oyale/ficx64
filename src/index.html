@@ -139,6 +139,7 @@
               <button type="button" class="settings-action is-primary" id="wizard-install-button">Instalar la app</button>
               <span class="wizard-hint" id="wizard-install-hint">Se abre a pantalla completa y funciona sin conexión.</span>
             </p>
+            <p class="wizard-hint" id="wizard-install-ios" hidden>En iPhone y iPad: abre la app en Safari, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>.</p>
             <p class="wizard-installed" id="wizard-installed" hidden>🎉 <b>Ya la tienes instalada.</b> Ábrela desde su icono: entra directa, a pantalla completa, y funciona sin conexión.</p>
             <ol class="wizard-cycle">
               <li><span class="wizard-cycle-step">1</span><span><b>Elige películas.</b> Lo que quieres ver, lo que estás dudando y lo que descartas.</span></li>
@@ -382,8 +383,9 @@
           <div class="help-replay" id="help-instalar">
             <p class="eyebrow">INSTALARLA COMO APLICACIÓN</p>
             <p>Se instala como una app más: icono propio, pantalla completa y <b>funciona sin conexión</b>.</p>
-            <p id="help-install-fallback"><b>Android y ordenador:</b> pulsa el botón. <b>iPhone y iPad:</b> abre la app, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>.</p>
             <p class="help-install-ready" id="help-install-state" hidden><b>Se puede instalar en este dispositivo.</b></p>
+            <p id="help-install-ios" hidden>En iPhone y iPad: abre la app en Safari, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>. iOS no deja que la web lance la instalación sola.</p>
+            <p id="help-install-other" hidden>Tu navegador no ofrece instalar la app desde aquí. Prueba con Chrome o con el menú del navegador («Instalar app»).</p>
             <button type="button" class="settings-action is-primary" id="help-install-button" hidden>Instalar la app</button>
             <p>Lo que guardes vive en este navegador. Instalada y en el navegador comparten los datos si entras por la misma dirección; el fichero guardado en el móvil es otro dispositivo. Sin conexión verás el programa de la última vez, y la app avisa cuando hay una versión nueva.</p>
           </div>
@@ -557,13 +559,24 @@
     window.addEventListener("appinstalled", () => { installPrompt = null; syncInstallBox(); });
     window.addEventListener("load", syncInstallBox);
     // El mismo aviso sirve en el asistente y en la ayuda.
+    // iOS no lanza beforeinstallprompt nunca: la marca solo sirve para elegir el texto a quien
+    // no tiene botón. iPadOS 13+ se anuncia como Mac, de ahí la segunda comprobación.
+    const isIosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent)
+      || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     const helpInstallButton = document.querySelector("#help-install-button");
     const helpInstallState = document.querySelector("#help-install-state");
-    const helpInstallFallback = document.querySelector("#help-install-fallback");
+    const helpInstallIos = document.querySelector("#help-install-ios");
+    const helpInstallOther = document.querySelector("#help-install-other");
     const syncHelpInstall = () => {
-      helpInstallButton.hidden = !installPrompt;
-      helpInstallState.hidden = !installPrompt;
-      helpInstallFallback.hidden = Boolean(installPrompt);
+      // La capacidad manda: si hay prompt, botón; si no, el texto del dispositivo.
+      const canInstall = Boolean(installPrompt) && !isInstalled();
+      helpInstallButton.hidden = !canInstall;
+      helpInstallState.hidden = !canInstall;
+      helpInstallIos.hidden = canInstall || !isIosDevice;
+      helpInstallOther.hidden = canInstall || isIosDevice;
+      // El bloque del asistente usa la misma regla.
+      const wizardIos = document.querySelector("#wizard-install-ios");
+      if (wizardIos) wizardIos.hidden = canInstall || !isIosDevice;
     };
     window.addEventListener("beforeinstallprompt", syncHelpInstall);
     window.addEventListener("appinstalled", syncHelpInstall);
