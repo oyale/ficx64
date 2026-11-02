@@ -1928,7 +1928,9 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 #shared-pending-summary { flex: 1 1 100%; font-size: 13px; font-weight: 700; }
 .is-list-reception .shared-actions button { min-height: 44px; }
 #shared-list .shared-film.is-pending { border-color: var(--blue); }
-.shared-pending-note { color: var(--blue); font-size: 12px; font-weight: 700; }
+#shared-list .shared-pending-note { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin: 4px 0 0; color: var(--text-muted); font-size: 11px; font-weight: 400; line-height: 1.4; }
+#shared-list .shared-pending-note::before { content: ""; width: 5px; height: 5px; flex: 0 0 5px; border-radius: 50%; background: var(--blue); }
+@media (max-width: 650px) { #shared-list .shared-pending-note { justify-content: flex-start; } }
 @media (max-width: 650px) { .is-list-reception .shared-actions { bottom: calc(64px + env(safe-area-inset-bottom)); } }
 
 /* Mi programa: encajar un número entero de fotogramas en cada cenefa. */

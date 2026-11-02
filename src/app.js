@@ -2418,10 +2418,10 @@
       const pending = sharedListChanges().has(row.dataset.sharedRow);
       row.classList.toggle("is-pending", pending);
       let note = row.querySelector(".shared-pending-note");
-      if (!note) { note = document.createElement("p"); note.className = "shared-pending-note"; row.querySelector(".film-copy").append(note); }
+      if (!note) { note = document.createElement("p"); note.className = "shared-pending-note"; row.querySelector(".film-actions").append(note); }
       note.hidden = !pending;
       note.textContent = sharedListChanges().get(row.dataset.sharedRow) === null
-        ? "Se quitará de tus listas al guardar" : "Seleccionada · pendiente de guardar";
+        ? "Quitar · sin guardar" : "Sin guardar";
     }
     button.disabled = count === 0;
   }
