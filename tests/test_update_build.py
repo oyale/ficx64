@@ -41,8 +41,18 @@ class UpdateBuildTest(unittest.TestCase):
             data['films'][0]['title'] += ' (actualizada)'
             path.write_text(json.dumps(data))
             self.assertNotEqual(previous, build())
-            self.assertEqual((root / 'dist/index.html').read_bytes(),
-                             (root / 'dist/ficx64.html').read_bytes())
+            html = (root / 'dist/index.html').read_text()
+            legacy = (root / 'dist/ficx64.html').read_text()
+            self.assertGreater(len(html), 100_000)
+            self.assertLess(len(legacy), 1024)
+            self.assertIn('location.search + location.hash', legacy)
+            self.assertIn('href="./index.html" download="ficx64.html"', html)
+            # Una salida personalizada contiene la app completa, no la redirección.
+            output = root / 'portable' / 'ficx64.html'
+            subprocess.run([sys.executable, str(root / 'build.py'), '--output', str(output)],
+                           check=True, capture_output=True)
+            self.assertEqual(output.read_text(), html)
+            self.assertFalse((output.parent / 'index.html').exists())
 
 
 if __name__ == '__main__':
