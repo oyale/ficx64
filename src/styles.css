@@ -153,6 +153,10 @@ html:has(.wizard[open]), html:has(.wizard[open]) body { overflow: hidden; }
 .wizard-install { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0; }
 .wizard-install[hidden] { display: none; }
 .wizard-install .settings-action { min-height: 40px; }
+/* Mismo botón en la ayuda. */
+.help-install-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.help-install-row[hidden] { display: none; }
+.help-install-row .settings-action { min-height: 40px; }
 .wizard-list b { color: var(--text); }
 .wizard-list kbd { padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface-raised); color: var(--text); font-size: 10px; }
 /* Tarjeta de práctica: la misma cenefa turquesa de las tarjetas de cine. */

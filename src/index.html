@@ -364,7 +364,7 @@
           <p class="help-intro">Tu programa personal del festival, sin cuenta y sin servidor: todo queda en este navegador.</p>
         </header>
         <nav class="help-toc" aria-label="Índice de la ayuda">
-          <a href="#help-uso">Uso</a><a href="#help-mecanicas">Mecánicas</a><a href="#help-tiempos">Tiempos</a><a href="#help-datos">Datos</a><a href="#help-accesibilidad">Accesibilidad</a><a href="#help-privacidad">Privacidad</a>
+          <a href="#help-uso">Uso</a><a href="#help-mecanicas">Mecánicas</a><a href="#help-tiempos">Tiempos</a><a href="#help-datos">Datos</a><a href="#help-instalar">Instalar</a><a href="#help-accesibilidad">Accesibilidad</a><a href="#help-privacidad">Privacidad</a>
         </nav>
 
         <article class="help-block" id="help-uso">
@@ -425,6 +425,20 @@
           <summary>De dónde sale todo</summary>
           <p>El programa y los pases siguen la información publicada por el festival: la web <b>ficx.tv</b> y el <b>catálogo impreso</b> (PDF). Los datos pueden cambiar; lo que vale siempre es el programa oficial.</p>
           <p>Las imágenes de las películas son opcionales (se activan en Ajustes): al abrir una ficha se pide su imagen a la web del festival. Sin esa opción la app no hace peticiones, salvo cuando pulsas un enlace externo o «Google Calendar».</p>
+        </details>
+
+        <details class="help-block help-fold" id="help-instalar">
+          <summary>Instalarla como aplicación</summary>
+          <p>Se puede instalar como una app más: icono propio, se abre a pantalla completa y <b>funciona sin conexión</b>.</p>
+          <p><b>Android y ordenador (Chrome, Edge):</b> pulsa el botón de aquí abajo. Si no aparece, es que tu navegador ya la ofrece en su menú («Instalar app» o «Añadir a la pantalla de inicio»).</p>
+          <p><b>iPhone y iPad (Safari):</b> abre la app, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>. iOS no permite que la web lance la instalación sola.</p>
+          <p class="help-install-row" id="help-install" hidden>
+            <button type="button" class="settings-action is-primary" id="help-install-button">Instalar la app</button>
+            <span class="wizard-hint">Se abre a pantalla completa y funciona sin conexión.</span>
+          </p>
+          <p id="help-install-state">Si ya la tienes instalada, este botón no aparece.</p>
+          <p>Lo que guardes se queda en el navegador donde la uses. Instalada y en el navegador comparten los datos <b>si entras por la misma dirección</b>; si un día abres el fichero guardado en el móvil, ese es otro dispositivo.</p>
+          <p>Sin conexión verás el programa que se descargó la última vez. Si el festival cambia un pase, entra con red para actualizarla; la app avisa cuando hay una versión nueva.</p>
         </details>
 
         <details class="help-block help-fold" id="help-accesibilidad">
@@ -532,6 +546,25 @@
     window.addEventListener("beforeinstallprompt", syncInstallBox);
     window.addEventListener("appinstalled", () => { installPrompt = null; syncInstallBox(); });
     window.addEventListener("load", syncInstallBox);
+    // El mismo aviso sirve en el asistente y en la ayuda.
+    const helpInstall = document.querySelector("#help-install");
+    const helpInstallButton = document.querySelector("#help-install-button");
+    const helpInstallState = document.querySelector("#help-install-state");
+    const syncHelpInstall = () => {
+      helpInstall.hidden = !installPrompt;
+      helpInstallState.hidden = Boolean(installPrompt);
+    };
+    window.addEventListener("beforeinstallprompt", syncHelpInstall);
+    window.addEventListener("appinstalled", syncHelpInstall);
+    window.addEventListener("load", syncHelpInstall);
+    helpInstallButton.addEventListener("click", async () => {
+      if (!installPrompt) return;
+      installPrompt.prompt();
+      await installPrompt.userChoice.catch(() => {});
+      installPrompt = null;
+      syncInstallBox();
+      syncHelpInstall();
+    });
     installButton.addEventListener("click", async () => {
       if (!installPrompt) return;
       installPrompt.prompt();
