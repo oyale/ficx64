@@ -2613,11 +2613,16 @@
       .filter((name) => typeof name === "string" && name.trim() && name.length <= 40);
     return names.length ? names[Math.floor(Math.random() * names.length)] : "Tu nombre o apodo";
   }
-  function askAlias() {
+  function askAlias(kind = "itinerary") {
     const dialog = document.querySelector("#alias-dialog");
     const input = document.querySelector("#alias-input");
     const counter = document.querySelector("#alias-counter");
     if (!dialog || !input) return Promise.resolve("");
+    const isItinerary = kind === "itinerary";
+    document.querySelector("#alias-intro").textContent = isItinerary
+      ? "Es opcional: aparecerá como «El itinerario de …» al abrir el enlace."
+      : "Es opcional: aparecerá en la cabecera del enlace de tus listas.";
+    document.querySelector("#alias-privacy-note").hidden = !isItinerary;
     // Con nombre guardado, el enlace sale ya firmado: basta confirmar.
     userAlias = readAlias();
     input.value = userAlias;
@@ -2653,7 +2658,7 @@
       return;
     }
     // El alias es opcional: se usa para saludar en la pantalla de recepción.
-    const answer = await askAlias();
+    const answer = await askAlias("itinerary");
     if (answer === null) return;
     if (answer.trim()) { userAlias = answer.trim().slice(0, 40); persistAlias(userAlias); }
     const fragment = await encodePassLink(candidateIds, answer);
@@ -3453,7 +3458,7 @@
       button.textContent = "Comparte cuando tengas alguna en tus listas";
       return;
     }
-    const answer = await askAlias();
+    const answer = await askAlias("lists");
     if (answer === null) return;
     if (answer.trim()) { userAlias = answer.trim().slice(0, 40); persistAlias(userAlias); }
     const fragment = await encodeListLink(entries, answer);
