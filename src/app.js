@@ -1602,7 +1602,32 @@
     syncFilterToggles();
     renderFilms();
   });
-  clearSaved.addEventListener("click", () => { intentions.clear(); prioritized.clear(); persist(); persistPrioritized(); renderSaved(); });
+  function resetClearSavedConfirmation() {
+    clearTimeout(clearSaved._confirmTimer);
+    clearSaved.classList.remove("is-confirming");
+    clearSaved.textContent = "Vaciar ambas";
+    clearSaved.removeAttribute("title");
+    clearSaved.removeAttribute("aria-label");
+  }
+  function clearSavedLists() {
+    if (!clearSaved.classList.contains("is-confirming")) {
+      clearSaved.classList.add("is-confirming");
+      clearSaved.textContent = "¿Vaciar ambas?";
+      clearSaved.title = "Pulsa otra vez para confirmar";
+      clearSaved.setAttribute("aria-label", "Confirmar: vaciar ambas listas");
+      clearSaved._confirmTimer = setTimeout(resetClearSavedConfirmation, 2600);
+      return;
+    }
+    resetClearSavedConfirmation();
+    intentions.clear();
+    prioritized.clear();
+    persist(); persistPrioritized(); renderSaved();
+  }
+  clearSaved.addEventListener("click", clearSavedLists);
+  clearSaved.addEventListener("blur", resetClearSavedConfirmation);
+  clearSaved.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") resetClearSavedConfirmation();
+  });
   document.querySelector("#extras-toggle").addEventListener("click", (event) => {
     const panel = document.querySelector("#extras-panel");
     panel.hidden = !panel.hidden;
@@ -1908,12 +1933,17 @@
       switchScreen(tab.dataset.mobileTab === "program" ? "program" : "explore", { scrollTop: false });
       activeMobileTab = tab.dataset.mobileTab;
       updateMobileTabState();
-      const target = document.querySelector(`#${targetId}`);
+      const picksPanel = document.querySelector(".program-picks-panel");
+      const hasWantedPending = picksPanel.classList.contains("has-pending")
+        && !picksPanel.classList.contains("only-quizas");
+      const showPendingChoices = tab.dataset.mobileTab === "program" && hasWantedPending;
+      const target = showPendingChoices ? picksPanel : document.querySelector(`#${targetId}`);
+      if (showPendingChoices) document.querySelector("#program-picks-fold").open = true;
       if (!target) return;
       const jump = () => {
         let top = 0;
         for (let node = target; node; node = node.offsetParent) top += node.offsetTop;
-        window.scrollTo({ top: Math.max(0, top - 76), behavior: "smooth" });
+        window.scrollTo({ top: Math.max(0, top - 76), behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
       };
       window.scrollTo({ top: 0, behavior: "instant" });
       requestAnimationFrame(() => requestAnimationFrame(jump));
