@@ -139,6 +139,7 @@
               <button type="button" class="settings-action is-primary" id="wizard-install-button">Instalar la app</button>
               <span class="wizard-hint" id="wizard-install-hint">Se abre a pantalla completa y funciona sin conexión.</span>
             </p>
+            <p class="wizard-installed" id="wizard-installed" hidden>🎉 <b>Ya la tienes instalada.</b> Ábrela desde su icono: entra directa, a pantalla completa, y funciona sin conexión.</p>
             <ol class="wizard-cycle">
               <li><span class="wizard-cycle-step">1</span><span><b>Elige películas.</b> Lo que quieres ver, lo que estás dudando y lo que descartas.</span></li>
               <li><span class="wizard-cycle-step">2</span><span><b>Búscalas por sitio y hora.</b> «Buscar pases» filtra por día, franja y sede.</span></li>
@@ -364,7 +365,7 @@
           <p class="help-intro">Tu programa personal del festival, sin cuenta y sin servidor: todo queda en este navegador.</p>
         </header>
         <nav class="help-toc" aria-label="Índice de la ayuda">
-          <a href="#help-uso">Uso</a><a href="#help-mecanicas">Mecánicas</a><a href="#help-tiempos">Tiempos</a><a href="#help-datos">Datos</a><a href="#help-instalar">Instalar</a><a href="#help-accesibilidad">Accesibilidad</a><a href="#help-privacidad">Privacidad</a>
+          <a href="#help-uso">Uso</a><a href="#help-mecanicas">Mecánicas</a><a href="#help-tiempos">Tiempos</a><a href="#help-datos">Datos</a><a href="#help-accesibilidad">Accesibilidad</a><a href="#help-privacidad">Privacidad</a>
         </nav>
 
         <article class="help-block" id="help-uso">
@@ -378,6 +379,14 @@
             <li><b>Calendario</b> (.ics) y <b>enlace para compartir</b> tu itinerario.</li>
           </ul>
           <div class="help-replay"><p class="eyebrow">INTRODUCCIÓN</p><p>La primera vez se muestra un asistente de cinco pasos que configura la app y enseña a usarla.</p><button type="button" class="settings-action" id="replay-wizard">Volver a ver la introducción</button></div>
+          <div class="help-replay" id="help-instalar">
+            <p class="eyebrow">INSTALARLA COMO APLICACIÓN</p>
+            <p>Se instala como una app más: icono propio, pantalla completa y <b>funciona sin conexión</b>.</p>
+            <p id="help-install-fallback"><b>Android y ordenador:</b> pulsa el botón. <b>iPhone y iPad:</b> abre la app, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>.</p>
+            <p class="help-install-ready" id="help-install-state" hidden><b>Se puede instalar en este dispositivo.</b></p>
+            <button type="button" class="settings-action is-primary" id="help-install-button" hidden>Instalar la app</button>
+            <p>Lo que guardes vive en este navegador. Instalada y en el navegador comparten los datos si entras por la misma dirección; el fichero guardado en el móvil es otro dispositivo. Sin conexión verás el programa de la última vez, y la app avisa cuando hay una versión nueva.</p>
+          </div>
         </article>
 
         <article class="help-block">
@@ -425,20 +434,6 @@
           <summary>De dónde sale todo</summary>
           <p>El programa y los pases siguen la información publicada por el festival: la web <b>ficx.tv</b> y el <b>catálogo impreso</b> (PDF). Los datos pueden cambiar; lo que vale siempre es el programa oficial.</p>
           <p>Las imágenes de las películas son opcionales (se activan en Ajustes): al abrir una ficha se pide su imagen a la web del festival. Sin esa opción la app no hace peticiones, salvo cuando pulsas un enlace externo o «Google Calendar».</p>
-        </details>
-
-        <details class="help-block help-fold" id="help-instalar">
-          <summary>Instalarla como aplicación</summary>
-          <p>Se puede instalar como una app más: icono propio, se abre a pantalla completa y <b>funciona sin conexión</b>.</p>
-          <p><b>Android y ordenador (Chrome, Edge):</b> pulsa el botón de aquí abajo. Si no aparece, es que tu navegador ya la ofrece en su menú («Instalar app» o «Añadir a la pantalla de inicio»).</p>
-          <p><b>iPhone y iPad (Safari):</b> abre la app, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>. iOS no permite que la web lance la instalación sola.</p>
-          <p class="help-install-row" id="help-install" hidden>
-            <button type="button" class="settings-action is-primary" id="help-install-button">Instalar la app</button>
-            <span class="wizard-hint">Se abre a pantalla completa y funciona sin conexión.</span>
-          </p>
-          <p id="help-install-state">Si ya la tienes instalada, este botón no aparece.</p>
-          <p>Lo que guardes se queda en el navegador donde la uses. Instalada y en el navegador comparten los datos <b>si entras por la misma dirección</b>; si un día abres el fichero guardado en el móvil, ese es otro dispositivo.</p>
-          <p>Sin conexión verás el programa que se descargó la última vez. Si el festival cambia un pase, entra con red para actualizarla; la app avisa cuando hay una versión nueva.</p>
         </details>
 
         <details class="help-block help-fold" id="help-accesibilidad">
@@ -542,17 +537,33 @@
     });
     const installBox = document.querySelector("#wizard-install");
     const installButton = document.querySelector("#wizard-install-button");
-    const syncInstallBox = () => { installBox.hidden = !installPrompt; };
+    const installedNote = document.querySelector("#wizard-installed");
+    // Instalada se nota de dos formas: se abrió desde el icono (modo app) o el navegador la
+    // tiene ya instalada. iOS no expone ninguna de las dos de forma fiable, así que no lo afirma.
+    const isInstalled = () => window.matchMedia("(display-mode: standalone)").matches
+      || window.matchMedia("(display-mode: minimal-ui)").matches
+      || Boolean(navigator.standalone)
+      || Boolean(navigator.getInstalledRelatedApps && navigator.getInstalledRelatedApps !== undefined
+        && window.__ficxRelatedApp);
+    const syncInstallBox = () => {
+      const installed = isInstalled();
+      installBox.hidden = installed || !installPrompt;
+      installedNote.hidden = !installed;
+    };
+    if (navigator.getInstalledRelatedApps) {
+      navigator.getInstalledRelatedApps().then((apps) => { window.__ficxRelatedApp = (apps || []).length > 0; syncInstallBox(); }).catch(() => {});
+    }
     window.addEventListener("beforeinstallprompt", syncInstallBox);
     window.addEventListener("appinstalled", () => { installPrompt = null; syncInstallBox(); });
     window.addEventListener("load", syncInstallBox);
     // El mismo aviso sirve en el asistente y en la ayuda.
-    const helpInstall = document.querySelector("#help-install");
     const helpInstallButton = document.querySelector("#help-install-button");
     const helpInstallState = document.querySelector("#help-install-state");
+    const helpInstallFallback = document.querySelector("#help-install-fallback");
     const syncHelpInstall = () => {
-      helpInstall.hidden = !installPrompt;
-      helpInstallState.hidden = Boolean(installPrompt);
+      helpInstallButton.hidden = !installPrompt;
+      helpInstallState.hidden = !installPrompt;
+      helpInstallFallback.hidden = Boolean(installPrompt);
     };
     window.addEventListener("beforeinstallprompt", syncHelpInstall);
     window.addEventListener("appinstalled", syncHelpInstall);
