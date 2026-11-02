@@ -11,6 +11,7 @@ import hashlib
 import argparse
 import json
 from pathlib import Path
+from urllib.parse import urljoin, urlsplit
 
 ROOT = Path(__file__).resolve().parent
 SOURCE = ROOT / "src"
@@ -52,7 +53,14 @@ def compact(value) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument("--site-url", help="URL base del despliegue alternativo (por ejemplo GitHub Pages)")
     args = parser.parse_args()
+    site_url = args.site_url
+    if site_url:
+        parsed = urlsplit(site_url)
+        if parsed.scheme != "https" or not parsed.netloc or parsed.query or parsed.fragment:
+            parser.error("--site-url debe ser una URL HTTPS sin parámetros ni fragmentos")
+        site_url = site_url.rstrip("/") + "/"
 
     films = load("films").get("films", [])
     screenings = load("screenings").get("screenings", [])
@@ -92,17 +100,25 @@ def main() -> None:
             '<!doctype html><html lang="es"><meta charset="utf-8">'
             '<title>FICX 64</title><script>'
             'location.replace("./" + location.search + location.hash);'
-            '</script><p>La app está en <a href="./">ficx.situacion.es</a>.</p></html>',
+            '</script><p>La app está en <a href="./">la página principal</a>.</p></html>',
             encoding="utf-8")
 
     # Piezas que la instalación necesita fuera del HTML: manifest, iconos y service worker.
     import shutil
-    shutil.copyfile(ROOT / "manifest.webmanifest", out.parent / "manifest.webmanifest")
+    manifest_bytes = (ROOT / "manifest.webmanifest").read_bytes()
+    manifest = json.loads(manifest_bytes)
+    if site_url:
+        manifest["id"] = site_url
+        manifest["related_applications"] = [{
+            "platform": "webapp", "url": urljoin(site_url, "manifest.webmanifest"), "id": site_url,
+        }]
+        manifest_bytes = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    (out.parent / "manifest.webmanifest").write_bytes(manifest_bytes)
     worker = (SOURCE / "sw.js").read_text(encoding="utf-8")
     digest = hashlib.sha256()
     for name, content in [("index.html", html.encode("utf-8")),
                           ("sw.js", worker.encode("utf-8")),
-                          ("manifest.webmanifest", (ROOT / "manifest.webmanifest").read_bytes())] + [
+                          ("manifest.webmanifest", manifest_bytes)] + [
                               (f"icons/{icon.name}", icon.read_bytes())
                               for icon in sorted((ROOT / "icons").glob("*.png"))]:
         digest.update(name.encode("utf-8") + b"\0" + content + b"\0")
