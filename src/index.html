@@ -383,18 +383,19 @@
           </ul>
           <div class="help-replay"><p class="eyebrow">INTRODUCCIÓN</p><p>La primera vez se muestra un asistente de cinco pasos que configura la app y enseña a usarla.</p><button type="button" class="settings-action" id="replay-wizard">Volver a ver la introducción</button></div>
           <div class="help-replay" id="help-instalar">
-            <p class="eyebrow">INSTALARLA COMO APLICACIÓN</p>
-            <p>Se instala como una app más: icono propio, pantalla completa y <b>funciona sin conexión</b>.</p>
-            <p id="help-install-ios" hidden>En iPhone y iPad: abre la app en Safari, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>. iOS no deja que la web lance la instalación sola.</p>
-            <p id="help-install-other" hidden>Si tu navegador ofrece instalar la app, usa la opción de su menú («Instalar app»). También puedes probar con Chrome.</p>
-            <p class="help-install-ready" id="help-installed" role="status" hidden>La app está instalada. Puedes abrirla desde su icono.</p>
-            <p class="help-install-ready" id="help-install-state" hidden><b>Se puede instalar en este dispositivo.</b></p>
+            <h3 id="help-install-title">Instalar la app</h3>
+            <p id="help-installed" class="help-installed" role="status" hidden><strong>Ya la tienes instalada.</strong><span>Puedes abrirla desde su icono y consultar el programa sin conexión.</span></p>
+            <p id="help-install-intro">Tenla a mano con un icono propio y consulta el programa sin conexión, también cuando estés entre salas.</p>
+            <p id="help-install-ios" hidden>Para instalarla en iPhone o iPad, abre esta página en Safari, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>.</p>
+            <p id="help-install-other" hidden>Busca «Instalar app» o «Añadir a pantalla de inicio» en el menú con el que abriste esta página. Si no aparece, prueba a abrirla en Chrome o Safari, según tu dispositivo.</p>
+            <p class="help-install-ready" id="help-install-state" hidden>Puedes instalarla desde aquí.</p>
             <button type="button" class="settings-action is-primary" id="help-install-button" hidden>Instalar la app</button>
-            <p>Lo que guardes vive en este navegador. Instalada y en el navegador comparten los datos si entras por la misma dirección; el fichero guardado en el móvil es otro dispositivo. Sin conexión verás el programa de la última vez, y la app avisa cuando hay una versión nueva.</p>
-            <p id="help-local-app" hidden><b>Estás usando la versión en archivo HTML.</b> No se actualiza automáticamente. Tus elecciones se guardan en este navegador. Para llevarlas a otra copia o dispositivo, exporta tu programa desde Ajustes.</p>
+            <p id="help-app-updates">Con conexión, la app busca novedades y te avisa cuando hay una actualización lista. Sin conexión puedes consultar la última versión guardada.</p>
+            <p id="help-local-app" hidden><b>Estás usando la versión en archivo HTML.</b> Esta copia no se actualiza automáticamente. Puedes descargar otra cuando quieras renovar el catálogo.</p>
+            <p>Tus listas y tu parrilla se guardan aquí, sin cuenta ni sincronización automática. Para conservar una copia o llevarlas a otro dispositivo, usa <b>Exportar tu programa</b> en Ajustes. Hazlo también antes de borrar los datos de la app.</p>
             <div id="help-download-app">
               <a class="help-download-app" href="./index.html" download="ficx64.html">Descargar la app en un archivo HTML ↗</a>
-              <p>Para abrirla sin conexión sin instalarla. No incluye tus listas personales ni se actualiza automáticamente. Para llevarte tus elecciones, exporta tu programa desde Ajustes.</p>
+              <p id="help-download-description">Otra forma de usarla sin conexión, sin instalarla. El archivo incluye el catálogo, pero no tus listas ni tu parrilla, y no se actualiza automáticamente. Tus elecciones se exportan por separado desde Ajustes.</p>
             </div>
           </div>
         </article>
@@ -587,7 +588,14 @@
       || minimalDisplay.matches || Boolean(navigator.standalone);
     function syncInstallation() {
       const installed = isInstalled();
-      const available = !installed && Boolean(installPrompt);
+      const available = !usingLocalFile && !installed && Boolean(installPrompt);
+      document.querySelector("#help-install-title").textContent = usingLocalFile
+        ? "La app en un archivo" : installed ? "La app en tu dispositivo" : "Instalar la app";
+      document.querySelector("#help-install-intro").hidden = installed || usingLocalFile;
+      document.querySelector("#help-app-updates").hidden = usingLocalFile;
+      document.querySelector("#help-download-description").textContent = installed
+        ? "Puedes descargar una copia independiente de la app. No incluye tus listas ni tu parrilla y no recibe actualizaciones. Para guardar tus elecciones, usa Exportar tu programa en Ajustes."
+        : "Otra forma de usarla sin conexión, sin instalarla. El archivo incluye el catálogo, pero no tus listas ni tu parrilla, y no se actualiza automáticamente. Tus elecciones se exportan por separado desde Ajustes.";
       installBox.hidden = !available;
       installButton.disabled = !available;
       installedNote.hidden = !installed;
@@ -595,9 +603,9 @@
       helpInstallButton.disabled = !available;
       document.querySelector("#help-install-state").hidden = !available;
       document.querySelector("#help-installed").hidden = !installed;
-      document.querySelector("#help-install-ios").hidden = installed || available || !isIosDevice;
-      document.querySelector("#wizard-install-ios").hidden = installed || available || !isIosDevice;
-      document.querySelector("#help-install-other").hidden = installed || available || isIosDevice;
+      document.querySelector("#help-install-ios").hidden = usingLocalFile || installed || available || !isIosDevice;
+      document.querySelector("#wizard-install-ios").hidden = usingLocalFile || installed || available || !isIosDevice;
+      document.querySelector("#help-install-other").hidden = usingLocalFile || installed || available || isIosDevice;
     }
     window.addEventListener("beforeinstallprompt", (event) => {
       event.preventDefault();

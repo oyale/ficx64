@@ -1985,3 +1985,9 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .help-download-app { display: inline-flex; align-items: center; min-height: 44px; color: var(--blue); font-size: 13px; font-weight: 700; text-underline-offset: 3px; }
 .help-download-app:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 #help-download-app { border-top: 1px solid var(--line); padding-top: 10px; }
+
+/* Estado instalado: la confirmación precede a las instrucciones y al respaldo. */
+#help-instalar > h3 { margin: 0; }
+#help-instalar .help-installed { display: grid; gap: 5px; width: 100%; margin: 0; padding: 14px 16px; background: var(--ok-pale); color: var(--text-body); }
+.help-installed strong { color: var(--ok); font-size: 18px; line-height: 1.25; }
+.help-installed span { font-size: 13px; line-height: 1.5; }
