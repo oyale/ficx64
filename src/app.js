@@ -911,7 +911,7 @@
   // Shared markup for the compact film row, so Mi lista and Quizás never drift.
   function filmPickSummary({ film, duration, passText, detailsLine, badgeText, badgeClass, removeButton }) {
     const star = filmStar(film);
-    return `<summary><span class="program-film-title"><span class="program-film-name">${star}${escapeHtml(film.title)}</span><small>${escapeHtml(directorText(film))}${duration}<span class="program-film-passes"> · ${passText}</span></small>${detailsLine}</span><b class="program-film-fit ${badgeClass}">${escapeHtml(badgeText)}</b>${removeButton}</summary>`;
+    return `<summary><span class="program-film-title"><span class="program-film-name">${star}<button type="button" class="program-film-open" data-program-action="open-picker-film" data-film-id="${escapeHtml(film.id)}">${escapeHtml(film.title)}</button></span><small>${escapeHtml(directorText(film))}${duration}<span class="program-film-passes"> · ${passText}</span></small>${detailsLine}</span><b class="program-film-fit ${badgeClass}">${escapeHtml(badgeText)}</b>${removeButton}</summary>`;
   }
   function renderWantedFilmPick(film, events) {
     const selectedId = plannedScreenings.get(film.id) || events.find((screening) => screening.filmIds.includes(film.id))?.candidateId;
@@ -1065,20 +1065,23 @@
     }
     const options = screeningRecords.filter((screening) => screening.filmIds.includes(film.id)
       && (screening.accessType === "public" || includeSpecialInProgram));
+    const foldSuggestion = (content, badgeText, badgeClass = "", detailsLine = "") =>
+      `<details class="program-film-pick program-maybe-pick">${filmPickSummary({
+        film, duration: film.durationMinutes ? ` · ${film.durationMinutes} min` : "",
+        passText: `${options.length} ${options.length === 1 ? "pase" : "pases"}`,
+        detailsLine, badgeText, badgeClass, removeButton: maybeRemove,
+      })}<div class="program-film-options">${content}</div></details>`;
     const evaluated = options.map((screening) => ({ screening, fit: evaluatePlanChoice(screening, film.id, events) }))
       .map((item) => ({ ...item, conflicts: item.fit.conflicts, uncertain: item.fit.uncertain }));
     const recommendation = evaluated.filter((item) => !item.conflicts.length)
       .sort((a, b) => Number(a.uncertain) - Number(b.uncertain) || `${a.screening.date}T${a.screening.time}`.localeCompare(`${b.screening.date}T${b.screening.time}`))[0];
-    const suggestion = recommendation
-      ? `<p class="suggestion-meta"><time datetime="${escapeHtml(recommendation.screening.date)}T${escapeHtml(recommendation.screening.time)}">${escapeHtml(formatProgramDate(recommendation.screening.date, { weekday: "short", day: "numeric", month: "short" }))} · ${escapeHtml(recommendation.screening.time)}</time><span>${escapeHtml(recommendation.screening.venue)}${recommendation.screening.room ? ` · ${escapeHtml(recommendation.screening.room)}` : ""}</span></p>`
-      : "";
     if (!recommendation) {
       const hasAny = options.length > 0;
       const hasSpecial = screeningRecords.some((screening) => screening.filmIds.includes(film.id) && screening.accessType !== "public");
       const message = hasAny ? "Sus pases chocan con la parrilla actual." : hasSpecial && !includeSpecialInProgram ? "Solo se proyecta en pases escolares o de prensa." : "Aún no hay pases enlazados a esta película.";
       if (!hasAny) {
         const enableSpecial = `<button type="button" class="program-empty-action" data-program-action="enable-special">Mostrar esos pases</button>`;
-        return `<article class="program-maybe-pick"><div class="program-maybe-heading"><h3>${escapeHtml(film.title)}</h3>${maybeRemove}</div><p class="program-empty-note">${message}</p>${hasSpecial && !includeSpecialInProgram ? enableSpecial : ""}</article>`;
+        return foldSuggestion(`<p class="program-empty-note">${message}</p>${hasSpecial && !includeSpecialInProgram ? enableSpecial : ""}`, "Sin pases disponibles");
       }
       const blocked = [...evaluated].sort((a, b) => a.conflicts.length - b.conflicts.length || `${a.screening.date}T${a.screening.time}`.localeCompare(`${b.screening.date}T${b.screening.time}`))[0];
       const conflicts = [...new Map(blocked.conflicts.map((item) => [`${item.screening.candidateId}:${item.reason}`, item])).values()];
@@ -1087,10 +1090,10 @@
         const explanation = reason === "transfer" ? "No da tiempo al traslado con" : "Se solapa con";
         return `<li><b>${explanation}</b> ${escapeHtml(titles)} · ${escapeHtml(screening.time)} · ${escapeHtml(screening.venue)}${screening.room ? `, ${escapeHtml(screening.room)}` : ""}</li>`;
       }).join("");
-      return `<article class="program-maybe-pick has-blocked-options"><div class="program-maybe-heading"><p class="program-suggestion-fit">SIN PASE QUE ENCAJE</p>${maybeRemove}</div><h3>${escapeHtml(film.title)}</h3><p class="program-conflict-intro">${message} La alternativa más cercana es ${escapeHtml(formatProgramDate(blocked.screening.date, { weekday: "short", day: "numeric", month: "short" }))} a las ${escapeHtml(blocked.screening.time)}:</p><ul class="program-conflict-list">${blockers}</ul></article>`;
+      return foldSuggestion(`<p class="program-conflict-intro">${message} La alternativa más cercana es ${escapeHtml(formatProgramDate(blocked.screening.date, { weekday: "short", day: "numeric", month: "short" }))} a las ${escapeHtml(blocked.screening.time)}:</p><ul class="program-conflict-list">${blockers}</ul>`, "Sin pase que encaje", "is-conflict");
     }
     const uncertainNote = recommendation.uncertain ? `<p class="program-suggestion-caveat">Posible hueco: falta duración o distancia para confirmar el encaje.</p>` : "";
-    return `<article class="program-maybe-pick"><div class="program-maybe-heading"><p class="suggestion-kicker">${recommendation.uncertain ? "POSIBLE HUECO" : "ENCAJA CON TU PARRILLA"}</p>${maybeRemove}</div><h3>${escapeHtml(film.title)}</h3>${suggestion}${renderProgramChoice(recommendation.screening, film, "", events, true)}${uncertainNote}</article>`;
+    return foldSuggestion(`${renderProgramChoice(recommendation.screening, film, "", events, true)}${uncertainNote}`, recommendation.uncertain ? "Posible hueco" : "Encaja", recommendation.uncertain ? "is-uncertain" : "is-clear");
   }
   function renderProgram() {
     const allEvents = selectedPlanEvents();
@@ -1110,24 +1113,22 @@
     document.querySelector("#program-conflict-label").textContent = conflictPairs === 1 ? "conflicto" : "conflictos";
     document.querySelector("#program-unplanned-count").textContent = String(unplannedWanted.length);
     document.querySelector("#wanted-unplanned-count").textContent = String(unplannedWanted.length);
-  const picksPanel = document.querySelector(".program-picks-panel");
+    const picksPanel = document.querySelector(".program-picks-panel");
     const picksFold = document.querySelector("#program-picks-fold");
     const hasWantedPending = unplannedWanted.length > 0;
     const maybesPending = maybes.filter((film) => !coverage.has(film.id)).length;
     const hasPending = hasWantedPending || maybesPending > 0;
-    if (!picksPanel.dataset.autoSynced) {
-      picksFold.addEventListener("toggle", () => { picksFold.dataset.userOpen = String(picksFold.open); });
-      picksPanel.dataset.autoSynced = "1";
-    }
-    const userForced = picksFold.dataset.userOpen === "true";
-    // "pending" decides only the order; "only-quizas" and "all-fitted" also change
-    // the fold, so they are set once here and never flip on every render.
     picksPanel.classList.toggle("has-pending", hasPending);
     picksPanel.classList.toggle("only-quizas", hasPending && !hasWantedPending);
     picksPanel.classList.toggle("all-fitted", !hasPending);
     // Desktop keeps the column expanded; only the phone view folds it.
     const compactPicks = window.matchMedia("(max-width: 650px)").matches;
-    picksFold.open = compactPicks ? (hasWantedPending ? true : (userForced && hasPending)) : true;
+    const foldState = compactPicks ? (hasWantedPending ? "pending" : "complete") : "desktop";
+    // Solo al cambiar de situación: los repintados conservan el plegado manual.
+    if (picksFold.dataset.autoState !== foldState) {
+      picksFold.open = !compactPicks || hasWantedPending;
+      picksFold.dataset.autoState = foldState;
+    }
     updateMobileTabState();
     // The summary counts what is still open: films without a pass and quizás
     // films that still need a decision. It shrinks as passes are chosen.
@@ -1739,6 +1740,26 @@
     const button = event.target.closest("button[data-program-action]");
     if (!button) return;
     const { programAction, filmId, candidateId } = button.dataset;
+    if (programAction === "open-picker-film") {
+      event.preventDefault(); // Abrir la ficha no debe alternar el desplegable padre.
+      const film = filmById.get(filmId);
+      if (!film) return;
+      const source = button.closest(".program-film-picks");
+      filmNavigationIds = [...source.querySelectorAll('[data-program-action="open-picker-film"]')]
+        .map((item) => item.dataset.filmId);
+      programScrollY = window.scrollY;
+      returnToProgram = true;
+      returnToSessionSearch = false;
+      returnToShared = false;
+      activeSection = "";
+      search.value = "";
+      moreSections.value = "";
+      expandedId = film.id;
+      renderSectionPicker();
+      renderFilms();
+      switchScreen("explore", { scrollTop: false });
+      return;
+    }
     if (programAction === "explore-films") { switchScreen("explore"); return; }
     if (programAction === "calendar-event") {
       openCalendarMenu(button, candidateId);
@@ -2146,6 +2167,8 @@
   }
   function renderSharedScreen(candidateIds, alias = "") {
     sharedListsOnly = false;
+    document.querySelector("#screen-shared").classList.remove("is-list-reception");
+    for (const id of ["shared-list-filters", "shared-filter-empty", "shared-pending-summary", "shared-view-lists", "shared-keep-looking"]) document.getElementById(id).hidden = true;
     document.querySelector("#shared-eyebrow").textContent = "ITINERARIO COMPARTIDO";
     document.querySelector("#shared-dismiss").textContent = "Descartar este itinerario";
     candidateIds = candidateIds.filter(findScreening);
@@ -2237,12 +2260,14 @@
   }
   // ---- Pantalla de listas compartidas ----
   let sharedListFilms = [];
+  let sharedListFilter = "all";
+  const sharedRecovered = new Set();
   // Lo que decide cada persona: película → «want» o «maybe». La lista de origen solo propone.
   const sharedListChoices = new Map();
   function sharedListState(filmId) {
     const film = filmById.get(filmId);
     if (!film) return { disabled: true, reason: "" };
-    if (discarded.has(film.id)) return { disabled: true, reason: "La tienes descartada: se recupera desde «Descartadas»." };
+    if (discarded.has(film.id) && !sharedRecovered.has(film.id)) return { disabled: true, discarded: true, reason: "La tienes descartada." };
     const mine = intentions.get(film.id);
     if (mine === "want") return { disabled: true, reason: "🎉 Coincidimos: también la tienes en «Lo quiero ver».", match: "want" };
     if (mine === "maybe") return { disabled: false, reason: "🎉 Coincidimos: también la tienes en «Mmm… quizás».", listed: true, match: "maybe" };
@@ -2252,6 +2277,14 @@
     sharedListFilms = lists.filter((item) => filmById.has(item.filmId));
     sharedListChoices.clear();
     sharedListsOnly = true;
+    sharedAlias = alias;
+    sharedListFilter = "all";
+    sharedRecovered.clear();
+    document.querySelector("#screen-shared").classList.add("is-list-reception");
+    document.querySelector("#shared-list-filters").hidden = false;
+    document.querySelector("#shared-pending-summary").hidden = false;
+    document.querySelector("#shared-view-lists").hidden = true;
+    document.querySelector("#shared-keep-looking").hidden = true;
     if (!document.querySelector("#screen-shared").hidden) window.scrollTo(0, 0);
     document.querySelector("#shared-feedback").textContent = "";
     document.querySelector("#shared-explore").hidden = true;
@@ -2262,17 +2295,17 @@
     const maybe = sharedListFilms.length - wanted;
     const already = sharedListFilms.filter((item) => intentions.get(item.filmId) === "want").length;
     document.querySelector("#shared-eyebrow").textContent = "LISTAS COMPARTIDAS";
-    document.querySelector("#shared-dismiss").textContent = "Descartar estas listas";
+    document.querySelector("#shared-dismiss").textContent = "Cerrar sin guardar";
     document.querySelector("#shared-title").innerHTML = alias
       ? `Las listas de <span>${escapeHtml(alias)}.</span>`
       : `Te han compartido <span>sus listas.</span>`;
     const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
     const parts = [wanted ? plural(wanted, "película para ver", "películas para ver") : "", maybe ? plural(maybe, "quizás que quiere ver", "quizás que quiere ver") : ""].filter(Boolean);
-    document.querySelector("#shared-count").textContent = parts.join(" · ");
+    document.querySelector("#shared-count").textContent = `${sharedListFilms.length} películas · Coincidís en ${sharedListFilms.filter((item) => intentions.has(item.filmId)).length}`;
     document.querySelector("#shared-count").hidden = false;
     document.querySelector("#shared-summary").textContent = already === sharedListFilms.length && sharedListFilms.length
       ? "🎉 Las tienes todas: coincidís de pleno."
-      : "Cada película va con la lista que propone quien comparte. Cámbiala a tu gusto y añade.";
+      : "Elige qué quieres guardar. Tus listas se actualizarán al pulsar «Guardar selección». La estrella de prioridad se guarda al momento.";
     // Sin «marcar todas»: aquí se decide película a película, como en una tarjeta del catálogo.
     document.querySelector(".shared-tools").hidden = true;
     renderSharedFilmsOnly();
@@ -2281,7 +2314,15 @@
   }
   // Solo las tarjetas: la estrella cambia sin tocar cabecera, recuento ni posición.
   function renderSharedFilmsOnly() {
-    document.querySelector("#shared-list").innerHTML = sharedListFilms.map(({ filmId, status }) => {
+    const matchesFilter = ({ filmId }) => sharedListFilter === "all"
+      || (sharedListFilter === "matches" ? intentions.has(filmId) : !intentions.has(filmId));
+    const visible = sharedListFilms.filter(matchesFilter);
+    document.querySelector("#shared-filter-empty").hidden = visible.length > 0;
+    document.querySelector("#shared-list-filters").innerHTML = [["all", "Todas", sharedListFilms.length],
+      ["new", "Por descubrir", sharedListFilms.filter(({filmId}) => !intentions.has(filmId)).length],
+      ["matches", "Coincidencias", sharedListFilms.filter(({filmId}) => intentions.has(filmId)).length]]
+      .map(([id, label, count]) => `<button type="button" class="text-button" data-shared-filter="${id}" aria-pressed="${sharedListFilter === id}">${label} · ${count}</button>`).join("");
+    document.querySelector("#shared-list").innerHTML = visible.map(({ filmId, status }) => {
       const film = filmById.get(filmId);
       const state = sharedListState(filmId);
       // La misma ficha que en el catálogo: título, dirección, año y duración, y sus etiquetas.
@@ -2290,7 +2331,7 @@
       const tags = (film.sections || []).filter((name) => !["otras secciones", "cortometrajes"].includes(String(name).toLocaleLowerCase("es")))
         .map((name) => `<span class="film-section">${escapeHtml(name)}</span>`).join("");
       const cicloTags = (film.ciclo || []).map((name) => `<span class="film-ciclo">${escapeHtml(name)}</span>`).join("");
-      const suggested = status === "want" ? "verla" : "quizás";
+      const suggested = status === "want" ? "quiere verla" : "quizás";
       // La coincidencia se celebra junto al título; el motivo de bloqueo, debajo de la ficha.
       const match = state.match
         ? `<span class="shared-match" title="${escapeHtml(state.reason)}">${state.match === "want" ? "✓ En tu lista" : "★ Ya en quizás"}</span>`
@@ -2302,13 +2343,14 @@
             <p class="film-credit">${escapeHtml(credits) || "Sin datos de dirección"}</p>${facts ? `<p class="film-facts">${facts}</p>` : ""}${tags}${cicloTags}
             ${state.disabled && state.reason ? `<p class="shared-blocked">${escapeHtml(state.reason)}</p>` : ""}
           </div>
-          <div class="film-actions" role="group" aria-label="Añadir ${escapeHtml(film.title)} a una lista"><p class="shared-suggest">Propone <b>${suggested}</b></p>${suggestions(filmId, film, state)}</div>
+          <div class="film-actions" role="group" aria-label="Añadir ${escapeHtml(film.title)} a una lista"><p class="shared-suggest">${escapeHtml(sharedAlias || "Quien comparte")}: <b>${suggested}</b></p>${suggestions(filmId, film, state)}</div>
         </div>
       </li>`;
     }).join("");
   }
   // Mismos dos botones que en la tarjeta del catálogo, con la propuesta marcada hasta que se toca.
   function suggestions(filmId, film, state) {
+    if (state.discarded) return `<button type="button" class="text-button" data-shared-recover="${escapeHtml(filmId)}">Recuperar y seleccionar</button>`;
     if (state.disabled) return "";
     // Mismo marcado que la tarjeta: si ya está en una lista, el botón sale marcado al abrir; al
     // tocar, manda lo elegido en esta pantalla (incluido desmarcarlo).
@@ -2328,23 +2370,43 @@
     const changes = new Map();
     for (const [filmId, status] of sharedListChoices) {
       const mine = intentions.get(filmId) || null;
-      if (status && status !== mine) changes.set(filmId, status);
+      if (status !== mine) changes.set(filmId, status);
     }
     return changes;
   }
   function syncSharedListCount() {
+    if (!sharedListsOnly) return;
     const button = document.querySelector("#shared-add");
     if (!button) return;
     const count = sharedListChanges().size;
-    button.textContent = count
-      ? `Añadir ${count} ${count === 1 ? "película" : "películas"} a mis listas`
-      : "Elige qué añadir";
+    button.textContent = "Guardar selección";
+    const changes = [...sharedListChanges().values()];
+    document.querySelector("#shared-pending-summary").textContent = count
+      ? `${changes.filter((status) => status === "want").length} para ver · ${changes.filter((status) => status === "maybe").length} quizás · ${changes.filter((status) => status === null).length} para quitar`
+      : "Sin cambios pendientes";
+    for (const row of document.querySelectorAll("[data-shared-row]")) {
+      const pending = sharedListChanges().has(row.dataset.sharedRow);
+      row.classList.toggle("is-pending", pending);
+      let note = row.querySelector(".shared-pending-note");
+      if (!note) { note = document.createElement("p"); note.className = "shared-pending-note"; row.querySelector(".film-copy").append(note); }
+      note.hidden = !pending;
+      note.textContent = sharedListChanges().get(row.dataset.sharedRow) === null
+        ? "Se quitará de tus listas al guardar" : "Seleccionada · pendiente de guardar";
+    }
     button.disabled = count === 0;
   }
   function addSharedFilms() {
     let added = 0;
     for (const [filmId, status] of sharedListChanges()) {
-      if (!filmById.has(filmId) || discarded.has(filmId)) continue;
+      if (!filmById.has(filmId) || (discarded.has(filmId) && !sharedRecovered.has(filmId))) continue;
+      if (status === null) {
+        intentions.delete(filmId);
+        plannedScreenings.delete(filmId);
+        prioritized.delete(filmId);
+        added += 1;
+        continue;
+      }
+      discarded.delete(filmId);
       intentions.set(filmId, status === "maybe" ? "maybe" : "want");
       const entry = sharedListFilms.find((item) => item.filmId === filmId);
       if (entry?.prioritized) prioritized.add(filmId);
@@ -2352,7 +2414,7 @@
     }
     if (!added) return 0;
     sharedListChoices.clear();
-    persist(); persistPrioritized(); renderSaved(); countVisibleFilms();
+    persist(); persistPlannedScreenings(); persistDiscarded(); persistPrioritized(); renderSaved(); countVisibleFilms(); renderFilms();
     return added;
   }
   // Quitar un pase puede desbloquear uno compartido: repintar conservando lo marcado.
@@ -3233,8 +3295,9 @@
     if (!film) return;
     sharedScrollY = window.scrollY;
     returnToShared = true;
+    // Captura la lista visible y su orden al abrir, incluidos los filtros activos.
     filmNavigationIds = sharedListsOnly
-      ? sharedListFilms.map((item) => item.filmId)
+      ? [...document.querySelectorAll("#shared-list [data-shared-row]")].map((row) => row.dataset.sharedRow)
       : [...new Set(sharedPasses.flatMap((id) => findScreening(id)?.filmIds || []))];
     activeSection = "";
     search.value = "";
@@ -3296,8 +3359,37 @@
     button.parentElement.outerHTML = suggestions(filmId, filmById.get(filmId), sharedListState(filmId));
     syncSharedListCount();
   });
+  document.querySelector("#shared-list-filters").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-shared-filter]");
+    if (!button) return;
+    sharedListFilter = button.dataset.sharedFilter;
+    renderSharedFilmsOnly(); syncSharedListCount();
+    document.querySelector(`[data-shared-filter="${sharedListFilter}"]`)?.focus();
+  });
+  document.querySelector("#shared-list").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-shared-recover]");
+    if (!button || !sharedListsOnly) return;
+    const id = button.dataset.sharedRecover;
+    sharedRecovered.add(id); sharedListChoices.set(id, "want");
+    renderSharedFilmsOnly(); syncSharedListCount();
+    document.querySelector(`[data-shared-row="${CSS.escape(id)}"] button[data-add-status]`)?.focus();
+  });
+  document.querySelector("#shared-view-lists").addEventListener("click", () => {
+    switchScreen("explore");
+    document.querySelector("#mi-programa").scrollIntoView({block: "start"});
+    if (window.matchMedia("(max-width: 650px)").matches) openSelectionSheet(true);
+  });
+  document.querySelector("#shared-keep-looking").addEventListener("click", () => {
+    document.querySelector("#shared-list-filters button")?.focus();
+    document.querySelector("#shared-list-filters").scrollIntoView({block: "center"});
+  });
   document.querySelector("#shared-add").addEventListener("click", () => {
     if (sharedListsOnly) {
+      const changes = [...sharedListChanges()];
+      const moved = changes.filter(([id, status]) => status && intentions.has(id)).length;
+      const removed = changes.filter(([, status]) => status === null).length;
+      const maybe = changes.filter(([, status]) => status === "maybe").length;
+      const wanted = changes.filter(([, status]) => status === "want").length;
       const added = addSharedFilms();
       if (!added) {
         renderSharedListScreen(sharedListFilms, sharedAlias);
@@ -3305,7 +3397,10 @@
         return;
       }
       renderSharedListScreen(sharedListFilms, sharedAlias);
-      document.querySelector("#shared-feedback").textContent = `Añadidas ${added} ${added === 1 ? "película" : "películas"} a tus listas.`;
+      document.querySelector("#shared-feedback").textContent = `Cambios guardados: ${wanted} para ver · ${maybe} quizás · ${removed} quitadas.${moved ? ` ${moved} cambiadas de lista.` : ""}`;
+      document.querySelector("#shared-view-lists").hidden = false;
+      document.querySelector("#shared-keep-looking").hidden = false;
+      document.querySelector("#shared-dismiss").textContent = "Cerrar";
       return;
     }
     const added = addSharedPasses();
