@@ -64,7 +64,7 @@ body { background: var(--white); color: var(--ink); font-family: var(--sans); fo
 /* Con el asistente abierto el fondo no se mueve: el único scroll que queda es el suyo, y solo
    aparece si la ventana es tan baja que no cabe (720 px o menos con el paso 2 completo). */
 html:has(.wizard[open]), html:has(.wizard[open]) body { overflow: hidden; }
-.wizard::before { position: absolute; z-index: 0; inset: 0 auto 0 0; width: 14px; content: ""; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16'%3E%3Crect y='0' width='14' height='4.5' fill='%2300c5b2'/%3E%3Crect y='10.5' width='14' height='5.5' fill='%2300c5b2'/%3E%3Crect x='0' y='4.5' width='3' height='6' fill='%2300c5b2'/%3E%3Crect x='11' y='4.5' width='3' height='6' fill='%2300c5b2'/%3E%3C/svg%3E") center top / 14px 16px repeat-y; }
+.wizard::before { position: absolute; z-index: 0; inset: 0 auto 0 0; width: 14px; content: ""; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16' preserveAspectRatio='none'%3E%3Cpath fill='%2300c5b2' fill-rule='evenodd' d='M0 0H14V16H0Z M3 4.5H11V10.5H3Z'/%3E%3C/svg%3E") center top / 14px 16px repeat-y; }
 .wizard-card { display: grid; gap: 14px; padding: 18px 18px 16px 30px; }
 .wizard-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
 .wizard-progress { display: inline-flex; align-items: center; gap: 7px; margin: 0; color: var(--text); font-size: 9px; font-weight: 900; letter-spacing: .14em; }
@@ -163,7 +163,7 @@ html:has(.wizard[open]), html:has(.wizard[open]) body { overflow: hidden; }
 .wizard-list kbd { padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface-raised); color: var(--text); font-size: 10px; }
 /* Tarjeta de práctica: la misma cenefa turquesa de las tarjetas de cine. */
 .wizard-film { position: relative; isolation: isolate; display: grid; gap: 8px; padding: 12px 12px 12px 26px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface-raised); }
-.wizard-film::before { position: absolute; z-index: -1; inset: 0 auto 0 0; width: 14px; border-radius: 3px 0 0 3px; content: ""; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16'%3E%3Crect y='0' width='14' height='4.5' fill='%2300c5b2'/%3E%3Crect y='10.5' width='14' height='5.5' fill='%2300c5b2'/%3E%3Crect x='0' y='4.5' width='3' height='6' fill='%2300c5b2'/%3E%3Crect x='11' y='4.5' width='3' height='6' fill='%2300c5b2'/%3E%3C/svg%3E") center top / 14px 16px repeat-y; }
+.wizard-film::before { position: absolute; z-index: -1; inset: 0 auto 0 0; width: 14px; border-radius: 3px 0 0 3px; content: ""; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16' preserveAspectRatio='none'%3E%3Cpath fill='%2300c5b2' fill-rule='evenodd' d='M0 0H14V16H0Z M3 4.5H11V10.5H3Z'/%3E%3C/svg%3E") center top / 14px 16px repeat-y; }
 .wizard-film > * { position: relative; z-index: 1; }
 .wizard-film .eyebrow { margin: 0; color: var(--text-muted); font-size: 8px; font-weight: 900; letter-spacing: .14em; }
 /* Como en «Mi lista»: título y, a su lado, la estrella de prioridad. */
@@ -395,7 +395,7 @@ h1, h2, h3, p { margin-top: 0; }
 .featured-sections { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .cinema-card { position: relative; isolation: isolate; }
 /* Cenefa de película a la izquierda, en el turquesa del festival. */
-#film-list .cinema-card:not(.is-expanded)::before { position: absolute; z-index: 0; inset: 0 auto 0 0; width: 14px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16'%3E%3Crect y='0' width='14' height='4.5' fill='%2300c5b2'/%3E%3Crect y='10.5' width='14' height='5.5' fill='%2300c5b2'/%3E%3Crect x='0' y='4.5' width='3' height='6' fill='%2300c5b2'/%3E%3Crect x='11' y='4.5' width='3' height='6' fill='%2300c5b2'/%3E%3C/svg%3E") center top / 14px 16px repeat-y; content: ""; pointer-events: none; }
+#film-list .cinema-card:not(.is-expanded)::before { position: absolute; z-index: 0; inset: 0 auto 0 0; width: 14px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16' preserveAspectRatio='none'%3E%3Cpath fill='%2300c5b2' fill-rule='evenodd' d='M0 0H14V16H0Z M3 4.5H11V10.5H3Z'/%3E%3C/svg%3E") center top / 14px 16px repeat-y; content: ""; pointer-events: none; }
 #film-list .cinema-card:not(.is-expanded) { padding-left: 20px; }
 #film-list .cinema-card:not(.is-expanded) > * { position: relative; z-index: 1; }
 .section-card { position: relative; min-height: 118px; display: flex; flex-direction: column; justify-content: space-between; gap: 4px; padding: 13px 14px; overflow: hidden; border: 1px solid transparent; border-radius: 4px; background: var(--blue-pale); color: var(--ink); text-align: left; isolation: isolate; transition: transform .18s, box-shadow .18s, border-color .18s; }
@@ -770,7 +770,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 /* En la pantalla de listas compartidas la tarjeta es la del catálogo, con su cenefa y su
    reparto de texto y botones. Solo se añade la línea de lo que propone quien comparte. */
 #shared-list .shared-film { display: grid; grid-template-columns: minmax(0, 1fr); padding: 10px 11px 10px 20px; border: 1px solid var(--line); border-radius: 0; background: var(--surface-raised); }
-#shared-list .shared-film::before { position: absolute; z-index: 0; inset: 0 auto 0 0; width: 14px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16'%3E%3Crect y='0' width='14' height='4.5' fill='%2300c5b2'/%3E%3Crect y='10.5' width='14' height='5.5' fill='%2300c5b2'/%3E%3Crect x='0' y='4.5' width='3' height='6' fill='%2300c5b2'/%3E%3Crect x='11' y='4.5' width='3' height='6' fill='%2300c5b2'/%3E%3C/svg%3E") center top / 14px 16px repeat-y; content: ""; pointer-events: none; }
+#shared-list .shared-film::before { position: absolute; z-index: 0; inset: 0 auto 0 0; width: 14px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16' preserveAspectRatio='none'%3E%3Cpath fill='%2300c5b2' fill-rule='evenodd' d='M0 0H14V16H0Z M3 4.5H11V10.5H3Z'/%3E%3C/svg%3E") center top / 14px 16px repeat-y; content: ""; pointer-events: none; }
 #shared-list .shared-film > * { position: relative; z-index: 1; }
 #shared-list .shared-pass-meta { display: none; }
 /* «Propone» va encima de la botonera: en escritorio, justo sobre la columna de acciones. */
@@ -1316,36 +1316,23 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .program-picks-fold > summary b { order: 3; color: var(--gray); font-size: 9px; font-weight: 600; letter-spacing: 0; text-transform: none; }
   .program-picks-fold[open] > section { padding-top: 6px; }
   .program-panel-heading h2 { font-size: 24px; }
-  /* The fold summary already says "Mi parrilla": drop the repeated eyebrow. */
+  /* El control de plegado ya identifica la sección. */
   .program-picks-panel .program-picks-fold > section > .program-panel-heading .eyebrow { display: none; }
   .program-picks-panel .program-maybe-section .program-panel-heading .eyebrow { display: block; }
   .program-event { grid-template-columns: 54px minmax(0, 1fr) repeat(3, 28px); gap: 6px; padding: 9px; }
   .program-event-time { font-size: 18px; }
   .program-remove-event { width: 28px; height: 28px; }
   .program-film-pick > summary { min-height: 62px; }
-  /* Shared mobile card style for Mi lista and Tus quizás, so both lists read
-     as the same kind of film card (only the accent changes). */
-  .program-maybe-pick.program-film-pick { padding: 14px 13px 14px 34px; }
+  /* Películas como filas; la cenefa se reserva para sus pases desplegados. */
   .program-film-picks:not(:empty) { display: grid; gap: 8px; }
-  /* One filmstrip edge per film card, identical in Mi lista and Quizás:
-     blue band with sprocket holes, square outer corners like the original. */
   .program-film-pick,
-  .program-maybe-pick { position: relative; border: 0; border-radius: 0; background: transparent; padding: 14px 13px 14px 34px; }
-  .program-film-pick > *,
-  .program-maybe-pick > * { position: relative; z-index: 1; }
-  .program-film-pick > summary { position: static; }
-  .program-film-pick::before,
-  .program-maybe-pick::before { position: absolute; z-index: 0; inset: 0 auto 0 0; width: 14px; border-radius: 0; content: ""; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16'%3E%3Crect y='0' width='14' height='4.5' fill='%2300c5b2'/%3E%3Crect y='10.5' width='14' height='5.5' fill='%2300c5b2'/%3E%3Crect x='0' y='4.5' width='3' height='6' fill='%2300c5b2'/%3E%3Crect x='11' y='4.5' width='3' height='6' fill='%2300c5b2'/%3E%3C/svg%3E") center top / 14px 16px repeat-y; }
-  .program-film-pick > summary::before,
-  .program-film-pick > summary::after { display: none; }
-  /* The pass cards inside an expanded film use the official turquoise edge,
-     so it reads as a nested level instead of a second blue strip. */
-  .program-film-pick .program-pass-option::before,
-  .program-film-pick .program-pass-option::after,
-  .program-maybe-pick .program-pass-option::before,
-  .program-maybe-pick .program-pass-option::after { background-color: var(--cyan); }
-  .program-film-pick .program-pass-option::before,
-  .program-maybe-pick .program-pass-option::before { background-image: none; }
+  .program-maybe-pick,
+  .program-maybe-pick.program-film-pick {
+    position: relative; border: 0; border-top: 1px solid var(--line);
+    border-radius: 0; background: transparent; padding: 14px 0;
+  }
+  .program-film-pick::before, .program-maybe-pick::before { display: none; }
+  .program-film-pick > summary::before { display: none; }
   .program-film-pick.is-expanded { background: #f6fbf8; }
   .program-maybe-pick + .program-maybe-pick { margin-top: 0; }
   .program-maybe-pick > summary { min-height: 0; padding: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; cursor: pointer; list-style: none; }
@@ -1885,10 +1872,10 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 
 /* Cenefa de película en las tarjetas de pase (Buscar pases) y de la parrilla: la misma
    que el listado, sin tocar su rejilla (se dibuja en el hueco del padding). */
-.finder-screening, .program-event { position: relative; }
-.finder-screening::before, .program-event::before { position: absolute; z-index: 0; inset: 0 auto 0 0; width: 14px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16'%3E%3Crect y='0' width='14' height='4.5' fill='%2300c5b2'/%3E%3Crect y='10.5' width='14' height='5.5' fill='%2300c5b2'/%3E%3Crect x='0' y='4.5' width='3' height='6' fill='%2300c5b2'/%3E%3Crect x='11' y='4.5' width='3' height='6' fill='%2300c5b2'/%3E%3C/svg%3E") center top / 14px 16px repeat-y; content: ""; pointer-events: none; }
-.finder-screening, .program-event { padding-left: 22px; }
-.finder-screening > *, .program-event > * { position: relative; z-index: 1; }
+.finder-screening, .program-event, .program-film-options .program-pass-option { position: relative; }
+.finder-screening::before, .program-event::before, .program-film-options .program-pass-option::before { display: block; position: absolute; z-index: 0; inset: 0 auto 0 0; width: 14px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16' preserveAspectRatio='none'%3E%3Cpath fill='%2300c5b2' fill-rule='evenodd' d='M0 0H14V16H0Z M3 4.5H11V10.5H3Z'/%3E%3C/svg%3E") center top / 14px 16px repeat-y; content: ""; pointer-events: none; }
+.finder-screening, .program-event, .program-film-options .program-pass-option { padding-left: 22px; }
+.finder-screening > *, .program-event > *, .program-film-options .program-pass-option > * { position: relative; z-index: 1; }
 
 /* Cerrar la ayuda: arriba a la derecha, como el resto de cabeceras de pantalla. */
 .help-close { position: absolute; top: 18px; right: 18px; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface-float); color: var(--text); cursor: pointer; }
@@ -1932,3 +1919,60 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .wizard-step { flex: 0 0 auto; }
   .wizard-foot { position: relative; z-index: 1; background: var(--surface-float); }
 }
+
+/* Recepción de listas: selección pendiente y guardado siempre al alcance. */
+.shared-list-filters { display: flex; flex-wrap: wrap; gap: 8px 18px; padding-block: 8px; border-bottom: 1px solid var(--line); }
+.shared-list-filters button { min-height: 44px; }
+.shared-list-filters [aria-pressed="true"] { color: var(--blue); text-decoration: underline; text-decoration-color: var(--cyan); text-decoration-thickness: 3px; text-underline-offset: 7px; }
+.is-list-reception .shared-actions { position: sticky; z-index: 5; bottom: calc(12px + env(safe-area-inset-bottom)); padding: 14px; border-top: 2px solid var(--cyan); background: var(--surface-float); box-shadow: 0 6px 20px var(--shadow); align-items: center; }
+#shared-pending-summary { flex: 1 1 100%; font-size: 13px; font-weight: 700; }
+.is-list-reception .shared-actions button { min-height: 44px; }
+#shared-list .shared-film.is-pending { border-color: var(--blue); }
+.shared-pending-note { color: var(--blue); font-size: 12px; font-weight: 700; }
+@media (max-width: 650px) { .is-list-reception .shared-actions { bottom: calc(64px + env(safe-area-inset-bottom)); } }
+
+/* Mi programa: encajar un número entero de fotogramas en cada cenefa. */
+#screen-program .program-event::before,
+#screen-program .program-film-pick::before,
+#screen-program .program-maybe-pick::before,
+#screen-program .program-film-options .program-pass-option::before {
+  background-repeat: no-repeat round;
+}
+
+/* Control de plegado explícito para elegir pases en móvil. */
+@media (max-width: 650px) {
+  .program-layout > .program-picks-panel { align-self: stretch; width: 100%; }
+  .program-picks-fold, .program-picks-fold > summary { width: 100%; min-width: 0; }
+  .program-picks-fold > summary {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 64px; gap: 5px 14px; padding: 12px 0;
+    border-top: 2px solid var(--cyan); border-bottom: 1px solid var(--line);
+    font-size: 15px; letter-spacing: 0; text-transform: none;
+  }
+  .program-picks-fold > summary::before { display: none; }
+  .program-picks-fold > summary > span { grid-column: 1; grid-row: 1; }
+  .program-picks-fold > summary b { grid-column: 1; grid-row: 2; font-size: 12px; line-height: 1.4; }
+  .program-picks-fold > summary::after {
+    content: "Plegar ↑"; grid-column: 2; grid-row: 1 / 3;
+    color: var(--blue); font-size: 12px; font-weight: 700;
+  }
+  .program-picks-fold:not([open]) > summary::after { content: "Desplegar ↓"; }
+  .program-picks-fold > summary:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+}
+
+/* Tus listas: plegado nativo discreto, con el recuento siempre visible. */
+.intention-lane > summary.lane-heading { min-height: 44px; cursor: pointer; list-style: none; }
+.intention-lane > summary::-webkit-details-marker { display: none; }
+.intention-lane > summary h3 { flex: 1; }
+.intention-lane > summary::after {
+  content: ""; flex: 0 0 7px; width: 7px; height: 7px; margin: 0 3px 3px 6px;
+  border-right: 1.5px solid var(--blue); border-bottom: 1.5px solid var(--blue);
+  transform: rotate(45deg);
+}
+.intention-lane[open] > summary::after { transform: rotate(225deg); margin-bottom: -3px; }
+.intention-lane > summary:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+
+/* El título abre la ficha; el resto de la fila sigue desplegando sus pases. */
+.program-film-open { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
+.program-film-open:hover { color: var(--blue); text-decoration-color: currentColor; }
+.program-film-open:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
