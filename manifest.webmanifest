@@ -10,10 +10,36 @@
   "orientation": "any",
   "background_color": "#fbf9f3",
   "theme_color": "#0753dc",
-  "categories": ["entertainment", "lifestyle"],
+  "categories": [
+    "entertainment",
+    "lifestyle"
+  ],
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ]
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://ficx.situacion.es/manifest.webmanifest",
+      "id": "https://ficx.situacion.es/"
+    }
+  ],
+  "id": "/"
 }
