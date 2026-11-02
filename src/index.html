@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fbf9f3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0e1218" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Crect%20width=%2264%22%20height=%2264%22%20rx=%2214%22%20fill=%22#0753dc%22/%3E%3Cpath%20d=%22M40%206%2020%2034h15L12%2058l40-30H38L48%206z%22%20fill=%22#00b7a5%22/%3E%3C/svg%3E" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Crect%20width=%2264%22%20height=%2264%22%20rx=%2214%22%20fill=%22#0753dc%22/%3E%3Cpath%20d=%22M40%206%2020%2034h15L12%2058l40-30H38L48%206z%22%20fill=%22#00b7a5%22/%3E%3C/svg%3E">
+  <meta name="description" content="Explora las películas del FICX 64 y prepara tu programa personal.">
+  <title>FICX 64 — Programa personal</title>
+  <script>
+    // Tema antes del primer pintado: evita el destello blanco al recargar.
+    try {
+      // Sin preferencia guardada se sigue al sistema.
+      var savedTheme = localStorage.getItem("ficx64-theme-v1");
+      if (savedTheme === "dark" || savedTheme === "light") document.documentElement.dataset.theme = savedTheme;
+    } catch (_) {}
+  </script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <dialog class="wizard" id="wizard" aria-labelledby="wizard-title">
+    <div class="wizard-card">
+      <header class="wizard-head">
+        <p class="eyebrow wizard-progress" id="wizard-progress"><svg class="wizard-bolt wizard-head-bolt" viewBox="0 0 330 470" role="presentation" focusable="false"><path class="bolt-blue" d="M205 0 50 210h91L0 470l270-291h-94L330 0z"/><path class="bolt-cyan" d="M154 0 0 210h91L0 360l218-231h-89L270 0z"/></svg><span id="wizard-progress-text">PASO 1 DE 5</span></p>
+        <button type="button" class="wizard-skip" id="wizard-skip">Saltar</button>
+      </header>
+
+      <div class="wizard-live" id="wizard-live" aria-live="polite" hidden>Paso 1 de 5</div>
+
+      <div class="wizard-body">
+        <ol class="wizard-track" id="wizard-dots" aria-hidden="true"></ol>
+
+        <div class="wizard-main">
+          <section class="wizard-step" id="wizard-step-1">
+            <div class="wizard-split">
+              <div class="wizard-copy">
+                <div class="wizard-art" aria-hidden="true">
+                  <svg class="wizard-bolt" viewBox="0 0 330 470" role="presentation" focusable="false">
+                    <path class="bolt-blue" d="M205 0 50 210h91L0 470l270-291h-94L330 0z"/>
+                    <path class="bolt-cyan" d="M154 0 0 210h91L0 360l218-231h-89L270 0z"/>
+                  </svg>
+                  <span class="wizard-wordmark"><span class="wordmark-ficx">FICX<span class="wordmark-slash">/</span></span><span class="wordmark-edition">64</span></span>
+                </div>
+                <p class="eyebrow">PASO 1 · BIENVENIDA</p>
+                <h2 id="wizard-title">Monta tu <span>parrilla.</span></h2>
+                <p>Explora las películas del festival, guarda las que te llamen y monta tu propio programa con los pases que encajan.</p>
+              </div>
+            </div>
+            <p class="wizard-note"><b>Sin cuenta y sin servidor:</b> todo se guarda en este navegador. Si cambias de dispositivo, exporta tu programa desde Ajustes.</p>
+            <p class="wizard-note wizard-webview" id="wizard-webview" hidden><b>Estás abriéndolo dentro de WhatsApp.</b> Aquí es posible que no se guarde nada: ábrelo en Chrome o Safari.</p>
+          </section>
+
+          <section class="wizard-step" id="wizard-step-2" hidden>
+            <p class="eyebrow">PASO 2 · AJUSTES</p>
+            <h2>Cuatro <span>ajustes</span> y listo.</h2>
+            <p class="wizard-step-note" id="wizard-settings-note">Responde cada pregunta para seguir.</p>
+            <fieldset class="wizard-field">
+              <legend>¿Cómo te mueves entre sedes?</legend>
+              <div class="wizard-choices" id="wizard-transport">
+                <button type="button" data-transport="walking">A pie</button>
+                <button type="button" data-transport="cycling">En bici</button>
+                <button type="button" data-transport="bus">En bus</button>
+                <button type="button" data-transport="all">Todos</button>
+              </div>
+              <p class="wizard-hint">Sirve para avisarte si no llegas de una sede a otra.</p>
+            </fieldset>
+            <fieldset class="wizard-field">
+              <legend>¿Cargar las imágenes de las fichas?</legend>
+              <div class="wizard-choices" id="wizard-images">
+                <button type="button" data-images="false">No</button>
+                <button type="button" data-images="true">Sí</button>
+              </div>
+              <p class="wizard-hint">Vienen de la web del festival y necesitan conexión. Sin ellas, la app no pide nada a la red.</p>
+            </fieldset>
+            <fieldset class="wizard-field">
+              <legend>¿Cómo quieres ver la app?</legend>
+              <div class="wizard-choices wizard-theme" id="wizard-theme">
+                <button type="button" data-wizard-theme="light">Claro</button>
+                <button type="button" data-wizard-theme="dark">Oscuro</button>
+                <button type="button" data-wizard-theme="system">Sistema</button>
+              </div>
+              <p class="wizard-hint">Con «Sistema» sigue el ajuste de tu móvil u ordenador.</p>
+            </fieldset>
+            <fieldset class="wizard-field">
+              <legend>¿Quieres ver los pases con acceso especial?</legend>
+              <div class="wizard-choices" id="wizard-special">
+                <button type="button" data-special="true">Sí</button>
+                <button type="button" data-special="false">No</button>
+              </div>
+              <p class="wizard-hint">Son los pases escolares y de prensa y acreditados. Con «Sí» también aparecen en el catálogo y se pueden elegir.</p>
+            </fieldset>
+            <fieldset class="wizard-field">
+              <legend>¿Cómo te llamas? <small>(opcional)</small></legend>
+              <input type="text" class="wizard-name-input" id="wizard-name" maxlength="40" autocomplete="nickname" placeholder="Tu nombre o apodo">
+              <p class="wizard-hint">Solo para nombrar lo que compartas o descargues. Si lo dejas vacío, no pasa nada.</p>
+            </fieldset>
+          </section>
+
+          <section class="wizard-step" id="wizard-step-3" hidden>
+            <p class="eyebrow">PASO 3 · MI LISTA</p>
+            <h2>Así se guarda una <span>película</span>.</h2>
+            <div class="wizard-demo" id="wizard-demo-film"></div>
+            <p class="wizard-play" id="wizard-play-note"><span class="wizard-play-icon" aria-hidden="true">↯</span><span><b>No es una foto:</b> toca la tarjeta y prueba la estrella, las listas y descartar.</span></p>
+            <p class="wizard-hint" id="wizard-branches-hint" hidden>Con la película en una lista aparece la <b>estrella</b> junto al título: marca lo que no te quieres perder. Y si no quieres verla, se descarta: desaparece del listado y se recupera desde «Descartadas».</p>
+          </section>
+
+          <section class="wizard-step" id="wizard-step-4" hidden>
+            <p class="eyebrow">PASO 4 · TU PARRILLA</p>
+            <h2>Y así se encadenan los <span>pases</span>.</h2>
+            <div class="wizard-demo" id="wizard-demo-pass"></div>
+            <div class="wizard-pass-tools" id="wizard-pass-layers">
+              <button type="button" class="wizard-layer-action" data-wizard-layer="add-b"><span class="wizard-layer-plus" aria-hidden="true">+</span> Añade el pase B</button>
+              <button type="button" class="wizard-layer-action is-danger" data-wizard-layer="add-c" hidden><span class="wizard-layer-plus" aria-hidden="true">+</span> Añade un pase C que solapa</button>
+              <button type="button" class="wizard-plan-link" data-wizard-layer="reset" hidden>Volver al primer pase</button>
+            </div>
+            <p class="wizard-hint" id="wizard-layer-hint">Cada pase que añades trae lo que pasa entre uno y otro: el tiempo de traslado, o el aviso de que se solapan.</p>
+            <p class="wizard-hint" id="wizard-pass-note">Así lo verás en «Mi programa», con el tiempo entre sedes ya calculado.</p>
+          </section>
+
+          <section class="wizard-step" id="wizard-step-5" hidden>
+            <p class="eyebrow">PASO 5 · LLEVÁRTELO</p>
+            <h2>Llévatelo <span>contigo</span>.</h2>
+            <ul class="wizard-list">
+              <li><b>Calendario:</b> en tu parrilla, descarga el <code>.ics</code> e impórtalo en tu app.</li>
+              <li><b>Compartir:</b> el botón de compartir genera un enlace con tus pases —o con tus listas— y quien lo abra elige qué añadir.</li>
+              <li><b>Sin enlace:</b> también puedes exportar tu programa desde Ajustes e importarlo en otro dispositivo.</li>
+              <li><b>Navegar:</b> toca una tarjeta para abrir su ficha; ‹ › o desliza para pasar de una a otra; <kbd>←</kbd> <kbd>→</kbd> con teclado, <kbd>/</kbd> busca y <kbd>Esc</kbd> cierra.</li>
+            </ul>
+            <p class="wizard-note" id="wizard-demo-note">Lo que has probado aquí es una demostración: no se ha guardado nada. Empieza a explorar y añade tus películas cuando quieras.</p>
+            <ol class="wizard-cycle">
+              <li><span class="wizard-cycle-step">1</span><span><b>Elige películas.</b> Lo que quieres ver, lo que estás dudando y lo que descartas.</span></li>
+              <li><span class="wizard-cycle-step">2</span><span><b>Búscalas por sitio y hora.</b> «Buscar pases» filtra por día, franja y sede.</span></li>
+              <li><span class="wizard-cycle-step">3</span><span><b>Monta tu programa.</b> Un pase por película, encajando horarios y traslados.</span></li>
+              <li><span class="wizard-cycle-step">4</span><span><b>Llévatelo.</b> Descarga el calendario, comparte el enlace o exporta tu programa.</span></li>
+            </ol>
+          </section>
+        </div>
+      </div>
+
+      <footer class="wizard-foot">
+        <div class="wizard-actions">
+          <button type="button" class="settings-action is-ghost" id="wizard-back">Atrás</button>
+          <button type="button" class="settings-action is-primary" id="wizard-next">Siguiente</button>
+        </div>
+      </footer>
+    </div>
+  </dialog>
+  <div class="app-shell">
+    <header class="masthead">
+      <a class="wordmark" href="#peliculas" aria-label="FICX 64">
+        <span class="wordmark-ficx">FICX<span class="wordmark-slash">/</span></span>
+        <span class="wordmark-edition">64</span>
+      </a>
+      <nav class="main-nav" aria-label="Navegación principal">
+        <button class="nav-link is-current" type="button" data-screen="explore" aria-current="page">Películas <span id="nav-film-count">—</span></button>
+        <button class="nav-link nav-link-sessions" type="button" data-screen="sessions"><span class="nav-short" aria-hidden="true">Pases</span><span class="nav-long">Buscar pases</span></button>
+        <button class="program-link" id="go-program" type="button"><span class="program-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M7 14h4M7 17.5h7"/></svg></span><span class="program-label"> Mi programa</span> <b id="nav-plan-count">0</b></button>
+      </nav>
+      <span class="masthead-divider" aria-hidden="true"></span>
+      <button class="masthead-settings theme-toggle" id="theme-toggle" type="button" aria-label="Cambiar de tema" title="Cambiar de tema"><span class="theme-toggle-icon" aria-hidden="true"></span></button>
+      <button class="masthead-settings" id="help-toggle" type="button" data-screen="help" aria-label="Ayuda" title="Ayuda"><span class="settings-icon" aria-hidden="true">?</span><span class="settings-label">Ayuda</span></button>
+      <button class="masthead-settings" id="extras-toggle" type="button" aria-expanded="false" aria-controls="extras-panel"><span class="settings-icon" aria-hidden="true">⚙</span><span class="settings-label">Ajustes</span></button>
+    </header>
+
+    <main>
+      <section class="extras-panel settings-panel" id="extras-panel" aria-label="Configuración y datos" hidden>
+        <section class="settings-section">
+          <div class="extras-copy"><p class="eyebrow">TU PROGRAMA</p><h2>Lleva tu selección contigo.</h2><p>Tus listas y tu parrilla se guardan <b>solo en este navegador</b>. Si cambias de dispositivo o borras los datos del navegador, expórtalos como código (o `.json`) y vuelve a importarlos allí.</p></div>
+          <div class="settings-controls">
+            <div id="settings-data-empty" hidden>
+              <p class="settings-empty-note">Aún no has guardado nada. Empieza a explorar o trae un programa que te hayan pasado.</p>
+              <div class="settings-actions"><button type="button" class="settings-action is-primary" id="settings-start-fresh">Empezar de cero</button><button type="button" class="settings-action" id="settings-open-import">Importar un programa</button></div>
+            </div>
+            <div id="settings-data-ready" hidden>
+              <p class="settings-summary" id="settings-summary">—</p>
+              <div class="settings-actions"><button type="button" class="settings-action is-primary" id="settings-export">Exportar</button><button type="button" class="settings-action" id="settings-import">Importar otro</button><button type="button" class="settings-action is-ghost" id="settings-clear">Borrar mis datos</button></div>
+            </div>
+            <div id="settings-export-view" hidden>
+              <label class="settings-field"><span>Tu código · cópialo para compartirlo</span><textarea id="settings-export-code" readonly rows="4"></textarea></label>
+              <div class="settings-actions"><button type="button" class="settings-action is-primary" id="settings-copy">Copiar código</button><button type="button" class="settings-action" id="settings-download">Descargar .json</button><button type="button" class="settings-action is-ghost" id="settings-export-done">Hecho</button></div>
+            </div>
+            <div id="settings-import-view" hidden>
+              <label class="settings-field"><span>Pega aquí un código</span><textarea id="settings-import-code" rows="4" placeholder="Pega el código…"></textarea></label>
+              <div class="settings-actions"><button type="button" class="settings-action is-primary" id="settings-do-import">Importar</button><button type="button" class="settings-action" id="settings-upload">Subir .json</button><button type="button" class="settings-action is-ghost" id="settings-import-cancel">Cancelar</button></div>
+              <input type="file" id="settings-file" accept="application/json,.json,text/plain" hidden>
+              <p class="settings-feedback" id="settings-feedback" role="status"></p>
+            </div>
+          </div>
+        </section>
+        <section class="settings-section">
+          <div class="extras-copy"><p class="eyebrow">TU PANTALLA INICIAL</p><h2>Secciones fijadas.</h2><p>Son los accesos rápidos que ves arriba al explorar. Fija hasta ocho; puedes cambiarlas cuando quieras.</p></div>
+          <div class="settings-controls"><div class="settings-pins" id="settings-pins" aria-label="Secciones fijadas"></div></div>
+        </section>
+        <section class="settings-section">
+          <div class="extras-copy"><p class="eyebrow">QUÉ PASES VER</p><h2>Escolares y prensa.</h2><p>Por defecto solo se muestran los pases abiertos al público. Actívalo si quieres ver también los escolares, de prensa y acreditados.</p></div>
+          <div class="settings-controls"><button type="button" class="program-special-toggle" id="program-include-special" aria-pressed="false"><span class="program-special-track" aria-hidden="true"></span><span class="program-special-copy"><b>Incluir pases con acceso especial</b><small>Escolares, prensa y acreditados</small></span></button></div>
+        </section>
+        <section class="settings-section">
+          <div class="extras-copy"><p class="eyebrow">CÓMO TE MUEVES</p><h2>Modo de transporte.</h2><p>Se usa para estimar si te da tiempo a llegar de una sede a otra.</p></div>
+          <div class="settings-controls"><label class="settings-transport"><span><b>Me muevo</b><small>A pie · En bici · En bus</small></span><select id="settings-transport"><option value="walking">A pie</option><option value="cycling">En bici</option><option value="bus">En bus</option><option value="all">Todos</option></select></label></div>
+        </section>
+        <section class="settings-section">
+          <div class="extras-copy"><p class="eyebrow">MEJORA OPCIONAL</p><h2>Imágenes de las fichas.</h2><p>Se cargan al abrir cada ficha y necesitan conexión. Sin conexión, cada película muestra su cartel tipográfico.</p></div>
+          <div class="settings-controls"><label class="remote-images-toggle"><input id="remote-images-toggle" type="checkbox"><span class="remote-toggle-track" aria-hidden="true"></span><span><b>Cargar imágenes desde ficx.tv</b><small id="remote-images-status">Desactivado · no se solicitan imágenes remotas.</small></span></label></div>
+        </section>
+        <section class="settings-section">
+          <div class="extras-copy"><p class="eyebrow">APARIENCIA</p><h2>Claro u oscuro.</h2><p>Elige cómo quieres ver la app. «Sistema» sigue el ajuste de tu dispositivo.</p></div>
+          <div class="settings-controls"><div class="theme-options" id="theme-options" role="group" aria-label="Tema">
+            <button type="button" class="theme-option" data-theme-value="light" aria-pressed="false">Claro</button>
+            <button type="button" class="theme-option" data-theme-value="dark" aria-pressed="false">Oscuro</button>
+            <button type="button" class="theme-option" data-theme-value="system" aria-pressed="true">Sistema</button>
+          </div></div>
+        </section>
+        <footer class="settings-footer"><button type="button" class="settings-apply is-strong" id="settings-apply">Aplicar y cerrar</button></footer>
+      </section>
+
+      <section class="app-screen" id="screen-explore" aria-labelledby="page-title">
+        <div class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> 13—21 NOVIEMBRE 2026 · XIXÓN</p>
+            <h1 id="page-title">Tu propio<br><span>FICX.</span></h1>
+            <p class="hero-deck">Explora las 215 películas del FICX 64, guarda lo que te llama y monta tu propio programa con los pases que encajan.</p>
+            <button class="hero-action" type="button" data-screen="sessions">Encuentra un pase <span>↗</span></button>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="hero-art-edition">FICX<br><b>64</b></div>
+            <svg class="bolt-art" viewBox="0 0 330 470" role="presentation" focusable="false">
+              <path class="bolt-blue" d="M205 0 50 210h91L0 470l270-291h-94L330 0z"/>
+              <path class="bolt-cyan" d="M154 0 0 210h91L0 360l218-231h-89L270 0z"/>
+            </svg>
+            <span class="hero-art-caption">64ª edición<br>Festival Internacional<br>de Cine de Xixón</span>
+          </div>
+          <div class="hero-baseline"><span>FESTIVAL INTERNACIONAL DE CINE DE XIXÓN</span><span>13 — 21 · 11 · 2026</span></div>
+          <p class="hero-source">Programa y pases según la información publicada por el festival; pueden cambiar. La app es personal y no está vinculada al FICX.</p>
+        </div>
+
+        <section class="section-picker" aria-labelledby="sections-title">
+          <div class="section-heading">
+            <div><p class="eyebrow">Una primera pista</p><h2 id="sections-title">¿Qué te apetece ver?</h2></div>
+            <div class="section-tools"><span class="section-hint">ELIGE UNA SECCIÓN <b>↓</b></span><button type="button" id="toggle-pin-config" class="pin-config-toggle" aria-expanded="false" aria-controls="pin-config">Configurar fijadas <span id="pinned-count">0/8</span></button></div>
+          </div>
+          <div class="section-jump"><button type="button" id="show-all-sections" class="show-all-button">Ver todo el festival <span>→</span></button></div>
+          <div class="featured-sections" id="featured-sections" aria-label="Secciones principales"></div>
+          <div class="pin-config" id="pin-config" hidden>
+            <div class="pin-config-heading"><p>Fija hasta ocho secciones. Elige las que mejor encajen con tu forma de explorar.</p><b id="pin-limit-note">Máximo 8</b></div>
+            <div class="pin-options" id="pin-options"></div>
+          </div>
+          <div class="more-sections-row">
+            <label for="more-sections">¿Buscas algo más concreto?</label>
+            <select id="more-sections"><option value="">Todas las demás secciones</option></select>
+          </div>
+        </section>
+
+        <section class="browse-area" id="browse-area" aria-label="Catálogo de películas">
+          <div class="browse-main">
+            <div class="browse-heading">
+              <div><p class="eyebrow">FICX 64 · <span id="active-section-label">Todas las secciones</span></p><h2 id="browse-title">Todas las películas <span id="browse-count" class="count-badge">—</span></h2></div>
+              <label class="sort-control">Orden
+                <select id="sort-order" aria-label="Ordenar películas"><option value="title">A—Z</option><option value="title-desc">Z—A</option></select>
+              </label>
+            </div>
+            <div id="section-subfilters" class="section-subfilters" hidden></div>
+            <div class="filters">
+              <label class="search-box"><span class="search-icon" aria-hidden="true">⌕</span><span class="sr-only">Buscar película o cineasta</span><input id="search-input" type="search" placeholder="Título o cineasta…" autocomplete="off"><kbd>/</kbd></label>
+              <button class="filter-toggle" id="only-my-lists" type="button" aria-pressed="false">Solo mis listas</button>
+              <button class="filter-toggle" id="show-discarded" type="button" aria-pressed="false">Descartadas</button>
+              <button class="clear-filters" id="clear-filters" type="button">Limpiar filtros</button>
+            </div>
+            <ol class="film-list" id="film-list" aria-live="polite"></ol>
+            <p class="empty-state" id="empty-state" hidden>No encontramos películas con esos filtros. Prueba otro título o sección.</p>
+          </div>
+
+          <div class="sheet-scrim" id="mi-programa-sheet" hidden></div>
+          <aside class="selection-column" id="mi-programa" aria-labelledby="selection-title" role="dialog" aria-modal="true" aria-label="Tus listas">
+            <button type="button" class="sheet-close" id="sheet-close" aria-label="Cerrar">✕</button>
+            <div class="selection-topline"><span>01 / TU LISTA</span><span class="selection-flash">✳</span></div>
+            <h2 id="selection-title">Tus<br><em>listas.</em></h2>
+            <p class="selection-intro">Lo que has ido guardando en las fichas. Puedes cambiarlo cuando quieras.</p>
+            <section class="intention-lane" aria-labelledby="want-title">
+              <div class="lane-heading"><h3 id="want-title">Lo quiero<br><em>ver.</em></h3><b id="want-count">0</b></div>
+              <div id="saved-list" class="saved-list"></div>
+              <p class="lane-empty" id="want-empty">Las que no te quieres perder.</p>
+            </section>
+            <section class="intention-lane maybe-lane" aria-labelledby="maybe-title">
+              <div class="lane-heading"><h3 id="maybe-title">Mmm…<br><em>quizás.</em></h3><b id="maybe-count">0</b></div>
+              <div id="maybe-list" class="saved-list"></div>
+              <p class="lane-empty" id="maybe-empty">Déjalas aquí mientras te decides.</p>
+            </section>
+            <div class="selection-footer"><span><b id="saved-total">0</b> películas en tus listas</span><button id="clear-saved" type="button" class="text-button" hidden>Vaciar ambas</button></div>
+            <button id="share-lists" type="button" class="settings-action share-lists-button">Compartir mis listas</button>
+            <button class="next-step" id="next-to-sessions" type="button"><span class="next-step-index">SIGUIENTE PASO</span><strong>Buscar los pases <i>↗</i></strong></button>
+          </aside>
+        </section>
+      </section>
+
+      <section class="app-screen sessions-screen" id="screen-sessions" aria-labelledby="sessions-title" hidden>
+        <div class="screen-kicker"><button type="button" class="back-link" data-screen="explore">← Volver a películas</button><button type="button" class="back-link" data-screen="program">Ver mi parrilla →</button><span>FICX 64 / PROGRAMA</span></div>
+        <div class="sessions-heading"><div><p class="eyebrow"><span class="eyebrow-dot"></span> ELIGE CUÁNDO Y DÓNDE</p><h1 id="sessions-title">Encuentra<br><span>tu pase.</span></h1><p>Combina el día, la hora y la zona que te venga bien.</p></div><div class="sessions-bolt" aria-hidden="true">↯</div></div>
+        <div class="session-filters">
+          <fieldset class="filter-group"><legend><span>01</span> ¿Qué días?</legend><p class="filter-help">Puedes marcar varios.</p><div class="date-options" id="date-options"></div></fieldset>
+          <fieldset class="filter-group"><legend><span>02</span> ¿A qué hora?</legend><p class="filter-help">Una o varias franjas.</p><div class="time-options" id="time-options">
+            <button type="button" class="choice-chip is-selected" data-time-all aria-pressed="true">Todos</button>
+            <button type="button" class="choice-chip" data-time="morning">Mañana <small>antes de 13:00</small></button>
+            <button type="button" class="choice-chip" data-time="afternoon">Tarde <small>13:00—19:00</small></button>
+            <button type="button" class="choice-chip" data-time="evening">Noche <small>desde 19:00</small></button>
+          </div></fieldset>
+          <fieldset class="filter-group venue-filter-group"><legend><span>03</span> ¿Por dónde?</legend><p class="filter-help">Agrupa por sede o marca varias.</p><div class="venue-options" id="venue-options">
+            <button type="button" class="venue-all is-selected" data-venue-all aria-pressed="true">Todas las sedes</button>
+            <label class="venue-choice"><input type="checkbox" value="ocine"><span class="check-mark">✓</span><span><b>OCINE</b><small>Salas 1, 3 y 5</small></span><i>↗</i></label>
+            <label class="venue-choice"><input type="checkbox" value="yelmo"><span class="check-mark">✓</span><span><b>Yelmo Ocimax</b><small>Salas 7, 12 y 13</small></span><i>↗</i></label>
+            <label class="venue-choice"><input type="checkbox" value="teatro-jovellanos"><span class="check-mark">✓</span><span><b>Teatro Jovellanos</b><small>Centro</small></span><i>↗</i></label>
+            <label class="venue-choice"><input type="checkbox" value="escuela-comercio"><span class="check-mark">✓</span><span><b>Escuela de Comercio</b><small>Centro</small></span><i>↗</i></label>
+            <label class="venue-choice"><input type="checkbox" value="laboral"><span class="check-mark">✓</span><span><b>Laboral</b><small>Universidad Laboral</small></span><i>↗</i></label>
+            <label class="venue-choice"><input type="checkbox" value="antiguo-instituto"><span class="check-mark">✓</span><span><b>Antiguo Instituto</b><small>Centro</small></span><i>↗</i></label>
+            <label class="venue-choice"><input type="checkbox" value="pumarin"><span class="check-mark">✓</span><span><b>Pumarín</b><small>Gijón Sur</small></span><i>↗</i></label>
+          </div></fieldset>
+        </div>
+        <div class="session-results"><div class="results-topline"><div><p class="eyebrow">TU BÚSQUEDA</p><h2 id="session-results-title">Todos los días <span>·</span> todas las horas</h2></div><button type="button" id="reset-session-filters">Borrar filtros</button></div>
+          <label class="include-special-access"><input type="checkbox" id="only-saved"><span>Solo las de mi lista o quizás</span></label>
+          <ol class="screening-results" id="session-results-list" aria-live="polite"></ol>
+        </div>
+      </section>
+      <section class="app-screen program-screen" id="screen-program" aria-labelledby="program-title" hidden>
+        <div class="screen-kicker"><button type="button" class="back-link" data-screen="sessions">← Volver a buscar pases</button><span>FICX 64 / MI PROGRAMA</span></div>
+        <header class="program-heading">
+          <div><p class="eyebrow">TU FESTIVAL, A TU RITMO</p><h1 id="program-title">Encaja<br><span>tu parrilla.</span></h1><p>Elige un pase por película; te avisamos de solapes y destacamos los “quizás” que caben.</p></div>
+          <div class="program-stats" aria-live="polite"><div><b id="program-pass-count">0</b><span>pases</span></div><div><b id="program-conflict-count">0</b><span id="program-conflict-label">conflictos</span></div><div><b id="program-unplanned-count">0</b><span>por encajar</span></div></div>
+        </header>
+        <div class="program-toolbar"><div class="program-day-options" id="program-day-options" aria-label="Filtrar la parrilla por día"></div><div class="program-toolbar-options"><label class="program-transport-choice" for="program-transport"><span>Me muevo</span><select id="program-transport"><option value="walking">A pie</option><option value="cycling">En bici</option><option value="bus">En bus</option><option value="all">Todos</option></select></label></div></div>
+        <div class="program-layout">
+          <section class="program-agenda-panel" aria-labelledby="agenda-heading"><div class="program-panel-heading"><div><p class="eyebrow">ITINERARIO</p><h2 id="agenda-heading">Tu parrilla</h2></div><div class="program-panel-actions"><button type="button" class="text-button" id="clear-planned-screenings" hidden>Deshacer parrilla</button><div class="program-calendar-actions"><button type="button" class="program-calendar-toggle" id="program-calendar-toggle" aria-expanded="false" aria-controls="program-calendar-panel" aria-label="Calendario y compartir" title="Calendario y compartir"><svg class="program-calendar-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M9 15.5h6" stroke-dasharray="1 3"/></svg><svg class="program-share-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.6 6.8-4M8.6 13.4l6.8 4"/></svg><span class="program-calendar-caret" aria-hidden="true">▼</span></button><div class="program-calendar-panel" id="program-calendar-panel" hidden><p class="program-calendar-note" id="settings-calendar-note">—</p><div class="settings-actions"><button type="button" class="settings-action is-primary" id="settings-ics"><span>Descargar .ics</span></button><button type="button" class="settings-action" id="share-itinerary"><span>Compartir itinerario</span></button></div><div class="program-calendar-help"><p><b>Google Calendar:</b> abre <a href="https://calendar.google.com/calendar/r/settings/export" target="_blank" rel="noopener noreferrer">google.com/calendar</a> → Ajustes → Importar → sube el fichero que acabas de descargar.</p><p><b>Tu móvil:</b> abre el fichero desde la carpeta de descargas; te preguntará en qué calendario añadir los pases.</p><p><b>Cualquier otra app</b> (Outlook, Apple…): elige «Importar» y selecciona el <code>.ics</code>.</p><p class="program-calendar-warning">El enlace lleva tus pases dentro: quien lo tenga podrá verlos.</p></div><p class="settings-feedback" id="settings-calendar-feedback" role="status"></p></div></div></div></div><p class="program-travel-note">Usamos la duración de cada pase y los tiempos de desplazamiento entre sedes para avisarte de solapes y de si llegas tarde. <b>Toca el título de una película</b> para abrir su ficha.</p><div class="program-agenda" id="program-agenda"></div></section>
+          <aside class="program-picks-panel" aria-label="Estado de las películas de Mi lista"><details class="program-picks-fold" id="program-picks-fold" open><summary><span>Mi parrilla</span><b id="picks-fold-note">por revisar</b></summary><section><div class="program-panel-heading"><div><p class="eyebrow">MI PARRILLA</p><h2>Mi lista</h2></div><span class="program-counter" id="wanted-unplanned-count" aria-label="Películas aún por encajar">0</span></div><p class="program-suggestion-intro">Revisa el pase elegido y compara alternativas: encaja, choca o falta información.</p><div class="program-film-picks" id="program-wanted-list"></div></section><section class="program-maybe-section"><div class="program-panel-heading"><div><p class="eyebrow">UNA SUGERENCIA</p><h2>Quizás</h2></div></div><p class="program-suggestion-intro">Pases que encajan o parecen posibles; los datos pendientes se avisan.</p><div class="program-film-picks" id="program-maybe-list"></div></section></details></aside>
+        </div>
+      </section>
+      <section class="app-screen shared-screen" id="screen-shared" aria-labelledby="shared-title" hidden>
+        <header class="shared-heading">
+          <p class="eyebrow" id="shared-eyebrow">ITINERARIO COMPARTIDO</p>
+          <h1 id="shared-title">Te han compartido <span>un itinerario.</span></h1>
+          <p class="shared-count" id="shared-count" hidden>—</p>
+          <p id="shared-summary">—</p>
+        </header>
+        <div class="shared-tools"><button type="button" class="text-button" id="shared-mark-fitting">Marcar todos los que encajan</button><button type="button" class="text-button" id="shared-clear">Desmarcar todos</button></div>
+        <ul class="shared-list" id="shared-list" aria-live="polite"></ul>
+        <p class="settings-feedback" id="shared-feedback" role="status"></p>
+        <div class="shared-actions"><button type="button" class="settings-action is-primary" id="shared-add" disabled>Añadir</button><button type="button" class="settings-action is-ghost" id="shared-dismiss">Descartar este itinerario</button><button type="button" class="settings-action is-primary" id="shared-explore" hidden>Ir a Explorar</button></div>
+      </section>
+      <section class="app-screen help-screen" id="screen-help" aria-labelledby="help-title" hidden>
+        <button type="button" class="help-close" id="help-close" aria-label="Cerrar la ayuda" title="Cerrar"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button>
+        <header class="help-heading">
+          <p class="eyebrow">FICX 64 · GUÍA COMPLETA</p>
+          <h2 id="help-title">Ayuda y <span>referencia.</span></h2>
+          <p class="help-intro">Tu programa personal del festival, sin cuenta y sin servidor: todo queda en este navegador.</p>
+        </header>
+        <nav class="help-toc" aria-label="Índice de la ayuda">
+          <a href="#help-uso">Uso</a><a href="#help-mecanicas">Mecánicas</a><a href="#help-tiempos">Tiempos</a><a href="#help-datos">Datos</a><a href="#help-accesibilidad">Accesibilidad</a><a href="#help-privacidad">Privacidad</a>
+        </nav>
+
+        <article class="help-block" id="help-uso">
+          <h3>Qué te ofrece</h3>
+          <ul class="help-list">
+            <li><b>Todo el catálogo</b> del festival, con sinopsis de la web y del catálogo impreso.</li>
+            <li><b>Mi lista</b> para lo que quieres ver y <b>Quizás</b> para lo que estás dudando.</li>
+            <li><b>Una estrella</b> para priorizar lo que no te quieres perder si hay conflicto.</li>
+            <li><b>Descartar</b> lo que seguro no vas a ver: se queda aparte y puedes recuperarlo.</li>
+            <li><b>Tu parrilla</b> por días, con solapes y tiempos entre sedes.</li>
+            <li><b>Calendario</b> (.ics) y <b>enlace para compartir</b> tu itinerario.</li>
+          </ul>
+          <div class="help-replay"><p class="eyebrow">INTRODUCCIÓN</p><p>La primera vez se muestra un asistente de cinco pasos que configura la app y enseña a usarla.</p><button type="button" class="settings-action" id="replay-wizard">Volver a ver la introducción</button></div>
+        </article>
+
+        <article class="help-block">
+          <h3>Cómo decide que un pase encaja</h3>
+          <p class="help-formula">fin del pase + salida de la sede + desplazamiento + entrada en la siguiente <b>≤</b> hora de inicio</p>
+          <p>Si no se cumple, la app te avisa de que choca o de que no da tiempo al traslado. Cuando falta un dato (duración o distancia), lo marca como <i>por confirmar</i> en lugar de inventarlo.</p>
+          <aside class="help-callout">
+            <b>Pases con encuentro.</b> Algunos incluyen coloquio con el equipo. La app reserva <b>15 minutos antes</b> de la película para la presentación, pero <b>no cuenta el coloquio posterior</b>: da por hecho que te vas sin quedarte al encuentro. Si pones otra película justo detrás, te dirá que llegas aunque llegarías tarde quedándote al coloquio. Si quieres quedarte, deja el hueco tú misma.
+          </aside>
+        </article>
+
+        <article class="help-block">
+          <h3>Lo que no hace</h3>
+          <ul class="help-list">
+            <li>No vende ni reserva entradas.</li>
+            <li>No sincroniza entre dispositivos: el programa se pasa exportando e importando, o con un enlace.</li>
+            <li>No vigila los cambios del festival: si el programa cambia, vuelve a cargar la app actualizada.</li>
+            <li>No reserva asientos ni gestiona acreditaciones.</li>
+          </ul>
+        </article>
+
+        <details class="help-block help-fold" id="help-mecanicas">
+          <summary>Mecánicas al detalle</summary>
+          <ul class="help-list">
+            <li><b>Mi lista y Quizás</b> son excluyentes entre sí: una película está en una o en otra. Quitarla de la lista quita también su pase de la parrilla.</li>
+            <li><b>La estrella</b> vive junto al título y convive con las dos listas. Se apaga si descartas la película o te quedas sin lista.</li>
+            <li><b>Descartar</b> es excluyente con todo: sale del listado, de las listas y de la parrilla. Se recupera desde el interruptor «Descartadas» de Explorar.</li>
+            <li><b>Compartir</b> genera un enlace con los pases dentro, o con tus listas desde «Mis listas». Quien lo abre elige qué añadir: en el itinerario marca como «Coincidimos» el que ya tiene, «Choca con tu pase» el que solapa y «Ya la tienes en otro horario» la misma película en otro pase; en las listas, ve qué películas quiere ver y cuáles está dudando.</li>
+            <li><b>Calendario</b>: el fichero <code>.ics</code> vale para Google, Apple, Outlook y cualquier app que lo importe.</li>
+          </ul>
+        </details>
+
+        <details class="help-block help-fold" id="help-tiempos">
+          <summary>Tiempos que asume la app</summary>
+          <ul class="help-list">
+            <li><b>5 minutos</b> para cambiar de sala dentro del mismo edificio.</li>
+            <li>Entre sedes se suma salida y entrada: <b>10 minutos</b> en OCINE, Yelmo Ocimax y Laboral Teatro; <b>5 minutos</b> en el resto (Teatro Jovellanos, Escuela de Comercio, Antiguo Instituto y Pumarín).</li>
+            <li>Los desplazamientos a pie y en bici vienen de distancias reales entre sedes. <b>En bus</b>, de las líneas y paradas de EMTUSA: si entre dos sedes no hay conexión, la app lo dice («sin bus») y da el tiempo a pie.</li>
+            <li>La duración de cada pase es la del festival; en pases con varias películas se estima sumando las duraciones.</li>
+            <li>Son <b>estimaciones</b>: sirven para no encadenar imposibles, no para afinar al minuto.</li>
+          </ul>
+        </details>
+
+        <details class="help-block help-fold" id="help-datos">
+          <summary>De dónde sale todo</summary>
+          <p>El programa y los pases siguen la información publicada por el festival: la web <b>ficx.tv</b> y el <b>catálogo impreso</b> (PDF). Los datos pueden cambiar; lo que vale siempre es el programa oficial.</p>
+          <p>Las imágenes de las películas son opcionales (se activan en Ajustes): al abrir una ficha se pide su imagen a la web del festival. Sin esa opción la app no hace peticiones, salvo cuando pulsas un enlace externo o «Google Calendar».</p>
+        </details>
+
+        <details class="help-block help-fold" id="help-accesibilidad">
+          <summary>Accesibilidad</summary>
+          <p>La app se puede usar sin ratón, sin sonido y con el texto ampliado. Esto es lo que hace para ello.</p>
+          <ul class="help-list">
+            <li><b>Movimiento.</b> Si tu móvil u ordenador pide reducir el movimiento, la app lo respeta: el asistente no anima sus pasos, el aviso de descartar aparece sin transición y las pantallas no hacen desplazamientos suaves.</li>
+            <li><b>Contraste.</b> Hay tema claro y oscuro, los dos con texto por encima de 4,5:1. Se elige en Ajustes o se deja que siga al sistema.</li>
+            <li><b>Tacto.</b> Los botones miden al menos 44 px de alto.</li>
+            <li><b>Teclado.</b> <kbd>/</kbd> busca, <kbd>Esc</kbd> cierra la ficha o el aviso, <kbd>←</kbd> y <kbd>→</kbd> cambian de película con la ficha abierta, y en el aviso de descartar <kbd>Tab</kbd> se queda en «Deshacer».</li>
+            <li><b>Rótulos para lectores de pantalla.</b> Cada lista y cada grupo de botones lleva su nombre («Tus listas», «Secciones de la app», «Decidir sobre…»), los iconos que no aportan texto se marcan como decorativos para que no se lean, y los botones de alternar anuncian si están activos.</li>
+            <li><b>Avisos que se leen solos:</b> los cambios de pantalla, el acuse de descartar y los mensajes de estado se anuncian al lector de pantalla sin que haya que buscarlos.</li>
+            <li><b>Foco a la vista:</b> lo que tiene el foco lleva un contorno marcado, y el asistente de introducción mantiene el foco dentro y lo devuelve al cerrarse.</li>
+            <li><b>Zoom.</b> La app no bloquea el zoom del navegador.</li>
+          </ul>
+          <p id="help-accesibilidad-limite">El aviso de descartar se cierra solo a los <b>3 segundos</b>; la película queda en «Descartadas» y se recupera cuando quieras.</p>
+        </details>
+
+        <details class="help-block help-fold" id="help-privacidad">
+          <summary>Tus datos y tu privacidad</summary>
+          <p>No hay cuentas ni servidor: listas, parrilla y descartes se guardan <b>solo en este navegador</b>. No hay analítica ni seguimiento.</p>
+          <p>Si pones tu nombre (opcional, en la introducción o al compartir), se queda en tu dispositivo y solo sale en el enlace, el calendario o el fichero que tú decidas compartir.</p>
+          <p>Si borras los datos del navegador lo pierdes todo: exporta tu programa desde Ajustes y vuelve a importarlo. La app abierta dentro de WhatsApp u otra app de mensajería es posible que no guarde nada; ábrela en Chrome o Safari.</p>
+        </details>
+
+        <details class="help-block help-fold">
+          <summary>Software libre, licencia y créditos</summary>
+          <p>El código original de la app está bajo <b>GNU AGPL, versión 3 o posterior</b>: puedes usarlo, copiarlo y modificarlo cumpliendo sus condiciones. Se distribuye sin garantía. <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener noreferrer">Texto de la licencia</a> · <a href="https://github.com/oyale/ficx64" target="_blank" rel="noopener noreferrer">Código fuente</a>.</p><p>Las bibliotecas, fuentes, contenidos del catálogo, datos y marca TMDB conservan sus propios derechos y condiciones.</p>
+          <p>Los textos, títulos e imágenes del catálogo pertenecen al Festival Internacional de Cine de Xixón y a sus autores; aquí solo se reúnen para uso personal.</p>
+          <p>Hecho con <span aria-label="amor">🖤</span> y software libre en 2026 por <b>oyale</b>. Proyecto personal, sin ánimo de lucro y sin relación oficial con el festival.</p>
+        </details>
+      </section>
+    </main>
+
+    <nav class="mobile-tabbar" aria-label="Secciones de la app">
+      <button type="button" class="mobile-tab is-current" data-mobile-tab="explore" data-screen-jump="browse-area"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h10"/></svg><span>Películas</span></button>
+      <button type="button" class="mobile-tab" data-mobile-tab="mine" data-sheet="mi-programa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5zM8 11h6M8 15h6"/></svg><span>Mis listas</span></button>
+      <button type="button" class="mobile-tab" data-mobile-tab="sessions" data-screen="sessions"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4zM10 6v12"/></svg><span>Pases</span></button>
+      <button type="button" class="mobile-tab" data-mobile-tab="program" data-screen-jump="program-agenda"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h9"/><circle cx="18.5" cy="17" r="2"/></svg><span>Parrilla</span><b id="mobile-tab-count">0</b></button>
+    </nav>
+    <button class="back-to-top-floating" id="back-to-top-floating" type="button" aria-label="Volver arriba" title="Volver arriba" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"/></svg></button>
+    <footer class="page-footer"><span>FICX 64 · XIXÓN</span><span>13 — 21 NOVIEMBRE 2026</span><a href="#top" id="back-to-top">Volver arriba ↑</a></footer>
+  </div>
+  <script>window.FICX_FILMS = []; window.FICX_SCREENINGS = []; window.FICX_PRIMARY_SECTIONS = []; window.FICX_VENUE_TRANSFERS = {}; window.FICX_BUS_TRANSFERS = {};</script>
+  <script src="app.js"></script>
+  <dialog class="alias-dialog share-dialog" id="share-dialog" aria-labelledby="share-dialog-title">
+    <form method="dialog">
+      <h2 id="share-dialog-title">Tu enlace está listo</h2>
+      <p class="alias-intro" id="share-dialog-intro">Puedes enviarlo a quien quieras: verá los pases y elegirá cuáles añadir. <b>Quien tenga el enlace podrá ver tu itinerario.</b></p>
+      <label class="alias-field"><span>Enlace</span><input id="share-url" type="text" readonly></label>
+      <div class="alias-actions"><button type="button" class="settings-action is-ghost" id="share-copy">Copiar</button><button type="submit" class="settings-action is-primary" value="ok">Hecho</button></div>
+    </form>
+  </dialog>
+  <dialog class="alias-dialog" id="alias-dialog" aria-labelledby="alias-title">
+    <form method="dialog">
+      <h2 id="alias-title">¿Quién comparte?</h2>
+      <p class="alias-intro">Es opcional: aparece como «El itinerario de …» al abrir el enlace.</p>
+      <label class="alias-field"><span>Tu nombre o apodo</span><input id="alias-input" type="text" maxlength="40" autocomplete="off" placeholder="Fulanita"></label>
+      <p class="alias-counter" id="alias-counter">0/40</p>
+      <div class="alias-actions"><button type="button" class="settings-action is-ghost" id="alias-cancel">Cancelar</button><button type="submit" class="settings-action is-primary" id="alias-accept" value="ok">Compartir</button></div>
+    </form>
+  </dialog>
+  <div id="share-toast" class="share-toast" role="status" aria-live="polite"></div>
+</body>
+</html>

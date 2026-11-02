@@ -1,0 +1,463 @@
+{
+  "schemaVersion": 2,
+  "sameVenueBufferMinutes": 5,
+  "venues": [
+    {
+      "id": "ocine",
+      "name": "OCINE",
+      "enterExitMinutes": 10
+    },
+    {
+      "id": "yelmo",
+      "name": "Yelmo Ocimax",
+      "enterExitMinutes": 10
+    },
+    {
+      "id": "teatro-jovellanos",
+      "name": "Teatro Jovellanos",
+      "enterExitMinutes": 5
+    },
+    {
+      "id": "escuela-comercio",
+      "name": "Escuela de Comercio",
+      "enterExitMinutes": 5
+    },
+    {
+      "id": "laboral",
+      "name": "Laboral Teatro",
+      "enterExitMinutes": 10
+    },
+    {
+      "id": "antiguo-instituto",
+      "name": "Antiguo Instituto",
+      "enterExitMinutes": 5
+    },
+    {
+      "id": "pumarin",
+      "name": "Pumarín",
+      "enterExitMinutes": 5
+    }
+  ],
+  "transfers": [
+    {
+      "from": "teatro-jovellanos",
+      "to": "escuela-comercio",
+      "walkingMinutes": 3,
+      "cyclingMinutes": 1,
+      "busMinutes": null,
+      "distanceMeters": 260,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "teatro-jovellanos",
+      "to": "antiguo-instituto",
+      "walkingMinutes": 4,
+      "cyclingMinutes": 1,
+      "busMinutes": null,
+      "distanceMeters": 300,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "teatro-jovellanos",
+      "to": "ocine",
+      "walkingMinutes": 14,
+      "cyclingMinutes": 5,
+      "busMinutes": null,
+      "distanceMeters": 950,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "teatro-jovellanos",
+      "to": "pumarin",
+      "walkingMinutes": 33,
+      "cyclingMinutes": 10,
+      "busMinutes": null,
+      "distanceMeters": 2200,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "teatro-jovellanos",
+      "to": "yelmo",
+      "walkingMinutes": 47,
+      "cyclingMinutes": 13,
+      "busMinutes": null,
+      "distanceMeters": 3400,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "teatro-jovellanos",
+      "to": "laboral",
+      "walkingMinutes": 63,
+      "cyclingMinutes": 19,
+      "busMinutes": null,
+      "distanceMeters": 4500,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "escuela-comercio",
+      "to": "teatro-jovellanos",
+      "walkingMinutes": 3,
+      "cyclingMinutes": 1,
+      "busMinutes": null,
+      "distanceMeters": 260,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "escuela-comercio",
+      "to": "antiguo-instituto",
+      "walkingMinutes": 2,
+      "cyclingMinutes": 1,
+      "busMinutes": null,
+      "distanceMeters": 110,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "escuela-comercio",
+      "to": "ocine",
+      "walkingMinutes": 16,
+      "cyclingMinutes": 5,
+      "busMinutes": null,
+      "distanceMeters": 1100,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "escuela-comercio",
+      "to": "pumarin",
+      "walkingMinutes": 35,
+      "cyclingMinutes": 11,
+      "busMinutes": null,
+      "distanceMeters": 2350,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "escuela-comercio",
+      "to": "yelmo",
+      "walkingMinutes": 46,
+      "cyclingMinutes": 13,
+      "busMinutes": null,
+      "distanceMeters": 3300,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "escuela-comercio",
+      "to": "laboral",
+      "walkingMinutes": 65,
+      "cyclingMinutes": 20,
+      "busMinutes": null,
+      "distanceMeters": 4650,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "antiguo-instituto",
+      "to": "teatro-jovellanos",
+      "walkingMinutes": 4,
+      "cyclingMinutes": 1,
+      "busMinutes": null,
+      "distanceMeters": 300,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "antiguo-instituto",
+      "to": "escuela-comercio",
+      "walkingMinutes": 2,
+      "cyclingMinutes": 1,
+      "busMinutes": null,
+      "distanceMeters": 110,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "antiguo-instituto",
+      "to": "ocine",
+      "walkingMinutes": 18,
+      "cyclingMinutes": 6,
+      "busMinutes": null,
+      "distanceMeters": 1200,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "antiguo-instituto",
+      "to": "pumarin",
+      "walkingMinutes": 36,
+      "cyclingMinutes": 11,
+      "busMinutes": null,
+      "distanceMeters": 2400,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "antiguo-instituto",
+      "to": "yelmo",
+      "walkingMinutes": 46,
+      "cyclingMinutes": 13,
+      "busMinutes": null,
+      "distanceMeters": 3350,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "antiguo-instituto",
+      "to": "laboral",
+      "walkingMinutes": 66,
+      "cyclingMinutes": 20,
+      "busMinutes": null,
+      "distanceMeters": 4700,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "ocine",
+      "to": "teatro-jovellanos",
+      "walkingMinutes": 14,
+      "cyclingMinutes": 5,
+      "busMinutes": null,
+      "distanceMeters": 950,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "ocine",
+      "to": "escuela-comercio",
+      "walkingMinutes": 16,
+      "cyclingMinutes": 5,
+      "busMinutes": null,
+      "distanceMeters": 1100,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "ocine",
+      "to": "antiguo-instituto",
+      "walkingMinutes": 18,
+      "cyclingMinutes": 6,
+      "busMinutes": null,
+      "distanceMeters": 1200,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "ocine",
+      "to": "pumarin",
+      "walkingMinutes": 29,
+      "cyclingMinutes": 8,
+      "busMinutes": null,
+      "distanceMeters": 2000,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "ocine",
+      "to": "yelmo",
+      "walkingMinutes": 52,
+      "cyclingMinutes": 14,
+      "busMinutes": null,
+      "distanceMeters": 3700,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "ocine",
+      "to": "laboral",
+      "walkingMinutes": 61,
+      "cyclingMinutes": 20,
+      "busMinutes": null,
+      "distanceMeters": 4300,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "pumarin",
+      "to": "teatro-jovellanos",
+      "walkingMinutes": 33,
+      "cyclingMinutes": 10,
+      "busMinutes": null,
+      "distanceMeters": 2200,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "pumarin",
+      "to": "escuela-comercio",
+      "walkingMinutes": 35,
+      "cyclingMinutes": 11,
+      "busMinutes": null,
+      "distanceMeters": 2350,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "pumarin",
+      "to": "antiguo-instituto",
+      "walkingMinutes": 36,
+      "cyclingMinutes": 11,
+      "busMinutes": null,
+      "distanceMeters": 2400,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "pumarin",
+      "to": "ocine",
+      "walkingMinutes": 29,
+      "cyclingMinutes": 8,
+      "busMinutes": null,
+      "distanceMeters": 2000,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "pumarin",
+      "to": "yelmo",
+      "walkingMinutes": 43,
+      "cyclingMinutes": 11,
+      "busMinutes": null,
+      "distanceMeters": 3200,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "pumarin",
+      "to": "laboral",
+      "walkingMinutes": 81,
+      "cyclingMinutes": 25,
+      "busMinutes": null,
+      "distanceMeters": 5800,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "yelmo",
+      "to": "teatro-jovellanos",
+      "walkingMinutes": 47,
+      "cyclingMinutes": 13,
+      "busMinutes": null,
+      "distanceMeters": 3400,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "yelmo",
+      "to": "escuela-comercio",
+      "walkingMinutes": 46,
+      "cyclingMinutes": 13,
+      "busMinutes": null,
+      "distanceMeters": 3300,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "yelmo",
+      "to": "antiguo-instituto",
+      "walkingMinutes": 46,
+      "cyclingMinutes": 13,
+      "busMinutes": null,
+      "distanceMeters": 3350,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "yelmo",
+      "to": "ocine",
+      "walkingMinutes": 52,
+      "cyclingMinutes": 14,
+      "busMinutes": null,
+      "distanceMeters": 3700,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "yelmo",
+      "to": "pumarin",
+      "walkingMinutes": 43,
+      "cyclingMinutes": 11,
+      "busMinutes": null,
+      "distanceMeters": 3200,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "yelmo",
+      "to": "laboral",
+      "walkingMinutes": 106,
+      "cyclingMinutes": 28,
+      "busMinutes": null,
+      "distanceMeters": 7600,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "laboral",
+      "to": "teatro-jovellanos",
+      "walkingMinutes": 63,
+      "cyclingMinutes": 19,
+      "busMinutes": null,
+      "distanceMeters": 4500,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "laboral",
+      "to": "escuela-comercio",
+      "walkingMinutes": 65,
+      "cyclingMinutes": 20,
+      "busMinutes": null,
+      "distanceMeters": 4650,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "laboral",
+      "to": "antiguo-instituto",
+      "walkingMinutes": 66,
+      "cyclingMinutes": 20,
+      "busMinutes": null,
+      "distanceMeters": 4700,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "laboral",
+      "to": "ocine",
+      "walkingMinutes": 61,
+      "cyclingMinutes": 20,
+      "busMinutes": null,
+      "distanceMeters": 4300,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "laboral",
+      "to": "pumarin",
+      "walkingMinutes": 81,
+      "cyclingMinutes": 25,
+      "busMinutes": null,
+      "distanceMeters": 5800,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    },
+    {
+      "from": "laboral",
+      "to": "yelmo",
+      "walkingMinutes": 106,
+      "cyclingMinutes": 28,
+      "busMinutes": null,
+      "distanceMeters": 7600,
+      "source": "distances.json",
+      "reviewStatus": "verified"
+    }
+  ]
+}

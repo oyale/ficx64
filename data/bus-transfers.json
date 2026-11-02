@@ -1,0 +1,698 @@
+{
+ "schemaVersion": 1,
+ "source": "bus.json",
+ "operator": "EMTUSA Gijón",
+ "timeBands": {
+  "diurno_laborable_sabado": {
+   "label": "Lunes a Sábado (07:00 - 21:00)",
+   "headway_main_lines_min": "8 - 12",
+   "headway_secondary_lines_min": "15 - 20",
+   "reliability": "alta"
+  },
+  "festivo_y_tarde_noche": {
+   "label": "Domingos/Festivos (todo el día) y Diario (21:00 - 23:00)",
+   "headway_main_lines_min": "15 - 25",
+   "headway_secondary_lines_min": "25 - 30",
+   "reliability": "media"
+  },
+  "nocturno": {
+   "label": "Noches (> 23:00 hasta fin de pases)",
+   "headway_main_lines_min": "30 - 60",
+   "notes": "La L34 opera todas las noches (salidas ~23:20, 00:30). Los Búhos (B1, B2, B3, B4) operan viernes, sábados y vísperas de festivo desde Plaza del Humedal / Gota de Leche cada 30-60 min.",
+   "reliability": "baja_requiere_puntualidad"
+  }
+ },
+ "stops": {
+  "teatro-jovellanos": {
+   "hub": "centro",
+   "stops": {
+    "hacia_oeste_yelmo": "Avda. de la Costa - Begoña (frente Hotel Begoña) / Plaza Europa",
+    "hacia_este_laboral": "Begoña (Paseo de Begoña, lado Teatro) / Capua (para L10)",
+    "hacia_sur_pumarin": "Plaza Europa / Gota de Leche (Lado Llanes)",
+    "hacia_ocine": "Avda. de la Costa - Begoña / Plaza Europa",
+    "nocturno": "Gota de Leche / Humedal (Lado Semáforo)"
+   }
+  },
+  "escuela-comercio": {
+   "hub": "centro",
+   "stops": {
+    "hacia_oeste_yelmo": "Avda. de la Costa - Begoña / Plaza Europa (a 3 min a pie)",
+    "hacia_este_laboral": "Begoña (Paseo de Begoña) / Capua (a 3 min a pie)",
+    "hacia_sur_pumarin": "Plaza Europa / Gota de Leche (a 4 min a pie)",
+    "hacia_ocine": "Avda. de la Costa - Begoña (a 3 min a pie)",
+    "nocturno": "Gota de Leche / Humedal (a 5 min a pie)"
+   }
+  },
+  "antiguo-instituto": {
+   "hub": "centro",
+   "stops": {
+    "hacia_oeste_yelmo": "Plaza Europa / Instituto (Plaza del Parchís, para L10)",
+    "hacia_este_laboral": "Begoña (Paseo de Begoña) / Capua (para L10)",
+    "hacia_sur_pumarin": "Plaza Europa / Gota de Leche / Plaza del Carmen",
+    "hacia_ocine": "Avda. de la Costa - Begoña / Plaza Europa",
+    "nocturno": "Gota de Leche / Humedal"
+   }
+  },
+  "ocine": {
+   "hub": "ocine",
+   "stops": {
+    "en_rio_de_oro_los_fresnos": "Los Fresnos (C/ Río de Oro, para L2)",
+    "en_avda_schultz": "Avda. Schultz 35 - San José / Eleuterio Quintanilla (para L12, B3)",
+    "en_avda_llano": "Avda. del Llano - San José / Pérez de Ayala (para L20, L2)",
+    "en_avda_constitucion": "Cangas de Onís / Avda. Constitución - Puerta La Villa (a 5 min a pie, para L6, L15, L18)"
+   }
+  },
+  "pumarin": {
+   "hub": "pumarin",
+   "stops": {
+    "en_severo_ochoa_ramon_areces": "C/ Severo Ochoa / Ramón Areces (Cabecera L10, paso B2)",
+    "en_avda_constitucion": "Sedes / Puerta del Sol - Avda. Constitución (a 4 min a pie, para L6, L15, L18)"
+   }
+  },
+  "yelmo": {
+   "hub": "yelmo",
+   "stops": {
+    "llegada_desde_centro": "Uruguay (Avda. Argentina, 54) / Cuatro Caminos (a 5 min a pie)",
+    "salida_hacia_centro_y_este": "Cuatro Caminos (Avda. Galicia, 91) / Ecuador (C/ Los Andes, 13)",
+    "salida_hacia_sur_pumarin": "Cuatro Caminos (Avda. Galicia, 91, para L6)"
+   }
+  },
+  "laboral": {
+   "hub": "laboral",
+   "stops": {
+    "principal": "Universidad Laboral / Parque Tecnológico (frente acceso Paraninfo/Teatro)"
+   }
+  }
+ },
+ "routes": [
+  {
+   "from": [
+    "teatro-jovellanos",
+    "escuela-comercio",
+    "antiguo-instituto"
+   ],
+   "to": [
+    "yelmo"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L1",
+      "L12"
+     ],
+     "board_stop": "Avda. de la Costa - Begoña (L1) o Plaza Europa (L1, L12)",
+     "alight_stop": "Uruguay (Avda. Argentina, 54)",
+     "walk_notes": "Bajar en parada Uruguay y caminar 5 min por C/ Maestro Amado Morán hasta Ocimax.",
+     "minutes": {
+      "diurno_laborable_sabado": 22,
+      "festivo_y_tarde_noche": 28,
+      "nocturno": null
+     }
+    },
+    {
+     "lines": [
+      "L6"
+     ],
+     "board_stop": "Gota de Leche / F.E.V.E.",
+     "alight_stop": "Cuatro Caminos",
+     "walk_notes": "Alternativa si L1/L12 tardan; requiere caminar 6-7 min desde Cuatro Caminos.",
+     "minutes": {
+      "diurno_laborable_sabado": 25,
+      "festivo_y_tarde_noche": 32,
+      "nocturno": null
+     }
+    },
+    {
+     "lines": [
+      "L34",
+      "B1"
+     ],
+     "board_stop": "Gota de Leche / Humedal (Lado Semáforo)",
+     "alight_stop": "Cuatro Caminos / Uruguay",
+     "walk_notes": "Servicio nocturno (> 23:00). L34 opera a diario (salidas ~23:20 y 00:30); B1 viernes, sábados y vísperas.",
+     "minutes": {
+      "diurno_laborable_sabado": null,
+      "festivo_y_tarde_noche": null,
+      "nocturno": 30
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "yelmo"
+   ],
+   "to": [
+    "teatro-jovellanos",
+    "escuela-comercio",
+    "antiguo-instituto"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L1"
+     ],
+     "board_stop": "Cuatro Caminos (Avda. Galicia, 91)",
+     "alight_stop": "Begoña (Paseo de Begoña)",
+     "walk_notes": "Deja frente al Hotel Begoña, a 1 min del Teatro Jovellanos.",
+     "minutes": {
+      "diurno_laborable_sabado": 22,
+      "festivo_y_tarde_noche": 28,
+      "nocturno": null
+     }
+    },
+    {
+     "lines": [
+      "L12"
+     ],
+     "board_stop": "Ecuador (C/ Los Andes, 13) o Cuatro Caminos",
+     "alight_stop": "Gota de Leche (C/ Palacio Valdés)",
+     "walk_notes": "Deja en Gota de Leche, a 4 min a pie de las tres sedes del centro.",
+     "minutes": {
+      "diurno_laborable_sabado": 23,
+      "festivo_y_tarde_noche": 29,
+      "nocturno": null
+     }
+    },
+    {
+     "lines": [
+      "L34",
+      "B1"
+     ],
+     "board_stop": "Ecuador (C/ Los Andes, 13) / Cuatro Caminos",
+     "alight_stop": "Gota de Leche / Plaza del Humedal",
+     "walk_notes": "Vuelta nocturna al terminar los últimos pases en Ocimax.",
+     "minutes": {
+      "diurno_laborable_sabado": null,
+      "festivo_y_tarde_noche": null,
+      "nocturno": 30
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "teatro-jovellanos",
+    "escuela-comercio",
+    "antiguo-instituto"
+   ],
+   "to": [
+    "laboral"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L1",
+      "L18"
+     ],
+     "board_stop": "Begoña (Paseo de Begoña)",
+     "alight_stop": "Universidad Laboral / Parque Tecnológico",
+     "walk_notes": "L1 va por La Arena/El Bibio y L18 por Viesques; ambas paran en la misma marquesina de Begoña y dejan frente a la Laboral.",
+     "minutes": {
+      "diurno_laborable_sabado": 24,
+      "festivo_y_tarde_noche": 30,
+      "nocturno": null
+     }
+    },
+    {
+     "lines": [
+      "L10",
+      "L15"
+     ],
+     "board_stop": "Begoña (L15) o Capua / Marqués de Casa Valdés (L10)",
+     "alight_stop": "Universidad Laboral / Tanatorio - Hospital Cabueñes",
+     "walk_notes": "L10 es ideal si sales directamente desde Antiguo Instituto bajando hacia Capua.",
+     "minutes": {
+      "diurno_laborable_sabado": 27,
+      "festivo_y_tarde_noche": 34,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "laboral"
+   ],
+   "to": [
+    "teatro-jovellanos",
+    "escuela-comercio",
+    "antiguo-instituto"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L1",
+      "L18",
+      "L15"
+     ],
+     "board_stop": "Universidad Laboral (sentido Centro)",
+     "alight_stop": "Avda. de la Costa - Begoña / Plaza Europa",
+     "walk_notes": "Cualquiera de las tres líneas te deja en Begoña en unos 15-17 min. Último paso sobre las 22:45 - 23:00.",
+     "minutes": {
+      "diurno_laborable_sabado": 24,
+      "festivo_y_tarde_noche": 30,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "teatro-jovellanos",
+    "escuela-comercio",
+    "antiguo-instituto"
+   ],
+   "to": [
+    "pumarin"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L10"
+     ],
+     "board_stop": "Instituto (Plaza del Parchís) / Plaza del Carmen",
+     "alight_stop": "C/ Severo Ochoa / Ramón Areces",
+     "walk_notes": "Te deja en la puerta misma del CMI Pumarín Gijón-Sur.",
+     "minutes": {
+      "diurno_laborable_sabado": 18,
+      "festivo_y_tarde_noche": 24,
+      "nocturno": null
+     }
+    },
+    {
+     "lines": [
+      "L6",
+      "L15",
+      "L18"
+     ],
+     "board_stop": "Plaza Europa (L15) / Gota de Leche (L6) / Sanz Crespo",
+     "alight_stop": "Sedes / Puerta del Sol (Avda. de la Constitución)",
+     "walk_notes": "Bajar en Avda. Constitución (Sedes o Puerta del Sol) y caminar 4 min hasta el CMI Pumarín.",
+     "minutes": {
+      "diurno_laborable_sabado": 17,
+      "festivo_y_tarde_noche": 22,
+      "nocturno": null
+     }
+    },
+    {
+     "lines": [
+      "B2"
+     ],
+     "board_stop": "Humedal (Lado Semáforo) / Plaza del Carmen",
+     "alight_stop": "Severo Ochoa / Pumarín",
+     "walk_notes": "Búho nocturno (viernes, sábados y vísperas).",
+     "minutes": {
+      "diurno_laborable_sabado": null,
+      "festivo_y_tarde_noche": null,
+      "nocturno": 25
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "pumarin"
+   ],
+   "to": [
+    "teatro-jovellanos",
+    "escuela-comercio",
+    "antiguo-instituto"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L10"
+     ],
+     "board_stop": "C/ Severo Ochoa / Ramón Areces",
+     "alight_stop": "Plaza del Carmen / Álvarez Garaya / Jovellanos",
+     "walk_notes": "Directo desde la puerta del CMI hasta el corazón del centro.",
+     "minutes": {
+      "diurno_laborable_sabado": 18,
+      "festivo_y_tarde_noche": 24,
+      "nocturno": null
+     }
+    },
+    {
+     "lines": [
+      "L15",
+      "L18",
+      "L6"
+     ],
+     "board_stop": "Sedes - Avda. La Constitución / Puerta del Sol",
+     "alight_stop": "Begoña (L15, L18) o Gota de Leche (L6, L18)",
+     "walk_notes": "Gran frecuencia combinada subiendo por toda la Avda. de la Constitución.",
+     "minutes": {
+      "diurno_laborable_sabado": 17,
+      "festivo_y_tarde_noche": 22,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "teatro-jovellanos",
+    "escuela-comercio",
+    "antiguo-instituto"
+   ],
+   "to": [
+    "ocine"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L20",
+      "L12"
+     ],
+     "board_stop": "Begoña (L20) / Plaza Europa (L12)",
+     "alight_stop": "Avda. del Llano - San José (L20) / Avda. Schultz - San José (L12)",
+     "walk_notes": "A pie son solo 14-18 min; el autobús solo compensa si llueve mucho o estás justo en la parada cuando pasa.",
+     "minutes": {
+      "diurno_laborable_sabado": 13,
+      "festivo_y_tarde_noche": 18,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "ocine"
+   ],
+   "to": [
+    "laboral"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L2"
+     ],
+     "board_stop": "Los Fresnos (C/ Río de Oro)",
+     "alight_stop": "Universidad Laboral / Parque Tecnológico",
+     "walk_notes": "Conexión directa perfecta: se coge en la misma puerta del CC Los Fresnos y te deja frente a la Laboral.",
+     "minutes": {
+      "diurno_laborable_sabado": 23,
+      "festivo_y_tarde_noche": 30,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "laboral"
+   ],
+   "to": [
+    "ocine"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L2"
+     ],
+     "board_stop": "Universidad Laboral (sentido El Corte Inglés)",
+     "alight_stop": "Los Fresnos",
+     "walk_notes": "Directo hasta el lateral del CC Los Fresnos sin pasar por el centro.",
+     "minutes": {
+      "diurno_laborable_sabado": 23,
+      "festivo_y_tarde_noche": 30,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "ocine"
+   ],
+   "to": [
+    "yelmo"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L12"
+     ],
+     "board_stop": "Avda. Schultz 35 - San José / Eleuterio Quintanilla",
+     "alight_stop": "Uruguay (Avda. Argentina, 54)",
+     "walk_notes": "Caminar 3 min desde OCINE hasta Avda. Schultz; L12 cruza directo hacia La Calzada.",
+     "minutes": {
+      "diurno_laborable_sabado": 26,
+      "festivo_y_tarde_noche": 33,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "yelmo"
+   ],
+   "to": [
+    "ocine"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L12"
+     ],
+     "board_stop": "Ecuador (C/ Los Andes, 13) / Cuatro Caminos",
+     "alight_stop": "San José / Pérez de Ayala (Avda. Schultz)",
+     "walk_notes": "Te deja a 3 min a pie de la entrada de Los Fresnos.",
+     "minutes": {
+      "diurno_laborable_sabado": 26,
+      "festivo_y_tarde_noche": 33,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "ocine"
+   ],
+   "to": [
+    "pumarin"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L2"
+     ],
+     "board_stop": "Los Fresnos / Pérez de Ayala",
+     "alight_stop": "Parque / Avda. de Oviedo (Centro Comercial)",
+     "walk_notes": "Deja en la zona sur/Corte Inglés, a unos 6-7 min a pie del CMI Pumarín.",
+     "minutes": {
+      "diurno_laborable_sabado": 19,
+      "festivo_y_tarde_noche": 25,
+      "nocturno": null
+     }
+    },
+    {
+     "lines": [
+      "L6",
+      "L15"
+     ],
+     "board_stop": "Cangas de Onís (Avda. de la Constitución, a 5 min de OCINE)",
+     "alight_stop": "Sedes / Puerta del Sol",
+     "walk_notes": "Bajas 3 paradas por Avda. de la Constitución y caminas 4 min hasta el CMI.",
+     "minutes": {
+      "diurno_laborable_sabado": 18,
+      "festivo_y_tarde_noche": 23,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "pumarin"
+   ],
+   "to": [
+    "ocine"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L15"
+     ],
+     "board_stop": "Sedes - Avda. La Constitución",
+     "alight_stop": "Avda. Constitución (Puerta La Villa)",
+     "walk_notes": "Te deja en Puerta La Villa, a 4 min andando por Río de Oro hasta Los Fresnos.",
+     "minutes": {
+      "diurno_laborable_sabado": 18,
+      "festivo_y_tarde_noche": 23,
+      "nocturno": null
+     }
+    },
+    {
+     "lines": [
+      "L2"
+     ],
+     "board_stop": "Avda. de Oviedo (Centro Comercial)",
+     "alight_stop": "Los Fresnos (C/ Río de Oro)",
+     "walk_notes": "Caminar 6-7 min hasta Avda. Oviedo; te deja en la misma puerta de Los Fresnos.",
+     "minutes": {
+      "diurno_laborable_sabado": 20,
+      "festivo_y_tarde_noche": 26,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "pumarin"
+   ],
+   "to": [
+    "yelmo"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L6"
+     ],
+     "board_stop": "Puerta del Sol / Sedes (Avda. de la Constitución)",
+     "alight_stop": "Cuatro Caminos",
+     "walk_notes": "Única línea directa entre Pumarín y La Calzada (pasa por Humedal/Poniente). Desde Cuatro Caminos, 6 min a pie hasta Ocimax.",
+     "minutes": {
+      "diurno_laborable_sabado": 29,
+      "festivo_y_tarde_noche": 36,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "yelmo"
+   ],
+   "to": [
+    "pumarin"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L6"
+     ],
+     "board_stop": "Cuatro Caminos (Avda. Galicia)",
+     "alight_stop": "Sedes / Puerta del Sol",
+     "walk_notes": "Línea directa hasta Avda. de la Constitución, a 4 min del CMI Pumarín.",
+     "minutes": {
+      "diurno_laborable_sabado": 29,
+      "festivo_y_tarde_noche": 36,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "pumarin"
+   ],
+   "to": [
+    "laboral"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L18",
+      "L15"
+     ],
+     "board_stop": "Sedes - Avda. La Constitución",
+     "alight_stop": "Universidad Laboral / Parque Tecnológico (L18) o Tanatorio (L15)",
+     "walk_notes": "L18 es la más rápida (22 min en bus por Begoña y Viesques) y te deja justo delante de la Laboral.",
+     "minutes": {
+      "diurno_laborable_sabado": 31,
+      "festivo_y_tarde_noche": 38,
+      "nocturno": null
+     }
+    },
+    {
+     "lines": [
+      "L10"
+     ],
+     "board_stop": "C/ Severo Ochoa / Ramón Areces",
+     "alight_stop": "Travesía de la Laboral / Tanatorio - Hospital Cabueñes",
+     "walk_notes": "Se coge en la puerta misma del CMI, aunque da más vuelta por Somió (~28 min de trayecto).",
+     "minutes": {
+      "diurno_laborable_sabado": 36,
+      "festivo_y_tarde_noche": 42,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "laboral"
+   ],
+   "to": [
+    "pumarin"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L18",
+      "L15"
+     ],
+     "board_stop": "Universidad Laboral (L18) / Tanatorio - Hospital Cabueñes (L15, L18)",
+     "alight_stop": "Sedes / Puerta del Sol",
+     "walk_notes": "Bajada directa por Viesques, Begoña y Avda. Constitución hasta Pumarín.",
+     "minutes": {
+      "diurno_laborable_sabado": 31,
+      "festivo_y_tarde_noche": 38,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "yelmo"
+   ],
+   "to": [
+    "laboral"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L1"
+     ],
+     "board_stop": "Cuatro Caminos (Avda. Galicia, 91)",
+     "alight_stop": "Universidad Laboral / Parque Tecnológico",
+     "walk_notes": "La L1 cruza Gijón entero de Oeste a Este sin necesidad de transbordo.",
+     "minutes": {
+      "diurno_laborable_sabado": 38,
+      "festivo_y_tarde_noche": 44,
+      "nocturno": null
+     }
+    }
+   ]
+  },
+  {
+   "from": [
+    "laboral"
+   ],
+   "to": [
+    "yelmo"
+   ],
+   "options": [
+    {
+     "lines": [
+      "L1"
+     ],
+     "board_stop": "Universidad Laboral (sentido Cerillero)",
+     "alight_stop": "Uruguay (Avda. Argentina, 54)",
+     "walk_notes": "Directa de punta a punta sin transbordo; 5 min a pie desde la parada Uruguay hasta Ocimax.",
+     "minutes": {
+      "diurno_laborable_sabado": 38,
+      "festivo_y_tarde_noche": 44,
+      "nocturno": null
+     }
+    }
+   ]
+  }
+ ]
+}
