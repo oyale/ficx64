@@ -1976,3 +1976,6 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .program-film-open { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
 .program-film-open:hover { color: var(--blue); text-decoration-color: currentColor; }
 .program-film-open:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+/* Vaciar listas: la primera pulsación solo pide confirmar. */
+#clear-saved.is-confirming { color: var(--danger); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
