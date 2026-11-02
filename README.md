@@ -164,3 +164,29 @@ between two venues, the app says so (“no bus”) instead of making one up.
 
 The code in this repository is **CC0 1.0** (public domain). Catalogue content keeps the
 festival's authorship.
+
+## Actualizaciones de la PWA
+
+El build deriva la versión del service worker del contenido del HTML generado,
+el propio worker, el manifiesto y los iconos. Repetir un build sin cambios conserva
+la versión; no hay que incrementar un contador manualmente. Publicar siempre el
+contenido completo de `dist/` como un único despliegue.
+
+La app comprueba actualizaciones al cargar, al volver a primer plano, al recuperar
+conexión y cada cinco minutos mientras está visible. El aviso solo aparece después
+de preparar la caché nueva. «Actualizar» pide activar el worker y recarga al recibir
+el cambio de controlador. Cerrar el aviso no fuerza una recarga. Las listas siguen
+en `localStorage`; la limpieza se limita a cachés de FICX.
+
+Validación automatizada:
+
+```sh
+python3 -m unittest discover -s tests -v
+node --test tests/test_service_worker.cjs
+```
+
+Prueba de aceptación en navegador: abrir una versión publicada, guardar una película,
+publicar otra con un cambio de interfaz o datos sin tocar `sw.js`, volver a la app y
+comprobar el aviso. Pulsar Actualizar y verificar el cambio y la película guardada.
+Repetir sin conexión: la app debe abrir la copia guardada. Las pruebas automatizadas
+no sustituyen esta comprobación real de instalación, actualización y modo offline.

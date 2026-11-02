@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import argparse
 import json
 from pathlib import Path
@@ -91,7 +92,16 @@ def main() -> None:
     # Piezas que la instalación necesita fuera del HTML: manifest, iconos y service worker.
     import shutil
     shutil.copyfile(ROOT / "manifest.webmanifest", out.parent / "manifest.webmanifest")
-    shutil.copyfile(SOURCE / "sw.js", out.parent / "sw.js")
+    worker = (SOURCE / "sw.js").read_text(encoding="utf-8")
+    digest = hashlib.sha256()
+    for name, content in [("index.html", html.encode("utf-8")),
+                          ("sw.js", worker.encode("utf-8")),
+                          ("manifest.webmanifest", (ROOT / "manifest.webmanifest").read_bytes())] + [
+                              (f"icons/{icon.name}", icon.read_bytes())
+                              for icon in sorted((ROOT / "icons").glob("*.png"))]:
+        digest.update(name.encode("utf-8") + b"\0" + content + b"\0")
+    version = digest.hexdigest()[:20]
+    (out.parent / "sw.js").write_text(worker.replace("__BUILD_VERSION__", version), encoding="utf-8")
     icons_out = out.parent / "icons"
     icons_out.mkdir(exist_ok=True)
     for icon in (ROOT / "icons").glob("*.png"):

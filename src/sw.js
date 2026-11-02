@@ -6,7 +6,8 @@
    entra por «/», por «/index.html» o con un fragmento «#pases=…»: el fragmento nunca llega al
    service worker, y de las dos rutas solo se conserva esta copia. */
 
-const VERSION = "ficx64-v3";
+const CACHE_PREFIX = `ficx64:${self.registration.scope}:`;
+const VERSION = `${CACHE_PREFIX}__BUILD_VERSION__`;
 const HOME = new URL("./", self.location).href;
 const SHELL = [
   // Solo la canónica: guardar también index.html dejaría dos copias de la misma página.
@@ -19,14 +20,19 @@ const SHELL = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(VERSION).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting())
+    caches.open(VERSION).then((cache) => cache.addAll(SHELL.map((url) => new Request(url, { cache: "reload" }))))
   );
+});
+
+// La actualización solo toma el control cuando la persona pulsa Actualizar.
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== VERSION).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => key !== VERSION && (key.startsWith(CACHE_PREFIX) || /^ficx64-v\d+$/.test(key))).map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
@@ -39,26 +45,26 @@ self.addEventListener("fetch", (event) => {
 
   const isDocument = request.mode === "navigate" || request.destination === "document";
   if (isDocument) {
-    // Red primero; si falla, la copia canónica. `caches.match(HOME)` no depende de la ruta pedida.
+    // Red primero; si falla, la copia canónica. `caches.open(VERSION).then((cache) => cache.match(HOME))` no depende de la ruta pedida.
     event.respondWith(
-      fetch(request)
+      fetch(new Request(request, { cache: "no-cache" }))
         .then((response) => {
           if (response && response.ok) {
             const copy = response.clone();
-            caches.open(VERSION).then((cache) => cache.put(HOME, copy)).catch(() => {});
+            event.waitUntil(caches.open(VERSION).then((cache) => cache.put(HOME, copy)).catch(() => {}));
           }
           return response;
         })
-        .catch(() => caches.match(HOME))
+        .catch(() => caches.open(VERSION).then((cache) => cache.match(HOME)))
     );
     return;
   }
 
   // Iconos y manifest: caché primero, se descargan una vez.
   event.respondWith(
-    caches.match(request).then((cached) => cached || fetch(request).then((response) => {
+    caches.open(VERSION).then((cache) => cache.match(request)).then((cached) => cached || fetch(request).then((response) => {
       const copy = response.clone();
-      caches.open(VERSION).then((cache) => cache.put(request, copy)).catch(() => {});
+      if (response.ok) event.waitUntil(caches.open(VERSION).then((cache) => cache.put(request, copy)).catch(() => {}));
       return response;
     }))
   );
