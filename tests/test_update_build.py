@@ -53,6 +53,16 @@ class UpdateBuildTest(unittest.TestCase):
                            check=True, capture_output=True)
             self.assertEqual(output.read_text(), html)
             self.assertFalse((output.parent / 'index.html').exists())
+            pages_output = root / 'pages' / 'index.html'
+            subprocess.run([sys.executable, str(root / 'build.py'), '--output', str(pages_output),
+                            '--site-url', 'https://oyale.github.io/ficx64/'], check=True, capture_output=True)
+            pages_manifest = json.loads((pages_output.parent / 'manifest.webmanifest').read_text())
+            self.assertEqual(pages_manifest['id'], 'https://oyale.github.io/ficx64/')
+            self.assertEqual(pages_manifest['related_applications'][0]['url'],
+                             'https://oyale.github.io/ficx64/manifest.webmanifest')
+            self.assertEqual((root / 'manifest.webmanifest').read_bytes(),
+                             (root / 'dist/manifest.webmanifest').read_bytes())
+            self.assertNotEqual((pages_output.parent / 'sw.js').read_bytes(), build())
 
 
 if __name__ == '__main__':

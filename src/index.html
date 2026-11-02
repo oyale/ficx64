@@ -662,7 +662,7 @@
           try {
             const sameManifest = new URL(app.url, manifestUrl).href === manifestUrl.href;
             // Android puede omitir id; en escritorio se comprueba la identidad publicada.
-            return sameManifest && (!app.id || app.id === "https://ficx.situacion.es/");
+            return sameManifest && (!app.id || new URL(app.id, manifestUrl).href === new URL("./", manifestUrl).href);
           }
           catch (_) { return false; }
         });

@@ -22,8 +22,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Construir el HTML
-        run: python3 build.py
+      - name: Configurar GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Construir el HTML para GitHub Pages
+        env:
+          FICX_PAGES_URL: ${{ steps.pages.outputs.base_url }}
+        run: python3 build.py --site-url "$FICX_PAGES_URL"
       - name: Comprobar que los datos están dentro
         run: |
           set -e

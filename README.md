@@ -151,57 +151,58 @@ Any `reviewStatus` other than `"verified"` makes the app show “transfer to be 
 }
 ```
 
-Minutes are **per time band** and may be `null` when there is no service. If there is no route
-between two venues, the app says so (“no bus”) instead of making one up.
+Minutes are **per time band** and may be `null` when there is no service. The data format only
+includes routes explicitly listed in `routes`.
 
 ## What this repository does not include
 
 - How the JSON files are produced from the festival PDFs or website. This repository documents
   the **format**, not the extraction.
-- Film images or texts: they belong to the festival and their authors.
+- Film image files: synopses are included in the catalogue JSON, but images are not stored here.
+  Their external URLs are loaded only if the user enables images.
 
 ## Licence
 
 The code in this repository is **CC0 1.0** (public domain). Catalogue content keeps the
 festival's authorship.
 
-## Actualizaciones de la PWA
+## PWA updates
 
-El build deriva la versión del service worker del contenido del HTML generado,
-el propio worker, el manifiesto y los iconos. Repetir un build sin cambios conserva
-la versión; no hay que incrementar un contador manualmente. Publicar siempre el
-contenido completo de `dist/` como un único despliegue.
+The build derives the service worker version from the generated HTML, the worker,
+the manifest and the icons. Repeating a build without changes keeps the same
+version; no manual counter is needed. Always publish the complete contents of
+`dist/` as a single deployment.
 
-La app comprueba actualizaciones al cargar, al volver a primer plano, al recuperar
-conexión y cada cinco minutos mientras está visible. El aviso solo aparece después
-de preparar la caché nueva. «Actualizar» pide activar el worker y recarga al recibir
-el cambio de controlador. Cerrar el aviso no fuerza una recarga. Las listas siguen
-en `localStorage`; la limpieza se limita a cachés de FICX.
+The app checks for updates on load, when returning to the foreground, when
+connection is restored and every five minutes while visible. The notice appears
+only after the new cache is ready. “Update” activates the worker and reloads when
+the controller changes. Dismissing the notice does not force a reload. Lists stay
+in `localStorage`; cleanup is limited to FICX caches.
 
-Validación automatizada:
+Automated checks:
 
 ```sh
 python3 -m unittest discover -s tests -v
 node --test tests/test_service_worker.cjs
 ```
 
-Prueba de aceptación en navegador: abrir una versión publicada, guardar una película,
-publicar otra con un cambio de interfaz o datos sin tocar `sw.js`, volver a la app y
-comprobar el aviso. Pulsar Actualizar y verificar el cambio y la película guardada.
-Repetir sin conexión: la app debe abrir la copia guardada. Las pruebas automatizadas
-no sustituyen esta comprobación real de instalación, actualización y modo offline.
+Browser acceptance check: open a published version, save a film, publish another
+version with a UI or data change without touching `sw.js`, return to the app and
+check for the notice. Press Update and verify the change and the saved film.
+Repeat offline: the app should open the cached copy. Automated checks do not
+replace this real installation, update and offline check.
 
-## Descargar la app como HTML
+## Download the app as HTML
 
-Ayuda ofrece descargar `index.html` con el nombre sugerido `ficx64.html`.
-El archivo incluye la app y el catálogo, pero no las elecciones del navegador:
-para transferirlas hay que exportar el programa desde Ajustes. El archivo local
-no recibe actualizaciones automáticas. El enlace de descarga se oculta al abrirlo
-como archivo local.
+Help offers `index.html` for download with the suggested filename `ficx64.html`.
+The file includes the app and catalogue, but not browser choices; export the
+programme from Settings to transfer them. The local file does not receive
+automatic updates. The download link is hidden when the app is opened as a local
+file.
 
-`dist/index.html` es la única copia completa publicada. `dist/ficx64.html` es una
-redirección pequeña para conservar enlaces antiguos, incluidos parámetros y
-fragmentos de listas o itinerarios. Para generar un portable aparte:
+`dist/index.html` is the only complete published copy. `dist/ficx64.html` is a
+small redirect that preserves old links, including list and itinerary parameters
+and fragments. To generate a separate portable copy:
 
 ```sh
 python3 build.py --output /tmp/ficx64-portable/ficx64.html
