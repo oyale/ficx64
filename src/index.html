@@ -509,28 +509,56 @@
     <button type="button" id="update-dismiss" aria-label="Ahora no">×</button>
   </div>
   <script>
-    // El service worker solo existe servido por http(s): sobre file:// no hay nada que registrar.
+    // Comprobar al abrir, recuperar conexión y volver a la app; sin recarga automática.
     if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
       const toast = document.querySelector("#update-toast");
+      const reloadButton = document.querySelector("#update-reload");
+      let registration = null;
+      let applyingUpdate = false;
+      let checkingUpdate = false;
+      let lastCheck = 0;
       const showUpdate = () => { toast.hidden = false; };
       document.querySelector("#update-dismiss").addEventListener("click", () => { toast.hidden = true; });
-      document.querySelector("#update-reload").addEventListener("click", () => window.location.reload());
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").then((registration) => {
-          // Mientras la app está abierta, un despliegue nuevo llega como «updatefound».
-          registration.addEventListener("updatefound", () => {
-            const next = registration.installing;
-            if (!next) return;
-            next.addEventListener("statechange", () => {
-              // Con un controlador delante, esto es una versión nueva, no la primera instalación.
-              if (next.state === "installed" && navigator.serviceWorker.controller) showUpdate();
-            });
-          });
-          // Ya había una versión esperando: se avisa sin esperar a la siguiente.
-          if (registration.waiting && navigator.serviceWorker.controller) showUpdate();
-          registration.update().catch(() => { /* Sin red: se reintenta al abrir. */ });
-        }).catch(() => { /* Sin SW la app funciona igual. */ });
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (applyingUpdate) window.location.reload();
       });
+      reloadButton.addEventListener("click", () => {
+        if (!registration?.waiting) { window.location.reload(); return; }
+        applyingUpdate = true;
+        reloadButton.disabled = true;
+        reloadButton.textContent = "Actualizando…";
+        registration.waiting.postMessage({ type: "SKIP_WAITING" });
+      });
+      async function checkUpdate(force = false) {
+        if (!registration || checkingUpdate || document.hidden || !navigator.onLine) return;
+        if (!force && Date.now() - lastCheck < 60000) return;
+        checkingUpdate = true;
+        lastCheck = Date.now();
+        try {
+          await registration.update();
+          if (registration.waiting) showUpdate();
+        } catch (_) { /* Sin red o despliegue incompleto: se reintenta más tarde. */ }
+        finally { checkingUpdate = false; }
+      }
+      window.addEventListener("load", async () => {
+        try {
+          registration = await navigator.serviceWorker.register("sw.js", { updateViaCache: "none" });
+          const observe = (worker) => {
+            if (!worker) return;
+            worker.addEventListener("statechange", () => {
+              if (worker.state === "installed" && navigator.serviceWorker.controller) showUpdate();
+            });
+          };
+          registration.addEventListener("updatefound", () => observe(registration.installing));
+          observe(registration.installing);
+          if (registration.waiting) showUpdate();
+          await checkUpdate(true);
+        } catch (_) { /* El documento sigue funcionando sin service worker. */ }
+      });
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) checkUpdate(); });
+      window.addEventListener("focus", () => checkUpdate());
+      window.addEventListener("online", () => checkUpdate(true));
+      setInterval(() => checkUpdate(), 5 * 60 * 1000);
     }
 
     // Un único estado de instalación para bienvenida y ayuda.
