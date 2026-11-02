@@ -382,7 +382,8 @@
           <div class="help-replay" id="help-instalar">
             <p class="eyebrow">INSTALARLA COMO APLICACIÓN</p>
             <p>Se instala como una app más: icono propio, pantalla completa y <b>funciona sin conexión</b>.</p>
-            <p id="help-install-fallback"><b>Android y ordenador:</b> pulsa el botón. <b>iPhone y iPad:</b> abre la app, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>.</p>
+            <p id="help-install-fallback"><b>Android y ordenador:</b> si el navegador ofrece instalar la app, usa la opción de su menú. <b>iPhone y iPad:</b> abre la app, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>.</p>
+            <p class="help-install-ready" id="help-installed" role="status" hidden>La app está instalada. Puedes abrirla desde su icono.</p>
             <p class="help-install-ready" id="help-install-state" hidden><b>Se puede instalar en este dispositivo.</b></p>
             <button type="button" class="settings-action is-primary" id="help-install-button" hidden>Instalar la app</button>
             <p>Lo que guardes vive en este navegador. Instalada y en el navegador comparten los datos si entras por la misma dirección; el fichero guardado en el móvil es otro dispositivo. Sin conexión verás el programa de la última vez, y la app avisa cuando hay una versión nueva.</p>
@@ -528,61 +529,55 @@
       });
     }
 
-    // Instalación: Chrome/Android avisa aquí cuando la app se puede instalar. iOS no lo hace
-    // (allí se añade a mano desde «Compartir»), así que el aviso simplemente no aparece.
+    // Un único estado de instalación para bienvenida y ayuda.
     let installPrompt = null;
-    window.addEventListener("beforeinstallprompt", (event) => {
-      event.preventDefault();
-      installPrompt = event;
-    });
+    let installedThisSession = false;
+    const appDisplay = window.matchMedia("(display-mode: standalone)");
+    const minimalDisplay = window.matchMedia("(display-mode: minimal-ui)");
     const installBox = document.querySelector("#wizard-install");
     const installButton = document.querySelector("#wizard-install-button");
     const installedNote = document.querySelector("#wizard-installed");
-    // Instalada se nota de dos formas: se abrió desde el icono (modo app) o el navegador la
-    // tiene ya instalada. iOS no expone ninguna de las dos de forma fiable, así que no lo afirma.
-    const isInstalled = () => window.matchMedia("(display-mode: standalone)").matches
-      || window.matchMedia("(display-mode: minimal-ui)").matches
-      || Boolean(navigator.standalone)
-      || Boolean(navigator.getInstalledRelatedApps && navigator.getInstalledRelatedApps !== undefined
-        && window.__ficxRelatedApp);
-    const syncInstallBox = () => {
-      const installed = isInstalled();
-      installBox.hidden = installed || !installPrompt;
-      installedNote.hidden = !installed;
-    };
-    if (navigator.getInstalledRelatedApps) {
-      navigator.getInstalledRelatedApps().then((apps) => { window.__ficxRelatedApp = (apps || []).length > 0; syncInstallBox(); }).catch(() => {});
-    }
-    window.addEventListener("beforeinstallprompt", syncInstallBox);
-    window.addEventListener("appinstalled", () => { installPrompt = null; syncInstallBox(); });
-    window.addEventListener("load", syncInstallBox);
-    // El mismo aviso sirve en el asistente y en la ayuda.
     const helpInstallButton = document.querySelector("#help-install-button");
-    const helpInstallState = document.querySelector("#help-install-state");
-    const helpInstallFallback = document.querySelector("#help-install-fallback");
-    const syncHelpInstall = () => {
-      helpInstallButton.hidden = !installPrompt;
-      helpInstallState.hidden = !installPrompt;
-      helpInstallFallback.hidden = Boolean(installPrompt);
-    };
-    window.addEventListener("beforeinstallprompt", syncHelpInstall);
-    window.addEventListener("appinstalled", syncHelpInstall);
-    window.addEventListener("load", syncHelpInstall);
-    helpInstallButton.addEventListener("click", async () => {
-      if (!installPrompt) return;
-      installPrompt.prompt();
-      await installPrompt.userChoice.catch(() => {});
-      installPrompt = null;
-      syncInstallBox();
-      syncHelpInstall();
+    const isInstalled = () => installedThisSession || appDisplay.matches
+      || minimalDisplay.matches || Boolean(navigator.standalone);
+    function syncInstallation() {
+      const installed = isInstalled();
+      const available = !installed && Boolean(installPrompt);
+      installBox.hidden = !available;
+      installButton.disabled = !available;
+      installedNote.hidden = !installed;
+      helpInstallButton.hidden = !available;
+      helpInstallButton.disabled = !available;
+      document.querySelector("#help-install-state").hidden = !available;
+      document.querySelector("#help-installed").hidden = !installed;
+      document.querySelector("#help-install-fallback").hidden = installed || available;
+    }
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      installPrompt = event;
+      syncInstallation();
     });
-    installButton.addEventListener("click", async () => {
-      if (!installPrompt) return;
-      installPrompt.prompt();
-      await installPrompt.userChoice.catch(() => {});
+    window.addEventListener("appinstalled", () => {
+      installedThisSession = true;
       installPrompt = null;
-      syncInstallBox();
+      syncInstallation();
     });
+    appDisplay.addEventListener("change", syncInstallation);
+    minimalDisplay.addEventListener("change", syncInstallation);
+    async function requestInstallation() {
+      if (!installPrompt) return;
+      const prompt = installPrompt;
+      installPrompt = null;
+      syncInstallation();
+      try {
+        await prompt.prompt();
+        await prompt.userChoice;
+      } catch (_) { /* La ayuda manual sigue disponible si el navegador falla. */ }
+      finally { syncInstallation(); }
+    }
+    installButton.addEventListener("click", requestInstallation);
+    helpInstallButton.addEventListener("click", requestInstallation);
+    syncInstallation();
   </script>
 </body>
 </html>
