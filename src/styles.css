@@ -149,6 +149,10 @@ html:has(.wizard[open]), html:has(.wizard[open]) body { overflow: hidden; }
 .wizard-cycle li { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: start; gap: 10px; color: var(--text-body); font-size: 12px; line-height: 1.45; }
 .wizard-cycle-step { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--blue); color: var(--on-blue); font-size: 11px; font-weight: 900; }
 .wizard-cycle b { color: var(--text); }
+/* Instalar: solo aparece cuando el navegador ofrece la instalación (Chrome/Android). */
+.wizard-install { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0; }
+.wizard-install[hidden] { display: none; }
+.wizard-install .settings-action { min-height: 40px; }
 .wizard-list b { color: var(--text); }
 .wizard-list kbd { padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface-raised); color: var(--text); font-size: 10px; }
 /* Tarjeta de práctica: la misma cenefa turquesa de las tarjetas de cine. */

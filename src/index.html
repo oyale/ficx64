@@ -135,6 +135,10 @@
               <li><b>Navegar:</b> toca una tarjeta para abrir su ficha; ‹ › o desliza para pasar de una a otra; <kbd>←</kbd> <kbd>→</kbd> con teclado, <kbd>/</kbd> busca y <kbd>Esc</kbd> cierra.</li>
             </ul>
             <p class="wizard-note" id="wizard-demo-note">Lo que has probado aquí es una demostración: no se ha guardado nada. Empieza a explorar y añade tus películas cuando quieras.</p>
+            <p class="wizard-install" id="wizard-install" hidden>
+              <button type="button" class="settings-action is-primary" id="wizard-install-button">Instalar la app</button>
+              <span class="wizard-hint" id="wizard-install-hint">Se abre a pantalla completa y funciona sin conexión.</span>
+            </p>
             <ol class="wizard-cycle">
               <li><span class="wizard-cycle-step">1</span><span><b>Elige películas.</b> Lo que quieres ver, lo que estás dudando y lo que descartas.</span></li>
               <li><span class="wizard-cycle-step">2</span><span><b>Búscalas por sitio y hora.</b> «Buscar pases» filtra por día, franja y sede.</span></li>
@@ -514,6 +518,27 @@
         }).catch(() => { /* Sin SW la app funciona igual. */ });
       });
     }
+
+    // Instalación: Chrome/Android avisa aquí cuando la app se puede instalar. iOS no lo hace
+    // (allí se añade a mano desde «Compartir»), así que el aviso simplemente no aparece.
+    let installPrompt = null;
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      installPrompt = event;
+    });
+    const installBox = document.querySelector("#wizard-install");
+    const installButton = document.querySelector("#wizard-install-button");
+    const syncInstallBox = () => { installBox.hidden = !installPrompt; };
+    window.addEventListener("beforeinstallprompt", syncInstallBox);
+    window.addEventListener("appinstalled", () => { installPrompt = null; syncInstallBox(); });
+    window.addEventListener("load", syncInstallBox);
+    installButton.addEventListener("click", async () => {
+      if (!installPrompt) return;
+      installPrompt.prompt();
+      await installPrompt.userChoice.catch(() => {});
+      installPrompt = null;
+      syncInstallBox();
+    });
   </script>
 </body>
 </html>
