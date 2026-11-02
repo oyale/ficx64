@@ -2515,6 +2515,12 @@
   }
   // Diálogo propio en vez de window.prompt: se estiliza, cuenta los 40 caracteres
   // y no vuelve a preguntar cuando el nombre es largo.
+  // Ejemplos del propio catálogo; nunca se usan como nombre del usuario.
+  function randomAliasPlaceholder() {
+    const names = [...new Set(films.flatMap((film) => film.directors || []))]
+      .filter((name) => typeof name === "string" && name.trim() && name.length <= 40);
+    return names.length ? names[Math.floor(Math.random() * names.length)] : "Tu nombre o apodo";
+  }
   function askAlias() {
     const dialog = document.querySelector("#alias-dialog");
     const input = document.querySelector("#alias-input");
@@ -2523,6 +2529,7 @@
     // Con nombre guardado, el enlace sale ya firmado: basta confirmar.
     userAlias = readAlias();
     input.value = userAlias;
+    input.placeholder = randomAliasPlaceholder();
     counter.textContent = `${input.value.length}/40`;
     return new Promise((resolve) => {
       let settled = false;
@@ -2827,6 +2834,7 @@
     wizardDemoBShown = false;
     wizardDemoC = null;
     userAlias = readAlias();
+    document.querySelector("#wizard-name").placeholder = randomAliasPlaceholder();
     goToOnboardingStep(step);
     if (!wizard.open) wizard.showModal();
     // Repinta ya abierto: al arrancar la app las elecciones se pintan antes del primer layout.
