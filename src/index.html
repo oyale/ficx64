@@ -139,6 +139,7 @@
               <button type="button" class="settings-action is-primary" id="wizard-install-button">Instalar la app</button>
               <span class="wizard-hint" id="wizard-install-hint">Se abre a pantalla completa y funciona sin conexión.</span>
             </p>
+            <p class="wizard-hint" id="wizard-install-ios" hidden>En iPhone y iPad: abre la app en Safari, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>.</p>
             <p class="wizard-installed" id="wizard-installed" hidden>🎉 <b>Ya la tienes instalada.</b> Ábrela desde su icono: entra directa, a pantalla completa, y funciona sin conexión.</p>
             <ol class="wizard-cycle">
               <li><span class="wizard-cycle-step">1</span><span><b>Elige películas.</b> Lo que quieres ver, lo que estás dudando y lo que descartas.</span></li>
@@ -382,7 +383,8 @@
           <div class="help-replay" id="help-instalar">
             <p class="eyebrow">INSTALARLA COMO APLICACIÓN</p>
             <p>Se instala como una app más: icono propio, pantalla completa y <b>funciona sin conexión</b>.</p>
-            <p id="help-install-fallback"><b>Android y ordenador:</b> si el navegador ofrece instalar la app, usa la opción de su menú. <b>iPhone y iPad:</b> abre la app, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>.</p>
+            <p id="help-install-ios" hidden>En iPhone y iPad: abre la app en Safari, toca <b>Compartir</b> y elige <b>Añadir a pantalla de inicio</b>. iOS no deja que la web lance la instalación sola.</p>
+            <p id="help-install-other" hidden>Si tu navegador ofrece instalar la app, usa la opción de su menú («Instalar app»). También puedes probar con Chrome.</p>
             <p class="help-install-ready" id="help-installed" role="status" hidden>La app está instalada. Puedes abrirla desde su icono.</p>
             <p class="help-install-ready" id="help-install-state" hidden><b>Se puede instalar en este dispositivo.</b></p>
             <button type="button" class="settings-action is-primary" id="help-install-button" hidden>Instalar la app</button>
@@ -530,6 +532,8 @@
     }
 
     // Un único estado de instalación para bienvenida y ayuda.
+    const isIosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent)
+      || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     let installPrompt = null;
     let installedThisSession = false;
     let relatedAppInstalled = false;
@@ -551,7 +555,9 @@
       helpInstallButton.disabled = !available;
       document.querySelector("#help-install-state").hidden = !available;
       document.querySelector("#help-installed").hidden = !installed;
-      document.querySelector("#help-install-fallback").hidden = installed || available;
+      document.querySelector("#help-install-ios").hidden = installed || available || !isIosDevice;
+      document.querySelector("#wizard-install-ios").hidden = installed || available || !isIosDevice;
+      document.querySelector("#help-install-other").hidden = installed || available || isIosDevice;
     }
     window.addEventListener("beforeinstallprompt", (event) => {
       event.preventDefault();
