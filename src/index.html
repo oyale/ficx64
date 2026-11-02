@@ -532,13 +532,14 @@
     // Un único estado de instalación para bienvenida y ayuda.
     let installPrompt = null;
     let installedThisSession = false;
+    let relatedAppInstalled = false;
     const appDisplay = window.matchMedia("(display-mode: standalone)");
     const minimalDisplay = window.matchMedia("(display-mode: minimal-ui)");
     const installBox = document.querySelector("#wizard-install");
     const installButton = document.querySelector("#wizard-install-button");
     const installedNote = document.querySelector("#wizard-installed");
     const helpInstallButton = document.querySelector("#help-install-button");
-    const isInstalled = () => installedThisSession || appDisplay.matches
+    const isInstalled = () => installedThisSession || relatedAppInstalled || appDisplay.matches
       || minimalDisplay.matches || Boolean(navigator.standalone);
     function syncInstallation() {
       const installed = isInstalled();
@@ -578,6 +579,22 @@
     installButton.addEventListener("click", requestInstallation);
     helpInstallButton.addEventListener("click", requestInstallation);
     syncInstallation();
+    // Un resultado vacío o una API ausente no prueban que no esté instalada.
+    if (location.protocol === "https:" && typeof navigator.getInstalledRelatedApps === "function") {
+      const manifestUrl = new URL(document.querySelector('link[rel="manifest"]').href);
+      navigator.getInstalledRelatedApps().then((apps) => {
+        relatedAppInstalled = apps.some((app) => {
+          if (app.platform !== "webapp" || !app.url) return false;
+          try {
+            const sameManifest = new URL(app.url, manifestUrl).href === manifestUrl.href;
+            // Android puede omitir id; en escritorio se comprueba la identidad publicada.
+            return sameManifest && (!app.id || app.id === "https://ficx.situacion.es/");
+          }
+          catch (_) { return false; }
+        });
+        syncInstallation();
+      }).catch(() => { /* Estado desconocido: mantener la ayuda manual. */ });
+    }
   </script>
 </body>
 </html>

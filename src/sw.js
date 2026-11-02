@@ -6,7 +6,7 @@
    entra por «/», por «/index.html» o con un fragmento «#pases=…»: el fragmento nunca llega al
    service worker, y de las dos rutas solo se conserva esta copia. */
 
-const VERSION = "ficx64-v2";
+const VERSION = "ficx64-v3";
 const HOME = new URL("./", self.location).href;
 const SHELL = [
   // Solo la canónica: guardar también index.html dejaría dos copias de la misma página.
