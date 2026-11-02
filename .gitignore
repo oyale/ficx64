@@ -1,0 +1,10 @@
+# La construcción publica en Pages desde aquí.
+dist/
+
+# Restos de Python y del sistema.
+__pycache__/
+*.pyc
+.DS_Store
+
+# Comparación local con el script original: no se publica.
+legacy_build.py
