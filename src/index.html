@@ -391,6 +391,7 @@
             <p class="help-install-ready" id="help-install-state" hidden><b>Se puede instalar en este dispositivo.</b></p>
             <button type="button" class="settings-action is-primary" id="help-install-button" hidden>Instalar la app</button>
             <p>Lo que guardes vive en este navegador. Instalada y en el navegador comparten los datos si entras por la misma dirección; el fichero guardado en el móvil es otro dispositivo. Sin conexión verás el programa de la última vez, y la app avisa cuando hay una versión nueva.</p>
+            <p id="help-local-app" hidden><b>Estás usando la versión en archivo HTML.</b> No se actualiza automáticamente. Tus elecciones se guardan en este navegador. Para llevarlas a otra copia o dispositivo, exporta tu programa desde Ajustes.</p>
             <div id="help-download-app">
               <a class="help-download-app" href="./index.html" download="ficx64.html">Descargar la app en un archivo HTML ↗</a>
               <p>Para abrirla sin conexión sin instalarla. No incluye tus listas personales ni se actualiza automáticamente. Para llevarte tus elecciones, exporta tu programa desde Ajustes.</p>
@@ -566,7 +567,9 @@
     }
 
     // El archivo portable ya está descargado: su carpeta puede no contener index.html.
-    if (location.protocol === "file:") document.querySelector("#help-download-app").hidden = true;
+    const usingLocalFile = location.protocol === "file:";
+    document.querySelector("#help-download-app").hidden = usingLocalFile;
+    document.querySelector("#help-local-app").hidden = !usingLocalFile;
 
     // Un único estado de instalación para bienvenida y ayuda.
     const isIosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent)
