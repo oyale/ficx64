@@ -1,11 +1,16 @@
 /* Service worker del programa del FICX.
    El documento va PRIMERO a la red: es donde está el programa y los enlaces compartidos, y
-   servir una copia vieja mostraría pases caducados. El caché solo entra cuando no hay red. */
+   servir una copia vieja mostraría pases caducados. El caché solo entra cuando no hay red.
 
-const VERSION = "ficx64-v1";
+   La página se guarda bajo una única URL canónica (la raíz del ámbito) para que da igual si se
+   entra por «/», por «/index.html» o con un fragmento «#pases=…»: el fragmento nunca llega al
+   service worker, y de las dos rutas solo se conserva esta copia. */
+
+const VERSION = "ficx64-v2";
+const HOME = new URL("./", self.location).href;
 const SHELL = [
+  // Solo la canónica: guardar también index.html dejaría dos copias de la misma página.
   "./",
-  "./index.html",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
@@ -34,16 +39,17 @@ self.addEventListener("fetch", (event) => {
 
   const isDocument = request.mode === "navigate" || request.destination === "document";
   if (isDocument) {
-    // Red primero; si falla, la copia guardada.
-    const base = new URL("./", self.location).href;
+    // Red primero; si falla, la copia canónica. `caches.match(HOME)` no depende de la ruta pedida.
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(VERSION).then((cache) => cache.put(base, copy)).catch(() => {});
+          if (response && response.ok) {
+            const copy = response.clone();
+            caches.open(VERSION).then((cache) => cache.put(HOME, copy)).catch(() => {});
+          }
           return response;
         })
-        .catch(() => caches.match(base).then((cached) => cached || caches.match(request)))
+        .catch(() => caches.match(HOME))
     );
     return;
   }
