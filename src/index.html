@@ -290,6 +290,7 @@
             <div class="selection-topline"><span>01 / TU LISTA</span><span class="selection-flash">✳</span></div>
             <h2 id="selection-title">Tus<br><em>listas.</em></h2>
             <p class="selection-intro">Lo que has ido guardando en las fichas. Puedes cambiarlo cuando quieras.</p>
+            <button id="share-lists" type="button" class="share-lists-button">Compartir mis listas</button>
             <section class="intention-lane" aria-labelledby="want-title">
               <div class="lane-heading"><h3 id="want-title">Lo quiero<br><em>ver.</em></h3><b id="want-count">0</b></div>
               <div id="saved-list" class="saved-list"></div>
@@ -301,7 +302,6 @@
               <p class="lane-empty" id="maybe-empty">Déjalas aquí mientras te decides.</p>
             </section>
             <div class="selection-footer"><span><b id="saved-total">0</b> películas en tus listas</span><button id="clear-saved" type="button" class="text-button" hidden>Vaciar ambas</button></div>
-            <button id="share-lists" type="button" class="settings-action share-lists-button">Compartir mis listas</button>
             <button class="next-step" id="next-to-sessions" type="button"><span class="next-step-index">SIGUIENTE PASO</span><strong>Buscar los pases <i>↗</i></strong></button>
           </aside>
         </section>
@@ -494,7 +494,7 @@
     <form method="dialog">
       <h2 id="alias-title">¿Quién comparte?</h2>
       <p class="alias-intro">Es opcional: aparece como «El itinerario de …» al abrir el enlace.</p>
-      <label class="alias-field"><span>Tu nombre o apodo</span><input id="alias-input" type="text" maxlength="40" autocomplete="off" placeholder="Fulanita"></label>
+      <label class="alias-field"><span>Tu nombre o apodo</span><input id="alias-input" type="text" maxlength="40" autocomplete="off" placeholder="Tu nombre o apodo"></label>
       <p class="alias-counter" id="alias-counter">0/40</p>
       <div class="alias-actions"><button type="button" class="settings-action is-ghost" id="alias-cancel">Cancelar</button><button type="submit" class="settings-action is-primary" id="alias-accept" value="ok">Compartir</button></div>
     </form>

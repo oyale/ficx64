@@ -761,7 +761,12 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .selection-footer { display: flex; align-items: center; justify-content: space-between; min-height: 34px; color: var(--gray); font-size: 12px; }
 .selection-footer b { color: var(--blue); }
 /* Compartir las listas: misma forma que «Compartir itinerario», debajo del recuento. */
-.share-lists-button { width: 100%; min-height: 40px; margin-top: 10px; font-size: 12px; }
+.share-lists-button { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 44px; padding: 10px 0; border: 0; border-top: 1px solid var(--line-strong); border-bottom: 2px solid var(--cyan); border-radius: 0; background: transparent; color: var(--blue); font: inherit; font-size: 12px; font-weight: 800; text-align: left; cursor: pointer; }
+.share-lists-button::after { content: "↗"; flex: 0 0 auto; color: var(--green-deep); font-size: 22px; line-height: 1; }
+.share-lists-button:hover:not(:disabled) { background: var(--blue-pale); color: var(--blue-deep); }
+.share-lists-button:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+.share-lists-button:disabled { color: var(--text-muted); border-bottom-color: var(--line-strong); cursor: default; }
+.share-lists-button:disabled::after { color: inherit; }
 /* En la pantalla de listas compartidas la tarjeta es la del catálogo, con su cenefa y su
    reparto de texto y botones. Solo se añade la línea de lo que propone quien comparte. */
 #shared-list .shared-film { display: grid; grid-template-columns: minmax(0, 1fr); padding: 10px 11px 10px 20px; border: 1px solid var(--line); border-radius: 0; background: var(--surface-raised); }
