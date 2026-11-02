@@ -503,9 +503,10 @@
   </dialog>
   <dialog class="alias-dialog" id="alias-dialog" aria-labelledby="alias-title">
     <form method="dialog">
-      <h2 id="alias-title">¿Quién comparte?</h2>
-      <p class="alias-intro">Es opcional: aparece como «El itinerario de …» al abrir el enlace.</p>
-      <label class="alias-field"><span>Tu nombre o apodo</span><input id="alias-input" type="text" maxlength="40" autocomplete="off" placeholder="Tu nombre o apodo"></label>
+      <h2 id="alias-title">¿Cómo quieres aparecer?</h2>
+      <p class="alias-intro" id="alias-intro">El nombre es opcional y aparecerá en la cabecera del enlace compartido.</p>
+      <p class="share-privacy-note" id="alias-privacy-note" hidden><strong>Antes de compartir:</strong> el enlace incluye los pases seleccionados, con días, horas y sedes. Revisa que quieras compartirlos todos. Quien tenga el enlace podrá verlos y reenviarlo. Si añades un nombre, mejor usa un seudónimo y no incluyas datos personales.</p>
+      <label class="alias-field"><span>Nombre o seudónimo (opcional)</span><input id="alias-input" type="text" maxlength="40" autocomplete="off" placeholder="Tu nombre o seudónimo"></label>
       <p class="alias-counter" id="alias-counter">0/40</p>
       <div class="alias-actions"><button type="button" class="settings-action is-ghost" id="alias-cancel">Cancelar</button><button type="submit" class="settings-action is-primary" id="alias-accept" value="ok">Compartir</button></div>
     </form>
