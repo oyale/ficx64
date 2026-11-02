@@ -27,9 +27,9 @@ jobs:
       - name: Comprobar que los datos están dentro
         run: |
           set -e
-          ! grep -q "window.FICX_FILMS = \[\];" dist/ficx64.html
-          ! grep -q "window.FICX_SCREENINGS = \[\];" dist/ficx64.html
-          test -s dist/ficx64.html
+          ! grep -q "window.FICX_FILMS = \[\];" dist/index.html
+          ! grep -q "window.FICX_SCREENINGS = \[\];" dist/index.html
+          test -s dist/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

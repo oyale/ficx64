@@ -43,13 +43,16 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;   // imágenes de ficx.tv: nunca se tocan
 
-  const isDocument = request.mode === "navigate" || request.destination === "document";
+  const appPaths = [new URL(HOME).pathname, new URL("index.html", HOME).pathname];
+  const isAppDocument = appPaths.includes(url.pathname);
+  // La descarga de index.html también puede usar la copia offline de la app.
+  const isDocument = isAppDocument || request.mode === "navigate" || request.destination === "document";
   if (isDocument) {
     // Red primero; si falla, la copia canónica. `caches.open(VERSION).then((cache) => cache.match(HOME))` no depende de la ruta pedida.
     event.respondWith(
       fetch(new Request(request, { cache: "no-cache" }))
         .then((response) => {
-          if (response && response.ok) {
+          if (isAppDocument && response && response.ok) {
             const copy = response.clone();
             event.waitUntil(caches.open(VERSION).then((cache) => cache.put(HOME, copy)).catch(() => {}));
           }

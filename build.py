@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Construye la app en un solo HTML a partir de src/ y data/.
 
-    python3 build.py                      # escribe dist/ficx64.html
+    python3 build.py                      # escribe dist/index.html
     python3 build.py --output otro.html   # escribe donde se le diga
 """
 
@@ -14,7 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SOURCE = ROOT / "src"
-OUTPUT = ROOT / "dist" / "ficx64.html"
+OUTPUT = ROOT / "dist" / "index.html"
 
 DATA = {
     "films": ROOT / "data" / "films.json",
@@ -86,8 +86,14 @@ def main() -> None:
     out = args.output
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
-    # Pages sirve index.html y el manifest apunta a «./»: se escribe también con ese nombre.
-    (out.parent / "index.html").write_text(html, encoding="utf-8")
+    # Compatibilidad con enlaces antiguos: solo una redirección, no otra copia de la app.
+    if out.resolve() == OUTPUT.resolve():
+        (out.parent / "ficx64.html").write_text(
+            '<!doctype html><html lang="es"><meta charset="utf-8">'
+            '<title>FICX 64</title><script>'
+            'location.replace("./" + location.search + location.hash);'
+            '</script><p>La app está en <a href="./">ficx.situacion.es</a>.</p></html>',
+            encoding="utf-8")
 
     # Piezas que la instalación necesita fuera del HTML: manifest, iconos y service worker.
     import shutil

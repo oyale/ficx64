@@ -12,7 +12,7 @@ unless you opt into film images.
 ## Building
 
 ```bash
-python3 build.py                 # writes dist/ficx64.html
+python3 build.py                 # writes dist/index.html
 python3 build.py --output other.html
 ```
 
@@ -196,3 +196,19 @@ publicar otra con un cambio de interfaz o datos sin tocar `sw.js`, volver a la a
 comprobar el aviso. Pulsar Actualizar y verificar el cambio y la película guardada.
 Repetir sin conexión: la app debe abrir la copia guardada. Las pruebas automatizadas
 no sustituyen esta comprobación real de instalación, actualización y modo offline.
+
+## Descargar la app como HTML
+
+Ayuda ofrece descargar `index.html` con el nombre sugerido `ficx64.html`.
+El archivo incluye la app y el catálogo, pero no las elecciones del navegador:
+para transferirlas hay que exportar el programa desde Ajustes. El archivo local
+no recibe actualizaciones automáticas. El enlace de descarga se oculta al abrirlo
+como archivo local.
+
+`dist/index.html` es la única copia completa publicada. `dist/ficx64.html` es una
+redirección pequeña para conservar enlaces antiguos, incluidos parámetros y
+fragmentos de listas o itinerarios. Para generar un portable aparte:
+
+```sh
+python3 build.py --output /tmp/ficx64-portable/ficx64.html
+```
