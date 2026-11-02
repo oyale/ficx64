@@ -961,7 +961,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .update-toast { position: fixed; z-index: 70; left: 50%; bottom: 24px; display: flex; align-items: center; gap: 12px; max-width: min(460px, calc(100vw - 32px)); padding: 10px 12px 10px 16px; border-radius: 10px; background: var(--ink); color: var(--surface-float); box-shadow: 0 10px 30px var(--shadow); transform: translateX(-50%); font-size: 12px; font-weight: 600; }
 .update-toast[hidden] { display: none; }
 .update-toast span { flex: 1 1 auto; }
-#update-reload { min-height: 34px; padding: 6px 12px; border: 0; border-radius: 6px; background: var(--cyan); color: var(--on-green); font-size: 12px; font-weight: 800; cursor: pointer; }
+#update-reload { min-height: 34px; padding: 6px 12px; border: 0; border-radius: 6px; background: var(--cyan); color: var(--on-cyan); font-size: 12px; font-weight: 800; cursor: pointer; }
 #update-reload:hover { background: var(--green-deep); color: var(--on-green); }
 #update-dismiss { width: 30px; height: 30px; border: 0; border-radius: 50%; background: transparent; color: inherit; font-size: 18px; line-height: 1; cursor: pointer; opacity: .8; }
 #update-dismiss:hover { opacity: 1; }
@@ -1891,3 +1891,39 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .help-close svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
 .help-screen { position: relative; }
 @media (max-width: 650px) { .help-close { top: 12px; right: 12px; } }
+
+/* Afinado de acciones y avisos: misma reserva inferior en móvil y modo app. */
+:root { --notice-bottom: calc(24px + env(safe-area-inset-bottom)); }
+.share-toast, .update-toast { bottom: var(--notice-bottom); }
+.update-toast { flex-wrap: wrap; width: max-content; }
+.update-toast span { min-width: 0; flex: 1 1 180px; overflow-wrap: anywhere; }
+#update-reload { min-height: 44px; flex-shrink: 0; }
+#update-dismiss { width: 44px; height: 44px; flex-shrink: 0; }
+.update-toast button:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
+.wizard-install .settings-action, #help-install-button { min-height: 44px; }
+.wizard-progress, .wizard-step .eyebrow { font-size: 11px; }
+.wizard-skip { min-height: 44px; font-size: 12px; }
+.wizard-note, .wizard-step-note, .wizard-error { font-size: 13px; }
+.wizard-list, .wizard-cycle li { font-size: 13px; }
+@media (max-width: 650px) {
+  :root { --notice-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .share-toast { border-radius: 12px; }
+  .program-event { grid-template-columns: 54px minmax(0, 1fr) 44px 44px; }
+  .program-event-time { grid-column: 1; grid-row: 1; }
+  .program-event-body { grid-column: 2 / -1; grid-row: 1; min-width: 0; }
+  .program-calendar-event, .program-share-event, .program-remove-event {
+    width: 44px; height: 44px; margin: 2px 0 0; grid-row: 2;
+  }
+  .program-calendar-event { grid-column: 2; justify-self: end; }
+  .program-share-event { grid-column: 3; }
+  .program-remove-event { grid-column: 4; }
+}
+
+/* Firefox: los pasos largos deben desbordar dentro del scroll, sin encogerse
+   y dibujar sus tarjetas por encima del pie y sus botones. */
+@media (max-width: 650px) {
+  .wizard-body, .wizard-main { min-height: 0; min-width: 0; }
+  .wizard-main { isolation: isolate; }
+  .wizard-step { flex: 0 0 auto; }
+  .wizard-foot { position: relative; z-index: 1; background: var(--surface-float); }
+}
