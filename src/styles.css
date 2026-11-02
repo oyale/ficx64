@@ -947,6 +947,15 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .share-toast { position: fixed; left: 50%; bottom: 24px; z-index: 60; max-width: min(420px, calc(100vw - 32px)); padding: 12px 18px; border-radius: 999px; background: #16302c; color: white; font-size: 12px; font-weight: 600; line-height: 1.35; text-align: center; box-shadow: 0 10px 30px var(--shadow); transform: translate(-50%, 16px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .2s, transform .2s, visibility .2s; }
 .share-toast.is-visible { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
 @media (max-width: 650px) { .share-toast { bottom: 16px; font-size: 11px; } }
+/* Versión nueva: banda abajo con la acción a la vista. El turquesa es de marca, no un aviso de error. */
+.update-toast { position: fixed; z-index: 70; left: 50%; bottom: 24px; display: flex; align-items: center; gap: 12px; max-width: min(460px, calc(100vw - 32px)); padding: 10px 12px 10px 16px; border-radius: 10px; background: var(--ink); color: var(--surface-float); box-shadow: 0 10px 30px var(--shadow); transform: translateX(-50%); font-size: 12px; font-weight: 600; }
+.update-toast[hidden] { display: none; }
+.update-toast span { flex: 1 1 auto; }
+#update-reload { min-height: 34px; padding: 6px 12px; border: 0; border-radius: 6px; background: var(--cyan); color: var(--on-green); font-size: 12px; font-weight: 800; cursor: pointer; }
+#update-reload:hover { background: var(--green-deep); color: var(--on-green); }
+#update-dismiss { width: 30px; height: 30px; border: 0; border-radius: 50%; background: transparent; color: inherit; font-size: 18px; line-height: 1; cursor: pointer; opacity: .8; }
+#update-dismiss:hover { opacity: 1; }
+@media (max-width: 650px) { .update-toast { bottom: 76px; left: 16px; right: 16px; max-width: none; transform: none; } }
 .program-remove-event { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 1px solid #f2c6c0; border-radius: 8px; background: var(--danger-pale); color: var(--danger); cursor: pointer; transition: background-color .15s, border-color .15s; }
 .program-remove-event:hover { background: #f7d5d1; border-color: #ecb0a9; }
 .program-remove-event svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }

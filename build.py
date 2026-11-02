@@ -82,9 +82,22 @@ def main() -> None:
     html = html.replace("window.FICX_VENUE_TRANSFERS = {};", f"window.FICX_VENUE_TRANSFERS = {compact(load('transfers', False))};")
     html = html.replace("window.FICX_BUS_TRANSFERS = {};", f"window.FICX_BUS_TRANSFERS = {compact(load('bus', False))};")
 
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(html, encoding="utf-8")
-    print(f"{len(films)} películas y {len(screenings)} pases -> {args.output}")
+    out = args.output
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(html, encoding="utf-8")
+    # Pages sirve index.html y el manifest apunta a «./»: se escribe también con ese nombre.
+    (out.parent / "index.html").write_text(html, encoding="utf-8")
+
+    # Piezas que la instalación necesita fuera del HTML: manifest, iconos y service worker.
+    import shutil
+    shutil.copyfile(ROOT / "manifest.webmanifest", out.parent / "manifest.webmanifest")
+    shutil.copyfile(SOURCE / "sw.js", out.parent / "sw.js")
+    icons_out = out.parent / "icons"
+    icons_out.mkdir(exist_ok=True)
+    for icon in (ROOT / "icons").glob("*.png"):
+        shutil.copyfile(icon, icons_out / icon.name)
+
+    print(f"{len(films)} películas y {len(screenings)} pases -> {out}")
 
 
 if __name__ == "__main__":
