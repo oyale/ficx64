@@ -70,7 +70,7 @@ things together.
 | `durationMinutes` | number or `null` | Film runtime |
 | `sections`, `ciclo` | string arrays | Festival section and retrospective, if any. The first section drives the home screen |
 | `format` | `"short"`, `"medium"` or `null` | Short or medium-length film; draws the format badge |
-| `synopsis`, `synopsisSource` | string or `null` | Text and where it came from (`"web"`, `"catalogo-pdf"`) |
+| `synopsis`, `synopsisSource` | string or `null` | Full text, with blank lines (`\n\n`) between paragraphs, and where it came from (`"web"`, `"catalogo-pdf"`) |
 | `pageUrl`, `imageUrl` | string | Optional links; the image only loads if the user enables it |
 | `hasWebPage` | boolean | Whether an external page exists |
 
@@ -185,6 +185,17 @@ Automated checks:
 python3 -m unittest discover -s tests -v
 node --test tests/test_service_worker.cjs
 ```
+
+Mobile film details also have a real Chromium regression check (Node 22+ and
+`chromium`, or set `CHROMIUM_BIN` to its executable):
+
+```sh
+python3 build.py
+node tests/test_film_swipe.cjs
+```
+
+It checks the first tap after swiping, vertical scrolling, complete paragraphs,
+the mobile font range, country/link layout and larger font preferences.
 
 Browser acceptance check: open a published version, save a film, publish another
 version with a UI or data change without touching `sw.js`, return to the app and

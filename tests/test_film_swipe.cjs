@@ -98,6 +98,60 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     assert.ok(await evaluate(`document.querySelector('dialog[open]').scrollTop`) > scrollBefore,
       'Vertical scrolling must remain available');
     console.log('20/20 first taps after swipe passed (light/dark); vertical scroll preserved');
+    // Readability and paragraph layout share the same real mobile dialog.
+    async function openFilm(id) {
+      await evaluate(`(() => {
+        document.querySelector('dialog[open] .film-detail-close')?.click();
+        document.querySelector('[data-film-id="${id}"] .film-title-line').click();
+      })()`);
+      await evaluate(`new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))`);
+    }
+    for (const [width, height, id] of [
+      [390, 844, 'aquarium'], [375, 667, 'aquarium'],
+      [390, 844, 'por-fortuna-o-por-desgracia-tu-nunca-moriras'],
+      [320, 667, 'la-libertad-doble'], [390, 844, 'tina'], [1280, 900, 'el-debut'],
+    ]) {
+      await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width <= 650 });
+      await openFilm(id);
+      const result = await evaluate(String.raw`(() => {
+        const dialog = document.querySelector('dialog[open]');
+        const film = window.FICX_FILMS.find(film => dialog.id === 'film-detail-' + film.id);
+        const paragraphs = [...dialog.querySelectorAll('.detail-synopsis')];
+        const country = dialog.querySelector('.detail-countryline')?.getBoundingClientRect();
+        const link = dialog.querySelector('.film-web-link')?.getBoundingClientRect();
+        return {
+          size: parseFloat(getComputedStyle(paragraphs[0]).fontSize),
+          complete: paragraphs.map(p => p.textContent).join('').replace(/\s/g, '') === film.synopsis.replace(/\s/g, ''),
+          paragraphCount: paragraphs.length, expectedCount: film.synopsis.split(/\n\s*\n/).length,
+          scroll: dialog.scrollHeight > dialog.clientHeight + 1,
+          overflow: dialog.scrollWidth > dialog.clientWidth,
+          heading: getComputedStyle(dialog.querySelector('.film-synopsis-heading h4')).display,
+          countryOverlap: country && link ? country.right > link.left : false,
+        };
+      })()`);
+      assert.equal(result.complete, true, `${id}: synopsis remains complete`);
+      assert.equal(result.paragraphCount, result.expectedCount, `${id}: paragraph boundaries preserved`);
+      assert.equal(result.overflow, false, `${id}: no horizontal overflow`);
+      if (width <= 650) {
+        assert.ok(result.size >= 15 && result.size <= 17, `${id}: readable mobile size`);
+        if (result.scroll) assert.equal(result.size, 15, `${id}: minimum size before falling back to scroll`);
+        assert.equal(result.heading, 'none', 'Mobile hides the Synopsis label');
+        assert.equal(result.countryOverlap, false, 'Countries and official link do not overlap');
+      } else assert.notEqual(result.heading, 'none', 'Desktop retains its heading');
+    }
+    await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+    await openFilm('aquarium');
+    const fontSize = () => evaluate(`getComputedStyle(document.querySelector('dialog[open] .detail-synopsis')).fontSize`);
+    const foldedSize = await fontSize();
+    await evaluate(`document.querySelector('dialog[open] .film-screenings-foldout > summary').click()`);
+    await evaluate(`new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))`);
+    assert.equal(await fontSize(), foldedSize, 'Unfolding passes does not shrink the synopsis');
+    await openFilm('por-fortuna-o-por-desgracia-tu-nunca-moriras');
+    await evaluate(`document.documentElement.style.fontSize = '20px';window.dispatchEvent(new Event('resize'))`);
+    await evaluate(`new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))`);
+    assert.ok(parseFloat(await fontSize()) >= 18.75, 'Larger root font preferences are respected');
+    console.log('Full paragraphs, adaptive font, countries/link layout and font preferences passed');
+
   } finally {
     clearTimeout(timeout);
     ws?.close();
@@ -106,6 +160,6 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       browser.kill();
       await exited;
     }
-    fs.rmSync(profile, { recursive: true, force: true });
+    fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });
