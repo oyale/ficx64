@@ -3187,11 +3187,11 @@
     const star = hasIntent && !wizardDemoDiscarded ? starButtonMarkup(wizardDemoFilm, wizardDemoStarred) : "";
     // La película descartada sale del listado y solo deja «Restaurar», como su tarjeta.
     card.innerHTML = `<p class="eyebrow">Ejemplo</p>
-      <h3><span>${escapeHtml(wizardDemoFilm.title)}</span>${star}</h3>
-      <p>${escapeHtml(directorText(wizardDemoFilm))}</p>
+      <div class="wizard-film-main"><h3><span>${escapeHtml(wizardDemoFilm.title)}</span>${star}</h3>
+      <p class="wizard-film-credit">${escapeHtml(directorText(wizardDemoFilm))}</p>
       <div class="wizard-film-actions">${wizardDemoDiscarded
         ? intentButtonMarkup("discard", { film: wizardDemoFilm, discardedFlag: true })
-        : `${intentButtonMarkup("want", { film: wizardDemoFilm, status: status || null })}${intentButtonMarkup("maybe", { film: wizardDemoFilm, status: status || null })}${hasIntent ? "" : intentButtonMarkup("discard", { film: wizardDemoFilm })}`}</div>`;
+        : `${intentButtonMarkup("want", { film: wizardDemoFilm, status: status || null })}${intentButtonMarkup("maybe", { film: wizardDemoFilm, status: status || null })}${hasIntent ? "" : intentButtonMarkup("discard", { film: wizardDemoFilm })}`}</div></div>`;
     document.querySelector("#wizard-branches-hint").hidden = false;
   }
   document.querySelector("#wizard-step-3").addEventListener("click", (event) => {
