@@ -419,7 +419,7 @@
           <div class="film-synopsis-heading"><h4>Sinopsis</h4>
             ${detailUrl ? `<a class="film-web-link" href="${escapeHtml(detailUrl)}" target="_blank" rel="noopener noreferrer" title="${film.synopsisSource === "catalogo-pdf" ? "Sinopsis del catálogo impreso. Abrir ficha oficial" : "Sinopsis de la ficha web. Abrir ficha oficial"}">Ficha oficial <span aria-hidden="true">↗</span></a>` : ""}
           </div>
-          ${film.synopsis ? `<p class="detail-synopsis">${escapeHtml(film.synopsis)}</p>` : `<p class="detail-synopsis detail-missing">La sinopsis no está disponible en la ficha capturada.</p>`}
+          ${film.synopsis ? film.synopsis.split(/\n\s*\n/).map(paragraph => `<p class="detail-synopsis">${escapeHtml(paragraph)}</p>`).join("") : `<p class="detail-synopsis detail-missing">La sinopsis no está disponible en la ficha capturada.</p>`}
         </div>
         </div>
         <div class="film-expanded-screenings">${renderFilmScreenings(film)}</div>
@@ -447,6 +447,7 @@
       });
       syncFilmDialog();
     }
+    scheduleSynopsisFit();
   }
   function renderSaved() {
     const wanted = films.filter((film) => intentions.get(film.id) === "want");
@@ -516,6 +517,62 @@
     dialog.showModal();
     dialog.querySelector(".film-detail-sticky .film-title")?.focus({ preventScroll: true });
   }
+  // Keep the complete mobile synopsis at the largest readable size that fits.
+  // The 15–17 px range follows the root font size, including user preferences.
+  const synopsisFitCache = new WeakMap();
+  let synopsisObservedDialog = null;
+  let synopsisFitFrame = 0;
+  const synopsisResizeObserver = typeof ResizeObserver === "function"
+    ? new ResizeObserver(scheduleSynopsisFit) : null;
+  function scheduleSynopsisFit() {
+    cancelAnimationFrame(synopsisFitFrame);
+    synopsisFitFrame = requestAnimationFrame(fitFilmSynopsis);
+  }
+  function fitFilmSynopsis() {
+    const dialog = list.querySelector("dialog.film-expanded[open]");
+    if (dialog !== synopsisObservedDialog) {
+      synopsisResizeObserver?.disconnect();
+      if (dialog) synopsisResizeObserver?.observe(dialog);
+      synopsisObservedDialog = dialog;
+    }
+    if (!dialog || !window.matchMedia("(max-width: 650px)").matches
+      || (window.visualViewport && window.visualViewport.scale !== 1)) return;
+    if (!dialog.querySelector(".detail-synopsis:not(.detail-missing)")
+      || dialog.querySelector(".film-screenings-foldout[open], .discard-ack")) return;
+    const rootSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const key = [dialog.clientWidth, dialog.clientHeight, rootSize].join(":");
+    if (synopsisFitCache.get(dialog) === key) return;
+    const minimum = rootSize * .9375;
+    const step = rootSize / 64;
+    const setSize = index => dialog.style.setProperty("--adaptive-synopsis-size", `${minimum + index * step}px`);
+    const fits = () => {
+      const actions = dialog.querySelector(".film-expanded-actions").getBoundingClientRect();
+      const passes = dialog.querySelector(".film-screenings-foldout > summary").getBoundingClientRect();
+      return dialog.scrollHeight <= dialog.clientHeight + 1 && passes.bottom <= actions.top - 12;
+    };
+    setSize(0);
+    if (fits()) {
+      setSize(8);
+      if (!fits()) {
+        let best = 0, low = 1, high = 7;
+        while (low <= high) {
+          const middle = Math.floor((low + high) / 2);
+          setSize(middle);
+          if (fits()) { best = middle; low = middle + 1; }
+          else high = middle - 1;
+        }
+        setSize(best);
+      }
+    }
+    synopsisFitCache.set(dialog, key);
+  }
+  window.addEventListener("resize", scheduleSynopsisFit);
+  window.visualViewport?.addEventListener("resize", scheduleSynopsisFit);
+  document.addEventListener("toggle", event => {
+    if (event.target.matches?.("details.film-screenings-foldout")) scheduleSynopsisFit();
+  }, true);
+  document.fonts?.ready.then(scheduleSynopsisFit);
+
   function closeFilmDetails(filmId = expandedId) {
     if (!filmId) return;
     openPassesId = null;

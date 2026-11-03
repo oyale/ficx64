@@ -2017,3 +2017,18 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
  .film-expanded-screenings { margin-top: 0; }
  .film-expanded-actions .intent-copy small { display: none; }
 }
+
+/* En móvil, el país y la ficha oficial comparten una fila que admite varias líneas. */
+@media (max-width: 650px) {
+  .film-expanded .film-detail-copy { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-items: baseline; }
+  .film-expanded .film-detail-copy > .detail-countryline { grid-column: 1; grid-row: 1; min-width: 0; margin: 0 0 10px; overflow-wrap: anywhere; }
+  .film-expanded .film-synopsis-heading { grid-column: 2; grid-row: 1; width: auto; margin: 0 0 10px; }
+  .film-expanded .film-synopsis-heading h4 { display: none; }
+  .film-expanded .film-synopsis-heading .film-web-link { white-space: nowrap; }
+  .film-expanded .film-detail-copy > .detail-synopsis { grid-column: 1 / -1; }
+}
+
+/* Sinopsis móvil completa: tamaño adaptable con un mínimo legible. */
+@media (max-width: 650px) {
+  .film-expanded .detail-synopsis { font-size: clamp(.9375rem, var(--adaptive-synopsis-size, 1rem), 1.0625rem); }
+}
