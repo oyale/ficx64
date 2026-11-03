@@ -576,20 +576,21 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .film-detail-close:hover { border-color: var(--blue); background: var(--blue-pale); }
 .film-detail-close svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-width: 1.8; }
 .film-expanded-main { display: grid; min-width: 0; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); align-items: start; }
-.film-detail-poster { position: relative; width: 100%; aspect-ratio: 16 / 9; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; padding: 19px; overflow: hidden; background: var(--blue); color: white; }
+.film-detail-poster { --poster-ink: #ffffff; position: relative; width: 100%; aspect-ratio: 16 / 9; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; padding: 19px; overflow: hidden; background: var(--blue); color: white; }
 .poster-image { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 1; background: #071a37; }
 .film-detail-poster::after { position: absolute; z-index: 0; inset: 0; background: transparent; content: ""; pointer-events: none; }
 .poster-tone-1 { background: var(--cyan); color: white; }
 .poster-tone-2 { background: #101c35; color: white; }
 .poster-tone-3 { background: #dff8f4; color: white; }
-.poster-topline { position: relative; z-index: 1; display: flex; align-items: center; gap: 7px; color: var(--on-blue); font-size: 11px; letter-spacing: -.05em; }
+.poster-tone-1:not(.poster-has-image), .poster-tone-3:not(.poster-has-image) { --poster-ink: #101722; }
+.poster-topline { position: relative; z-index: 1; display: flex; align-items: center; gap: 0; color: var(--poster-ink); font-size: 11px; letter-spacing: -.05em; }
 .poster-topline b { font-size: 18px; font-weight: 900; }
-.poster-topline span { display: grid; place-items: center; width: 21px; height: 21px; border: 1px solid currentColor; border-radius: 50%; font-size: 9px; }
+.poster-mark { display: block; width: 38px; height: 38px; }
 .poster-bolt { position: absolute; z-index: 1; top: 19px; right: -16px; width: 142px; height: 205px; opacity: .86; transform: rotate(4deg); }
 .poster-has-image .poster-bolt { width: 108px; height: 154px; opacity: .22; mix-blend-mode: screen; }
 .poster-bolt path { fill: var(--cyan); }
 .poster-tone-1 .poster-bolt path, .poster-tone-3 .poster-bolt path { fill: var(--blue); }
-.poster-edition { position: absolute; top: 57px; right: 12px; color: var(--on-blue); font-size: 7px; font-weight: 800; letter-spacing: .14em; line-height: 1.35; text-align: right; }
+.poster-edition { position: absolute; z-index: 2; top: 57px; right: 12px; color: var(--poster-ink); font-size: 7px; font-weight: 800; letter-spacing: .14em; line-height: 1.35; text-align: right; }
 .film-detail-poster h3 { position: relative; z-index: 1; max-width: 95%; margin: auto 0 13px; font-size: clamp(23px, 2.5vw, 36px); font-weight: 900; letter-spacing: -.07em; line-height: .96; overflow-wrap: anywhere; }
 .poster-meta { position: relative; z-index: 1; display: flex; gap: 7px; font-size: 9px; font-weight: 700; }
 .poster-meta span + span::before { padding-right: 7px; content: "·"; opacity: .65; }
