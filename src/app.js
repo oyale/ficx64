@@ -334,9 +334,12 @@
     const id = escapeHtml(film.id);
     const selected = (value) => (value === status ? " is-selected" : "");
     if (kind === "discard") {
+      const icon = discardedFlag
+        ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12c2.3-4.3 5.5-6.5 9.5-6.5s7.2 2.2 9.5 6.5c-2.3 4.3-5.5 6.5-9.5 6.5S4.8 16.3 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/><circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/></svg>`
+        : `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12c2.3-4.3 5.5-6.5 9.5-6.5s7.2 2.2 9.5 6.5c-2.3 4.3-5.5 6.5-9.5 6.5S4.8 16.3 2.5 12Z"/><path d="M4.3 4.3 9.95 9.95M14.05 14.05 19.7 19.7"/><circle cx="12" cy="12" r="2.8"/><circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/></svg>`;
       return discardedFlag
-        ? `<button class="intent-button intent-discard is-selected" type="button" data-action="discard" data-id="${id}" aria-pressed="true" title="Restaurar película"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><span class="intent-copy"><b>Restaurar</b><small>Volver a verla</small></span></button>`
-        : `<button class="intent-button intent-discard" type="button" data-action="discard" data-id="${id}" aria-pressed="false" title="Descartar película"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><span class="intent-copy"><b>Descartar</b><small>No la quiero ver</small></span></button>`;
+        ? `<button class="intent-button intent-discard is-selected" type="button" data-action="discard" data-id="${id}" aria-pressed="true" title="Restaurar película">${icon}<span class="intent-copy"><b>Restaurar</b><small>Volver a verla</small></span></button>`
+        : `<button class="intent-button intent-discard" type="button" data-action="discard" data-id="${id}" aria-pressed="false" title="Descartar película">${icon}<span class="intent-copy"><b>Descartar</b><small>No la quiero ver</small></span></button>`;
     }
     if (kind === "want") {
       const icon = status === "want"
@@ -344,7 +347,7 @@
         : `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>`;
       return `<button class="intent-button intent-want${selected("want")}" type="button" data-action="intent" data-status="want" data-id="${id}" aria-pressed="${status === "want"}" title="Añadir a mi lista">${icon}<span class="intent-copy"><b>${status === "want" ? "En mi lista" : "Añadir a mi lista"}</b><small>${status === "want" ? "Guardada" : "No perderla"}</small></span></button>`;
     }
-    return `<button class="intent-button intent-maybe${selected("maybe")}" type="button" data-action="intent" data-status="maybe" data-id="${id}" aria-pressed="${status === "maybe"}" title="Mmm… quizás"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.5 6.3L21 12l-6.5 2.7L12 21l-2.5-6.3L3 12l6.5-2.7L12 3Z"/></svg><span class="intent-copy"><b>${status === "maybe" ? "Quizás" : "Mmm… quizás"}</b><small>${status === "maybe" ? "Para más tarde" : "Lo estoy pensando"}</small></span></button>`;
+    return `<button class="intent-button intent-maybe${selected("maybe")}" type="button" data-action="intent" data-status="maybe" data-id="${id}" aria-pressed="${status === "maybe"}" title="Mmm… quizás"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3h11A1.5 1.5 0 0 1 19 4.5V21l-7-4-7 4V4.5Z"/><path d="M9.5 7.5a2.5 2.5 0 0 1 4.6 1.3c0 1.5-2.1 1.7-2.1 3.2M12 15h.01"/></svg><span class="intent-copy"><b>${status === "maybe" ? "Quizás" : "Mmm… quizás"}</b><small>${status === "maybe" ? "Para más tarde" : "Lo estoy pensando"}</small></span></button>`;
   }
   function renderFilms() {
     // El repintado rehace las tarjetas: el acuse abierto se recoloca al final del pintado.

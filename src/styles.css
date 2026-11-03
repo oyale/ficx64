@@ -434,9 +434,9 @@ h1, h2, h3, p { margin-top: 0; }
 kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-size: 8px; }
 .clear-filters, .text-button { padding: 5px 0; border: 0; background: transparent; color: var(--blue); font-size: 9px; text-decoration: underline; text-underline-offset: 3px; }
 .section-subfilters { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 10px 0 2px; padding: 8px 9px; background: #f2f8ff; }
-.subfilter-title { margin-right: 3px; color: #536176; font-size: 8px; font-weight: 800; }
+.subfilter-title { margin-right: 3px; color: var(--text-body); font-size: 8px; font-weight: 800; }
 .subfilter-title small { display: block; margin-top: 2px; color: var(--gray); font-size: 7px; font-weight: 400; }
-.subfilter-chip { display: inline-flex; align-items: center; gap: 4px; padding: 5px 7px; border: 1px solid #cbd8e8; background: var(--surface-float); color: #344257; cursor: pointer; }
+.subfilter-chip { display: inline-flex; align-items: center; gap: 4px; padding: 5px 7px; border: 1px solid var(--line-strong); background: var(--surface-float); color: var(--text); cursor: pointer; }
 .subfilter-chip input { margin: 0; accent-color: var(--blue); }
 .subfilter-chip span { font-size: 8px; }
 .subfilter-chip b { color: var(--blue); font-size: 8px; }
@@ -481,6 +481,8 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   #film-list .film-actions .intent-row { flex-direction: row; align-items: center; gap: 5px; }
   #film-list .film-actions .intent-primary { display: grid; flex: 1 1 auto; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #film-list .film-actions .intent-discard { flex: 0 0 auto; align-self: center; justify-content: center; min-width: 42px; margin-top: 0; padding: 6px; border-top: 0; border-radius: 10px; }
+  /* Sin intención elegida, el ojo ocupa el hueco de la futura estrella. */
+  #film-list .film-row .film-body .film-actions .intent-discard:not(.is-selected) { position: absolute; top: 0; right: 0; width: 32px; min-width: 32px; min-height: 32px; height: 32px; margin: 0; padding: 6px; border-radius: 50%; }
   /* En fila: el botón vuelve a ser una caja normal, sin el apilado de la columna. */
   #film-list .film-actions .intent-discard .intent-copy { position: static; width: auto; height: auto; margin: 0; clip: auto; overflow: visible; white-space: normal; }
   #film-list .film-actions .intent-discard .intent-copy { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
@@ -1505,8 +1507,9 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .share-privacy-note { margin: 0; padding: 9px 10px; border-left: 3px solid var(--cyan); border-radius: 3px; background: var(--cyan-pale); color: var(--text-body); font-size: 11px; line-height: 1.5; }
 .share-privacy-note strong { color: var(--green-deep); }
 .alias-field { display: grid; gap: 5px; }
-.alias-field span { color: #00786b; font-size: 9px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
-.alias-field input { padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf8; color: var(--ink); font: inherit; font-size: 14px; }
+.alias-field span { color: var(--green-deep); font-size: 9px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.alias-field input { padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-raised); color: var(--text); font: inherit; font-size: 14px; }
+.alias-field input::placeholder, .wizard-name-input::placeholder { color: var(--text-muted); opacity: 1; }
 .alias-field input:focus-visible { outline: 3px solid var(--blue); outline-offset: 1px; }
 .alias-counter { margin: -4px 0 0; color: var(--gray); font-size: 9px; text-align: right; }
 .alias-actions { display: flex; justify-content: flex-end; gap: 8px; }
