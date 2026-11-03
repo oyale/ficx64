@@ -1,4 +1,5 @@
 """Versionado reproducible de las actualizaciones PWA, sin tocar las fuentes reales."""
+import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -6,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from urllib.parse import parse_qs, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -25,16 +27,28 @@ class UpdateBuildTest(unittest.TestCase):
                 return (root / 'dist/sw.js').read_bytes()
 
             previous = build()
+            initial_icons = json.loads((root / 'dist/manifest.webmanifest').read_text())['icons']
             self.assertNotIn(b'__BUILD_VERSION__', previous)
             self.assertEqual(previous, build())
             for filename in ('src/app.js', 'src/styles.css', 'src/index.html',
                              'manifest.webmanifest', 'src/sw.js', 'icons/icon-192.png'):
                 with self.subTest(filename=filename):
                     path = root / filename
-                    path.write_bytes(path.read_bytes() + b'\n')
+                    if filename == 'manifest.webmanifest':
+                        manifest = json.loads(path.read_text())
+                        manifest['description'] += ' (actualizada)'
+                        path.write_text(json.dumps(manifest))
+                    else:
+                        path.write_bytes(path.read_bytes() + b'\n')
                     current = build()
                     self.assertNotEqual(previous, current)
                     self.assertEqual(current, build())
+                    published_icons = json.loads((root / 'dist/manifest.webmanifest').read_text())['icons']
+                    if filename == 'icons/icon-192.png':
+                        self.assertNotEqual(initial_icons[0]['src'], published_icons[0]['src'])
+                        self.assertEqual(initial_icons[1:], published_icons[1:])
+                    else:
+                        self.assertEqual(initial_icons, published_icons)
                     previous = current
             path = root / 'data/films.json'
             data = json.loads(path.read_text())
@@ -60,8 +74,21 @@ class UpdateBuildTest(unittest.TestCase):
             self.assertEqual(pages_manifest['id'], 'https://oyale.github.io/ficx64/')
             self.assertEqual(pages_manifest['related_applications'][0]['url'],
                              'https://oyale.github.io/ficx64/manifest.webmanifest')
-            self.assertEqual((root / 'manifest.webmanifest').read_bytes(),
-                             (root / 'dist/manifest.webmanifest').read_bytes())
+            source_manifest = json.loads((root / 'manifest.webmanifest').read_text())
+            production_manifest = json.loads((root / 'dist/manifest.webmanifest').read_text())
+            for original, published in zip(source_manifest['icons'], production_manifest['icons']):
+                parsed = urlsplit(published['src'])
+                self.assertEqual(parsed.path, original['src'])
+                expected_hash = hashlib.sha256((root / parsed.path).read_bytes()).hexdigest()[:16]
+                self.assertEqual(parse_qs(parsed.query), {'v': [expected_hash]})
+                self.assertIn(published['src'], (root / 'dist/sw.js').read_text())
+            self.assertEqual(production_manifest['id'], source_manifest['id'])
+            self.assertEqual(production_manifest['related_applications'], source_manifest['related_applications'])
+            for icon in ('apple-touch-icon.png', 'favicon-32.png'):
+                expected_hash = hashlib.sha256((root / 'icons' / icon).read_bytes()).hexdigest()[:16]
+                url = f'icons/{icon}?v={expected_hash}'
+                self.assertIn(url, html)
+                self.assertIn(url, (root / 'dist/sw.js').read_text())
             self.assertNotEqual((pages_output.parent / 'sw.js').read_bytes(), build())
 
 

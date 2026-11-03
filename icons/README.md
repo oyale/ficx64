@@ -21,3 +21,8 @@ The generator requires `rsvg-convert` (librsvg).
 - Maskable icons use a smaller mark centered inside the Android safe circle.
 - Installation assets have square backgrounds; the operating system applies
   its own shape. Dark assets use a lighter blue for contrast.
+
+The HTML build versions published icon URLs using a hash of each file's content.
+Manifest entries, HTML links and service worker precaching share those URLs, so
+installed apps can detect artwork changes even when the filenames stay the same.
+The app ID and manifest URL stay stable. System confirmation may still be needed.
