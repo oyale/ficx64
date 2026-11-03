@@ -107,6 +107,12 @@ html:has(.wizard[open]), html:has(.wizard[open]) body { overflow: hidden; }
   #wizard-step-3 .wizard-film .intent-button { min-height: 48px; font-size: 13px; }
   /* «Descartar» es una palabra: no se parte en dos líneas al crecer el resto. */
   #wizard-step-3 .wizard-film .intent-discard { white-space: nowrap; }
+  #wizard-step-3 .wizard-film h3 { min-height: 32px; padding-right: 40px; }
+  #wizard-step-3 .wizard-film-actions { position: static; }
+  #wizard-step-3 .wizard-film .film-star-button,
+  #wizard-step-3 .wizard-film .intent-discard:not(.is-selected) { position: absolute; top: 0; right: 0; width: 32px; min-width: 32px; height: 32px; min-height: 32px; margin: 0; padding: 6px; border-radius: 50%; }
+  #wizard-step-3 .wizard-film .film-star-button svg { width: 20px; height: 20px; }
+  #wizard-step-3 .wizard-film .intent-discard:not(.is-selected) .intent-copy { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 }
 .wizard-step .eyebrow { margin: 0; font-size: 9px; font-weight: 900; letter-spacing: .14em; }
 .wizard-step h2 { margin: 0; font-size: clamp(26px, 7vw, 36px); font-weight: 900; letter-spacing: -.045em; line-height: .98; }
@@ -168,7 +174,8 @@ html:has(.wizard[open]), html:has(.wizard[open]) body { overflow: hidden; }
 .wizard-film .eyebrow { margin: 0; color: var(--text-muted); font-size: 8px; font-weight: 900; letter-spacing: .14em; }
 /* Como en «Mi lista»: título y, a su lado, la estrella de prioridad. */
 .wizard-film h3 { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 20px; font-weight: 900; letter-spacing: -.035em; line-height: 1.05; }
-.wizard-film > p { margin: 0; color: var(--text-muted); font-size: 12px; }
+.wizard-film-main { display: grid; gap: 8px; }
+.wizard-film .wizard-film-credit { margin: 0; color: var(--text-muted); font-size: 12px; }
 .wizard-film-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 /* Los mismos botones del listado, a lo ancho de la tarjeta de práctica. */
 .wizard-film-actions .intent-button { flex: 1 1 0; min-height: 40px; }
