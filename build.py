@@ -11,7 +11,7 @@ import hashlib
 import argparse
 import json
 from pathlib import Path
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import quote, urljoin, urlsplit
 
 ROOT = Path(__file__).resolve().parent
 SOURCE = ROOT / "src"
@@ -76,6 +76,9 @@ def main() -> None:
             ]
 
     html = (SOURCE / "index.html").read_text(encoding="utf-8")
+    # Keep the adaptive favicon available in the downloaded standalone HTML.
+    favicon = (ROOT / "icons" / "favicon.svg").read_text(encoding="utf-8")
+    html = html.replace('href="icons/favicon.svg"', 'href="data:image/svg+xml,' + quote(favicon, safe="") + '"')
     html = html.replace('  <link rel="stylesheet" href="styles.css">',
                         f"  <style>\n{(SOURCE / 'styles.css').read_text(encoding='utf-8')}\n  </style>")
     html = html.replace('  <script src="app.js"></script>',
@@ -120,13 +123,15 @@ def main() -> None:
                           ("sw.js", worker.encode("utf-8")),
                           ("manifest.webmanifest", manifest_bytes)] + [
                               (f"icons/{icon.name}", icon.read_bytes())
-                              for icon in sorted((ROOT / "icons").glob("*.png"))]:
+                              for icon in sorted((ROOT / "icons").glob("*")) if icon.suffix in {".png", ".svg"}]:
         digest.update(name.encode("utf-8") + b"\0" + content + b"\0")
     version = digest.hexdigest()[:20]
     (out.parent / "sw.js").write_text(worker.replace("__BUILD_VERSION__", version), encoding="utf-8")
     icons_out = out.parent / "icons"
     icons_out.mkdir(exist_ok=True)
-    for icon in (ROOT / "icons").glob("*.png"):
+    for icon in (ROOT / "icons").glob("*"):
+        if icon.suffix not in {".png", ".svg"}:
+            continue
         shutil.copyfile(icon, icons_out / icon.name)
 
     print(f"{len(films)} películas y {len(screenings)} pases -> {out}")
