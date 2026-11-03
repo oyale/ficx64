@@ -75,6 +75,16 @@ def main() -> None:
                 for i in (screening.get("filmIds") or []) if i in by_id
             ]
 
+    icons = sorted(icon for icon in (ROOT / "icons").iterdir()
+                   if icon.suffix in {".png", ".svg"})
+    icon_urls = {f"icons/{icon.name}": f"icons/{icon.name}?v={hashlib.sha256(icon.read_bytes()).hexdigest()[:16]}"
+                 for icon in icons}
+
+    def version_icon_urls(content: str) -> str:
+        for original, versioned in icon_urls.items():
+            content = content.replace(original, versioned)
+        return content
+
     html = (SOURCE / "index.html").read_text(encoding="utf-8")
     # Keep the adaptive favicon available in the downloaded standalone HTML.
     favicon = (ROOT / "icons" / "favicon.svg").read_text(encoding="utf-8")
@@ -97,6 +107,8 @@ def main() -> None:
     html = html.replace("window.FICX_VENUE_TRANSFERS = {};", f"window.FICX_VENUE_TRANSFERS = {compact(load('transfers', False))};")
     html = html.replace("window.FICX_BUS_TRANSFERS = {};", f"window.FICX_BUS_TRANSFERS = {compact(load('bus', False))};")
 
+    html = version_icon_urls(html)
+
     out = args.output
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
@@ -113,14 +125,16 @@ def main() -> None:
     import shutil
     manifest_bytes = (ROOT / "manifest.webmanifest").read_bytes()
     manifest = json.loads(manifest_bytes)
+    for icon in manifest.get("icons", []):
+        icon["src"] = icon_urls.get(icon["src"], icon["src"])
     if site_url:
         manifest["id"] = site_url
         manifest["related_applications"] = [{
             "platform": "webapp", "url": urljoin(site_url, "manifest.webmanifest"), "id": site_url,
         }]
-        manifest_bytes = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    manifest_bytes = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
     (out.parent / "manifest.webmanifest").write_bytes(manifest_bytes)
-    worker = (SOURCE / "sw.js").read_text(encoding="utf-8")
+    worker = version_icon_urls((SOURCE / "sw.js").read_text(encoding="utf-8"))
     digest = hashlib.sha256()
     for name, content in [("index.html", html.encode("utf-8")),
                           ("sw.js", worker.encode("utf-8")),
