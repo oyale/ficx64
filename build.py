@@ -83,6 +83,9 @@ def main() -> None:
                         f"  <style>\n{(SOURCE / 'styles.css').read_text(encoding='utf-8')}\n  </style>")
     html = html.replace('  <script src="app.js"></script>',
                         f"  <script>\n{(SOURCE / 'app.js').read_text(encoding='utf-8')}\n  </script>")
+    # The fallback poster logo must also work in a downloaded offline HTML.
+    mark = (ROOT / "icons" / "mark.svg").read_text(encoding="utf-8")
+    html = html.replace('src="icons/mark.svg"', 'src="data:image/svg+xml,' + quote(mark, safe="") + '"')
     for placeholder, value in (
         ("window.FICX_FILMS = [];", films),
         ("window.FICX_SCREENINGS = [];", screenings),

@@ -403,8 +403,8 @@
         ${expandedHeader}
         <div class="film-expanded-main">
         <div class="film-detail-poster poster-tone-${toneIndex}${remoteImagesEnabled && film.imageUrl ? " poster-has-image" : ""}" aria-label="Imagen de ${escapeHtml(film.title)}">
-          ${remoteImagesEnabled && film.imageUrl ? `<img class="poster-image" src="${escapeHtml(film.imageUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}
-          <div class="poster-topline"><b>FICX</b><span>64</span></div>
+          ${remoteImagesEnabled && film.imageUrl ? `<img class="poster-image" src="${escapeHtml(film.imageUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.classList.remove('poster-has-image');this.remove()">` : ""}
+          <div class="poster-topline"><b>FICX</b><img class="poster-mark" src="icons/mark.svg" alt="64" width="38" height="38"></div>
           <svg class="poster-bolt" viewBox="0 0 180 250" aria-hidden="true"><path d="M112 0 25 114h52L0 250l155-155H99L180 0z"/></svg>
           <div class="poster-edition">XIXÓN<br>2026</div>
           ${formatBadge}
