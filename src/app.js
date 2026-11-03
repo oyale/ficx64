@@ -574,6 +574,16 @@
     const touch = event.touches[0];
     swipeStart = { x: touch.clientX, y: touch.clientY };
   }, { passive: true });
+  // Own horizontal navigation before Chromium interprets it as a native scroll.
+  // Otherwise its gesture handling can swallow the first tap in the next film.
+  document.addEventListener("touchmove", (event) => {
+    if (!swipeStart || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    const dx = Math.abs(touch.clientX - swipeStart.x);
+    const dy = Math.abs(touch.clientY - swipeStart.y);
+    if (dx > 10 && dx > dy && event.cancelable) event.preventDefault();
+  }, { passive: false });
+  document.addEventListener("touchcancel", () => { swipeStart = null; }, { passive: true });
   document.addEventListener("touchend", (event) => {
     if (!swipeStart || !event.changedTouches.length) return;
     const touch = event.changedTouches[0];
