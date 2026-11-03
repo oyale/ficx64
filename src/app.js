@@ -416,11 +416,10 @@
         </div>
         <div class="film-detail-copy">
           ${countries.length ? `<p class="detail-kicker detail-countryline">${escapeHtml(countries.join(" · "))}</p>` : ""}
-          <h4>Sinopsis</h4>
-          ${film.synopsis ? `<p class="detail-synopsis">${escapeHtml(film.synopsis)}</p>` : `<p class="detail-synopsis detail-missing">La sinopsis no está disponible en la ficha capturada.</p>`}
-          <div class="detail-bottom"><span class="detail-provenance">${film.synopsisSource === "catalogo-pdf" ? "Texto del catálogo impreso" : "Texto de la ficha web"}</span>
-            ${detailUrl ? `<a class="film-web-link" href="${escapeHtml(detailUrl)}" target="_blank" rel="noopener noreferrer">Ver ficha en ficx.tv <span aria-hidden="true">↗</span></a>` : ""}
+          <div class="film-synopsis-heading"><h4>Sinopsis</h4>
+            ${detailUrl ? `<a class="film-web-link" href="${escapeHtml(detailUrl)}" target="_blank" rel="noopener noreferrer" title="${film.synopsisSource === "catalogo-pdf" ? "Sinopsis del catálogo impreso. Abrir ficha oficial" : "Sinopsis de la ficha web. Abrir ficha oficial"}">Ficha oficial <span aria-hidden="true">↗</span></a>` : ""}
           </div>
+          ${film.synopsis ? `<p class="detail-synopsis">${escapeHtml(film.synopsis)}</p>` : `<p class="detail-synopsis detail-missing">La sinopsis no está disponible en la ficha capturada.</p>`}
         </div>
         </div>
         <div class="film-expanded-screenings">${renderFilmScreenings(film)}</div>

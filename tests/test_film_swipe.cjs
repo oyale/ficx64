@@ -79,7 +79,15 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
           `${theme}: first tap after swipe must toggle Add exactly once`);
       }
     }
-    await evaluate(`document.querySelector('dialog[open] .film-detail-close').click();document.querySelector('#film-list .film-title-line').click()`);
+    // The compact layout can fit short synopses entirely; use a long one to test scrolling.
+    await evaluate(`(() => {
+      document.querySelector('dialog[open] .film-detail-close').click();
+      const card = [...window.FICX_FILMS]
+        .sort((a, b) => (b.synopsis || '').length - (a.synopsis || '').length)
+        .map(film => document.querySelector('[data-film-id="' + CSS.escape(film.id) + '"] .film-title-line'))
+        .find(Boolean);
+      card.click();
+    })()`);
     const previous = await button();
     const scrollBefore = await evaluate(`document.querySelector('dialog[open]').scrollTop`);
     await touch('touchStart', [{ x: 200, y: 520 }]);

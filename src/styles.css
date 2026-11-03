@@ -2004,3 +2004,16 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 #help-instalar .help-installed { display: grid; gap: 5px; width: 100%; margin: 0; padding: 14px 16px; background: var(--ok-pale); color: var(--text-body); }
 .help-installed strong { color: var(--ok); font-size: 18px; line-height: 1.25; }
 .help-installed span { font-size: 13px; line-height: 1.5; }
+
+/* Sinopsis completa con enlace de procedencia junto al título. */
+.film-synopsis-heading { display: flex; width: 100%; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.film-synopsis-heading h4 { margin-bottom: 0; }
+.film-synopsis-heading .film-web-link { flex-shrink: 0; font-size: 11px; }
+@media (max-width: 650px) {
+ .film-expanded .film-detail-copy { padding: 14px 18px 0; }
+ .film-expanded .film-detail-copy h4 { font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--text); margin: 0; }
+ .film-expanded .detail-synopsis { font-size: 15px; line-height: 1.5; margin-bottom: 16px; }
+ .film-expanded .detail-countryline { margin-bottom: 8px; }
+ .film-expanded-screenings { margin-top: 0; }
+ .film-expanded-actions .intent-copy small { display: none; }
+}
