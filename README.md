@@ -237,8 +237,7 @@ python3 build.py --output /tmp/ficx64-portable/ficx64.html
 In Explore, section cards can be combined: films from any selected section are
 shown once. Click a selected card again to remove it. The additional-section
 selector adds a section without replacing the selection; it appears as a selected
-card so it can be removed. Desktop selection keeps the current scroll position;
-on smaller screens it scrolls to the results. Refinements use one shared list for the union of selected sections, with each film counted once. They also appear when viewing
+card so it can be removed. Selecting a section preserves the current scroll position on every screen size. Refinements use one shared list for the union of selected sections, with each film counted once. They also appear when viewing
 all sections, whenever the current results have additional tags to filter.
 Available options follow search and list filters, but remain available when
 unchecked so they can be restored.
@@ -256,9 +255,15 @@ Film cards show their countries beside the filmmaker only when the complete line
 fits with at least 32 CSS pixels to spare. This is recalculated for each card on
 resize and after fonts load; compact cards keep the existing single credit line.
 
-Catalogue ordering supports shortest/longest first; unknown durations stay last,
-with alphabetical ordering as the tie-breaker.
+Country credits are separated from filmmakers as `Filmmaker | (Country · Country)`.
+When that does not fit, cards try `Filmmaker | (First country +N)` before hiding the
+country credit. The complete list remains available to assistive technology and
+as a tooltip. Selected section cards use a stronger edge and short shadow, without checkmarks.
+Catalogue ordering also supports shortest/longest first; unknown durations stay
+last, with alphabetical ordering as the tie-breaker.
 
-Country credits use `Filmmaker | (Country · Country)` and abbreviate to
-`Filmmaker | (First country +N)` when space is limited. The complete list remains
-available to assistive technology and as a tooltip.
+Explore keeps the search field at full width. Refinements start collapsed and open
+inline through “Afinar resultados”; active exclusions remain visible on the button
+when collapsed. Escape closes the panel and returns focus to its button. Clear is
+shown only while catalogue filters are active. Selecting sections never scrolls
+the page, on desktop or mobile; selection uses an edge and shadow, without checks.

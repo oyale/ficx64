@@ -59,6 +59,8 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     }
     assert.ok(await evaluate(`!!document.querySelector('#film-list .film-title-line')`), await evaluate(`JSON.stringify({url:location.href,title:document.title,body:document.body?.innerText.slice(0,700)})`));
     await evaluate(`document.querySelectorAll('dialog[open]').forEach(d => d.close())`);
+    assert.equal(await evaluate(`document.querySelector('#section-subfilters').hidden`),true,'refinements start collapsed');
+    const openRefinements = () => evaluate(`if(document.querySelector('#toggle-refinements').getAttribute('aria-expanded')==='false') document.querySelector('#toggle-refinements').click()`);
     const choose = name => evaluate(`document.querySelector('#featured-sections button[data-section="${name}"]').click()`);
     const check = async names => {
       const actual = await evaluate(`Array.from(document.querySelectorAll('#film-list > li'), row => row.dataset.filmId).sort()`);
@@ -85,6 +87,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       await check([]);
     };
     const checkShortFilmSubsets = async () => {
+      await openRefinements();
       await evaluate(`document.querySelector('#clear-filters').click()`);
       const subsets = ['Asturies Curtiumetraxes', 'La Noche del Corto Español', 'Sección Oficial Cortometrajes'];
       const toggle = name => evaluate(`document.querySelector('#section-subfilters input[data-subfilter="${name}"]').click()`);
@@ -102,6 +105,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       await check([]);
     };
     const refineAll = async () => {
+      await openRefinements();
       assert.equal(await evaluate(`document.querySelector('#section-subfilters').hidden`), false);
       const name = await evaluate(`(() => {
         const input = document.querySelector('#section-subfilters input');
@@ -181,7 +185,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     await check(['Albar','Sección Oficial']);
     await send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true});
     await choose('Retueyos');
-    assert.equal(await evaluate('window.sectionScrollCalls'),1,'mobile retains its results shortcut');
+    assert.equal(await evaluate('window.sectionScrollCalls'),0,'mobile selection must not jump to results');
     await send('Emulation.setDeviceMetricsOverride', {width:1280,height:800,deviceScaleFactor:1,mobile:false});
     await evaluate(`document.querySelector('#clear-filters').click(); document.querySelectorAll('dialog[open]').forEach(d=>d.close());`);
     await evaluate(`window.countryCard = Array.from(document.querySelectorAll('#film-list .film-card-countries')).find(el=>Number(el.dataset.countryCount)>1).closest('.film-row'); countryCard.style.width='1200px';`);
@@ -205,6 +209,56 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     await evaluate(`countryCard.style.width='1200px'`);
     await pause(100);
     assert.equal(await evaluate(`countryCard.querySelector('.film-card-countries').hidden`),false,'countries reappear after widening the card');
+    await evaluate(`countryCard.style.width=''; document.querySelector('#clear-filters').click()`);
+    await choose('Albar');
+    assert.equal(await evaluate(`document.querySelectorAll('#featured-sections .section-card-selection').length`),0,'section cards have no checkboxes');
+    assert.ok(await evaluate(`parseFloat(getComputedStyle(document.querySelector('#featured-sections [aria-pressed="true"]')).outlineWidth) >= 2`));
+    for (const mode of ['duration-asc','duration-desc']) {
+      await evaluate(`document.querySelector('#clear-filters').click(); document.querySelector('#sort-order').value=${JSON.stringify(mode)}; document.querySelector('#sort-order').dispatchEvent(new Event('change'));`);
+      const durations = await evaluate(`Array.from(document.querySelectorAll('#film-list > li'),row=>window.FICX_FILMS.find(f=>f.id===row.dataset.filmId).durationMinutes).filter(n=>Number.isFinite(n)&&n>0)`);
+      assert.ok(durations.length>1);
+      assert.deepEqual(durations,[...durations].sort((a,b)=>mode==='duration-asc'?a-b:b-a));
+    }
+    await evaluate(`document.querySelector('#sort-order').value='title';document.querySelector('#sort-order').dispatchEvent(new Event('change'));window.scrollTo({top:0,behavior:'instant'});`);
+    for (const [width,height] of [[320,740],[390,844],[727,900],[1280,900]]) {
+      await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<900});
+      await evaluate(`document.querySelector('#clear-filters').click(); document.querySelector('#toggle-refinements').click();`);
+      if(await evaluate(`document.querySelector('#toggle-refinements').getAttribute('aria-expanded')`)==='true') await evaluate(`document.querySelector('#toggle-refinements').click()`);
+      const geometry=await evaluate(`(() => { const bar=document.querySelector('.filters').getBoundingClientRect(), search=document.querySelector('.search-box').getBoundingClientRect();
+        return {bar:bar.width,search:search.width,overflow:document.documentElement.scrollWidth>window.innerWidth, controls:Array.from(document.querySelectorAll('.filter-actions button,.filter-actions select'),el=>el.getBoundingClientRect().height)}; })()`);
+      assert.ok(Math.abs(geometry.bar-geometry.search)<1,'search has the full toolbar width');
+      assert.equal(geometry.overflow,false,'controls do not overflow the viewport');
+      assert.ok(geometry.controls.every(h=>h>=44),'controls have touch targets');
+      await openRefinements();
+      await evaluate(`document.querySelector('#section-subfilters input[data-subfilter="Cortometrajes"]').click()`);
+      assert.equal(await evaluate(`document.querySelector('#section-subfilters').hidden`),false,'editing preserves the expanded panel');
+      await evaluate(`document.querySelector('#section-subfilters input').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))`);
+      assert.equal(await evaluate(`document.querySelector('#section-subfilters').hidden`),true);
+      assert.equal(await evaluate(`document.activeElement.id`),'toggle-refinements');
+      assert.equal(await evaluate(`document.querySelector('#toggle-refinements').classList.contains('is-active')`),true,'closed panel shows active refinements');
+      assert.equal(await evaluate(`document.querySelector('#filter-summary').hidden`),false);
+      await evaluate(`document.querySelector('#clear-filters').click()`);
+      assert.equal(await evaluate(`document.querySelector('#filter-summary').hidden`),true);
+    }
+    if (process.env.FICX_CAPTURE) {
+      for (const [width,height] of [[390,844],[1280,900]]) {
+        await send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<900});
+        await evaluate(`document.querySelector('#clear-filters').click()`);
+        await choose('Albar'); await choose('Sección Oficial');
+        for(const theme of ['light','dark']) {
+          await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(theme)};window.scrollTo({top:document.querySelector('#featured-sections').getBoundingClientRect().top+window.scrollY-90,behavior:'instant'});`);
+          await pause(100);
+          const shot=await send('Page.captureScreenshot',{format:'png'});
+          fs.writeFileSync(process.env.FICX_CAPTURE+'-'+width+'-'+theme+'.png',Buffer.from(shot.data,'base64'));
+          for(const open of [false,true]) {
+            await evaluate(`if(document.querySelector('#toggle-refinements').getAttribute('aria-expanded')!==${JSON.stringify(String(open))}) document.querySelector('#toggle-refinements').click(); window.scrollTo({top:document.querySelector('#browse-area').getBoundingClientRect().top+window.scrollY-90,behavior:'instant'});`);
+            await pause(100);
+            const toolbar=await send('Page.captureScreenshot',{format:'png'});
+            fs.writeFileSync(process.env.FICX_CAPTURE+'-toolbar-'+width+'-'+theme+'-'+open+'.png',Buffer.from(toolbar.data,'base64'));
+          }
+        }
+      }
+    }
     console.log('Chromium: cumulative sections, no duplicates, shared refinements, unique counts, desktop scroll preservation, additional sections, deselection and resets passed at 3 viewport sizes');
   } finally {
     clearTimeout(timeout);
