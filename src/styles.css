@@ -2032,3 +2032,43 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 @media (max-width: 650px) {
   .film-expanded .detail-synopsis { font-size: clamp(.9375rem, var(--adaptive-synopsis-size, 1rem), 1.0625rem); }
 }
+
+/* Remains visible across screens while any local write is still unsaved. */
+.storage-warning {
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .5rem 1rem;
+  padding: .75rem 1rem;
+  padding-top: max(.75rem, env(safe-area-inset-top));
+  background: #fff0c2;
+  color: #362600;
+  border-bottom: 2px solid #886000;
+  font-size: .9rem;
+}
+.storage-warning[popover] {
+  position: fixed;
+  inset: 0 0 auto;
+  margin: 0;
+  width: auto;
+  max-width: none;
+  border: 0;
+  border-bottom: 2px solid #886000;
+}
+.storage-warning[hidden] { display: none; }
+.storage-warning button {
+  min-height: 44px;
+  padding: .5rem .75rem;
+  border: 1px solid currentColor;
+  border-radius: .3rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.storage-warning button:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }

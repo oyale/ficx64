@@ -191,6 +191,10 @@ a network failure or HTTP 404/5xx. A late successful response refreshes the cach
 without reloading the open page. Without a cached copy, the app keeps waiting for
 the network.
 
+If writing local data fails, a persistent warning offers an export of the current
+lists and schedule. It remains until all failed keys have been saved successfully;
+an unrelated successful write or an export does not clear it.
+
 Automated checks:
 
 ```sh
@@ -204,6 +208,7 @@ Mobile film details also have a real Chromium regression check (Node 22+ and
 ```sh
 python3 build.py
 node tests/test_film_swipe.cjs
+node tests/test_storage_failure_browser.cjs
 node tests/test_network_fallback_browser.cjs
 ```
 

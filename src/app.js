@@ -1,6 +1,55 @@
 (() => {
   "use strict";
 
+  const failedStorageKeys = new Set();
+  let storageWarning = null;
+  document.addEventListener("close", updateStorageWarning, true);
+  document.addEventListener("toggle", (event) => {
+    if (event.target.tagName === "DIALOG") updateStorageWarning();
+  }, true);
+
+  function saveLocalValue(key, value) {
+    try {
+      localStorage.setItem(key, value);
+      failedStorageKeys.delete(key);
+    } catch (_) {
+      failedStorageKeys.add(key);
+    }
+    updateStorageWarning();
+    queueMicrotask(updateStorageWarning);
+    return !failedStorageKeys.has(key);
+  }
+
+  function updateStorageWarning() {
+    let warning = storageWarning;
+    if (!warning && failedStorageKeys.size) {
+      warning = document.createElement("aside");
+      storageWarning = warning;
+      warning.id = "storage-warning";
+      warning.className = "storage-warning";
+      warning.setAttribute("role", "alert");
+      if (typeof warning.showPopover === "function") warning.setAttribute("popover", "manual");
+      const message = document.createElement("span");
+      message.textContent = "No se están guardando todos tus cambios en este navegador. Exporta tus listas y tu parrilla antes de cerrar la app.";
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = "Exportar mis datos";
+      button.addEventListener("click", () => document.querySelector("#settings-download").click());
+      warning.append(message, button);
+      document.body.prepend(warning);
+    }
+    if (warning) {
+      // A popover outside a modal dialog is inert; keep the export action inside it.
+      const parent = document.querySelector("dialog[open]") || document.body;
+      if (warning.parentElement !== parent) parent.prepend(warning);
+      warning.hidden = failedStorageKeys.size === 0;
+      if (typeof warning.showPopover === "function") {
+        warning.hidePopover();
+        if (!warning.hidden) warning.showPopover();
+      }
+    }
+  }
+
   const films = Array.isArray(window.FICX_FILMS) ? window.FICX_FILMS : [];
   const screeningRecords = Array.isArray(window.FICX_SCREENINGS) ? window.FICX_SCREENINGS : [];
   const venueTransfers = window.FICX_VENUE_TRANSFERS || {};
@@ -60,7 +109,7 @@
     try { return localStorage.getItem(specialAccessStorageKey) === "true"; } catch (_) { return false; }
   }
   function persistIncludeSpecial() {
-    try { localStorage.setItem(specialAccessStorageKey, String(includeSpecialInProgram)); } catch (_) { /* Preference stays for this session. */ }
+    try { saveLocalValue(specialAccessStorageKey, String(includeSpecialInProgram)); } catch (_) { /* Preference stays for this session. */ }
   }
   let transportMode = readTransportMode();
   let activeScreen = "explore";
@@ -88,7 +137,7 @@
     } catch (_) { return new Set(); }
   }
   function persistStandalone() {
-    try { localStorage.setItem(standaloneStorageKey, JSON.stringify([...plannedStandalone])); } catch (_) { /* Keep it for this session. */ }
+    try { saveLocalValue(standaloneStorageKey, JSON.stringify([...plannedStandalone])); } catch (_) { /* Keep it for this session. */ }
   }
   function readDiscarded() {
     try {
@@ -98,7 +147,7 @@
     } catch (_) { return new Set(); }
   }
   function persistDiscarded() {
-    try { localStorage.setItem(discardedStorageKey, JSON.stringify([...discarded])); } catch (_) { /* Keep it for this session. */ }
+    try { saveLocalValue(discardedStorageKey, JSON.stringify([...discarded])); } catch (_) { /* Keep it for this session. */ }
   }
   function readPrioritized() {
     try {
@@ -108,7 +157,7 @@
     } catch (_) { return new Set(); }
   }
   function persistPrioritized() {
-    try { localStorage.setItem(prioritizedStorageKey, JSON.stringify([...prioritized])); } catch (_) { /* Keep it for this session. */ }
+    try { saveLocalValue(prioritizedStorageKey, JSON.stringify([...prioritized])); } catch (_) { /* Keep it for this session. */ }
   }
   function readTransportMode() {
     try {
@@ -127,10 +176,10 @@
     } catch (_) { return new Map(); }
   }
   function persist() {
-    try { localStorage.setItem(storageKey, JSON.stringify(Object.fromEntries(intentions))); } catch (_) { /* Local storage may be disabled. */ }
+    try { saveLocalValue(storageKey, JSON.stringify(Object.fromEntries(intentions))); } catch (_) { /* Local storage may be disabled. */ }
   }
   function persistPlannedScreenings() {
-    try { localStorage.setItem(plannedScreeningsStorageKey, JSON.stringify(Object.fromEntries(plannedScreenings))); } catch (_) { /* The plan remains available for this session. */ }
+    try { saveLocalValue(plannedScreeningsStorageKey, JSON.stringify(Object.fromEntries(plannedScreenings))); } catch (_) { /* The plan remains available for this session. */ }
   }
   function availableSections() {
     return [...new Set(films.flatMap((film) => film.sections || []))]
@@ -156,7 +205,7 @@
     return FALLBACK_PINNED_SECTIONS.filter(valid).slice(0, maxPinnedSections);
   }
   function persistPinnedSections() {
-    try { localStorage.setItem(pinStorageKey, JSON.stringify(pinnedSections)); } catch (_) { /* Local storage may be disabled. */ }
+    try { saveLocalValue(pinStorageKey, JSON.stringify(pinnedSections)); } catch (_) { /* Local storage may be disabled. */ }
   }
   function readRemoteImagesSetting() {
     try { return localStorage.getItem(remoteImagesStorageKey) === "true"; } catch (_) { return false; }
@@ -1708,7 +1757,7 @@
   updateRemoteImagesStatus();
   remoteImagesToggle.addEventListener("change", () => {
     remoteImagesEnabled = remoteImagesToggle.checked;
-    try { localStorage.setItem(remoteImagesStorageKey, String(remoteImagesEnabled)); } catch (_) { /* Preference remains active for this session. */ }
+    try { saveLocalValue(remoteImagesStorageKey, String(remoteImagesEnabled)); } catch (_) { /* Preference remains active for this session. */ }
     updateRemoteImagesStatus();
     renderFilms();
   });
@@ -1733,7 +1782,7 @@
     themePreference = value;
     if (value === "system") delete document.documentElement.dataset.theme;
     else document.documentElement.dataset.theme = value;
-    try { localStorage.setItem(themeStorageKey, value); } catch (_) { /* Keep it for this session. */ }
+    try { saveLocalValue(themeStorageKey, value); } catch (_) { /* Keep it for this session. */ }
     // La barra del navegador móvil acompaña al tema elegido, no al del sistema.
     const dark = value === "dark" || (value === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#0e1218" : "#fbf9f3");
@@ -1950,7 +1999,7 @@
   transportSelect.value = transportMode;
   transportSelect.addEventListener("change", () => {
     transportMode = transportSelect.value;
-    try { localStorage.setItem(transportStorageKey, transportMode); } catch (_) { /* Keep this choice for the current session. */ }
+    try { saveLocalValue(transportStorageKey, transportMode); } catch (_) { /* Keep this choice for the current session. */ }
     settingsTransport.value = transportMode;
     renderProgram();
   });
@@ -2610,7 +2659,7 @@
     try { return String(localStorage.getItem(aliasStorageKey) || "").trim().slice(0, 40); } catch (_) { return ""; }
   }
   function persistAlias(value) {
-    try { localStorage.setItem(aliasStorageKey, value); } catch (_) { /* Stays for this session. */ }
+    try { saveLocalValue(aliasStorageKey, value); } catch (_) { /* Stays for this session. */ }
   }
   let userAlias = readAlias();
   function calendarTitle() {
@@ -2916,7 +2965,7 @@
     } catch (_) { return 1; }
   }
   function saveWizardStep(step) {
-    try { localStorage.setItem(wizardStepKey, String(step)); } catch (_) { /* Keep it for this session. */ }
+    try { saveLocalValue(wizardStepKey, String(step)); } catch (_) { /* Keep it for this session. */ }
   }
   // La demo repinta la tarjeta entera con los controles reales del listado y su propio estado:
   // nada de esto se guarda.
@@ -3008,7 +3057,7 @@
   }
   function closeOnboarding(markDone = false) {
     if (markDone) {
-      try { localStorage.setItem(wizardDoneKey, "true"); } catch (_) { /* Nothing to remember. */ }
+      try { saveLocalValue(wizardDoneKey, "true"); } catch (_) { /* Nothing to remember. */ }
       try { localStorage.removeItem(wizardStepKey); } catch (_) { /* Nothing to forget. */ }
     }
     if (wizard.open) wizard.close();
@@ -3081,7 +3130,7 @@
     const button = event.target.closest("button[data-transport]");
     if (!button) return;
     transportMode = button.dataset.transport;
-    try { localStorage.setItem(transportStorageKey, transportMode); } catch (_) { /* Keep it. */ }
+    try { saveLocalValue(transportStorageKey, transportMode); } catch (_) { /* Keep it. */ }
     transportSelect.value = transportMode;
     settingsTransport.value = transportMode;
     renderWizardChoices();
@@ -3094,7 +3143,7 @@
     const button = event.target.closest("button[data-images]");
     if (!button) return;
     remoteImagesEnabled = button.dataset.images === "true";
-    try { localStorage.setItem(remoteImagesStorageKey, String(remoteImagesEnabled)); } catch (_) { /* Keep it. */ }
+    try { saveLocalValue(remoteImagesStorageKey, String(remoteImagesEnabled)); } catch (_) { /* Keep it. */ }
     remoteImagesToggle.checked = remoteImagesEnabled;
     updateRemoteImagesStatus();
     renderFilms();
@@ -3677,7 +3726,7 @@
   settingsTransport.value = transportMode;
   settingsTransport.addEventListener("change", () => {
     transportMode = settingsTransport.value;
-    try { localStorage.setItem(transportStorageKey, transportMode); } catch (_) { /* Keep this choice for the current session. */ }
+    try { saveLocalValue(transportStorageKey, transportMode); } catch (_) { /* Keep this choice for the current session. */ }
     transportSelect.value = transportMode;
     renderProgram();
   });
