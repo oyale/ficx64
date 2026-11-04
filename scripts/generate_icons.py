@@ -39,4 +39,7 @@ for theme in ('light', 'dark'):
     render(f'icon-maskable{suffix}.png', 512, dark, True)
     for size in (16, 32):
         render(f'favicon-{size}{suffix}.png', size, dark)
+pdf_mark = ROOT / 'src' / 'pdf-assets' / 'ficx-mark.png'
+pdf_mark.parent.mkdir(parents=True, exist_ok=True)
+subprocess.run(['rsvg-convert', '-w', '256', '-h', '256', str(ICONS / 'mark.svg'), '-o', str(pdf_mark)], check=True)
 print('Generated light/dark icons and adaptive SVG favicon from icons/mark.svg')

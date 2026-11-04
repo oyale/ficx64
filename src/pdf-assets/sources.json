@@ -1,0 +1,44 @@
+[
+  {
+    "file": "jspdf-4.2.1.umd.min.js",
+    "url": "https://unpkg.com/jspdf@4.2.1/dist/jspdf.umd.min.js",
+    "sha256": "e6551fcdc32f09d6853b2c5126d18d01d9447e0da618a41a11ebeee0f6c20d54",
+    "bytes": 420165
+  },
+  {
+    "file": "LICENSE-jspdf.txt",
+    "url": "https://unpkg.com/jspdf@4.2.1/LICENSE",
+    "sha256": "dc388ec35ff463288cdde3588a36fd4ed12a45deff053243b37309acc9ef583b",
+    "bytes": 1142
+  },
+  {
+    "file": "Barlow-Regular.ttf",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/barlow/Barlow-Regular.ttf",
+    "sha256": "95aa02c7c43096e0dd44d787ba6216864a67157e402adab59b35572e0c1577ea",
+    "bytes": 104068
+  },
+  {
+    "file": "Barlow-SemiBold.ttf",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/barlow/Barlow-SemiBold.ttf",
+    "sha256": "86577cb32f8abe3673db53ca0f4221e6856751a4f6730c867e00f720f8bb1fc5",
+    "bytes": 108348
+  },
+  {
+    "file": "BarlowCondensed-SemiBold.ttf",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/barlowcondensed/BarlowCondensed-SemiBold.ttf",
+    "sha256": "7b619d14bc2327509a9ef32b0890f709626f7ecc9ff61191c2a4314c5499d2d9",
+    "bytes": 109428
+  },
+  {
+    "file": "OFL-Barlow.txt",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/barlow/OFL.txt",
+    "sha256": "186d750eb496a4c17a76385f82be6aea2ac1cf2de074a811d63786cf374ea73f",
+    "bytes": 4377
+  },
+  {
+    "file": "OFL-BarlowCondensed.txt",
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/barlowcondensed/OFL.txt",
+    "sha256": "186d750eb496a4c17a76385f82be6aea2ac1cf2de074a811d63786cf374ea73f",
+    "bytes": 4377
+  }
+]

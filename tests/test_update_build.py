@@ -31,7 +31,9 @@ class UpdateBuildTest(unittest.TestCase):
             self.assertNotIn(b'__BUILD_VERSION__', previous)
             self.assertEqual(previous, build())
             for filename in ('src/app.js', 'src/styles.css', 'src/index.html',
-                             'manifest.webmanifest', 'src/sw.js', 'icons/icon-192.png'):
+                             'manifest.webmanifest', 'src/sw.js', 'src/pdf-itinerary.js',
+                             'src/pdf-assets/Barlow-Regular.ttf', 'src/pdf-assets/ficx-mark.png',
+                             'icons/icon-192.png'):
                 with self.subTest(filename=filename):
                     path = root / filename
                     if filename == 'manifest.webmanifest':
@@ -61,6 +63,10 @@ class UpdateBuildTest(unittest.TestCase):
             self.assertLess(len(legacy), 1024)
             self.assertIn('location.search + location.hash', legacy)
             self.assertIn('href="./index.html" download="ficx64.html"', html)
+            self.assertNotIn('src="pdf-itinerary.js"', html)
+            self.assertNotIn('/* __PDF_FONTS__ */', html)
+            self.assertNotIn('/* __PDF_LOGO__ */', html)
+            self.assertNotIn('sourceMappingURL=jspdf', html)
             # Una salida personalizada contiene la app completa, no la redirección.
             output = root / 'portable' / 'ficx64.html'
             subprocess.run([sys.executable, str(root / 'build.py'), '--output', str(output)],
@@ -90,6 +96,13 @@ class UpdateBuildTest(unittest.TestCase):
                 self.assertIn(url, html)
                 self.assertIn(url, (root / 'dist/sw.js').read_text())
             self.assertNotEqual((pages_output.parent / 'sw.js').read_bytes(), build())
+            screening_path = root / 'data/screenings.json'
+            invalid = json.loads(screening_path.read_text())
+            invalid['screenings'][0]['mainFilmId'] = 'not-linked'
+            screening_path.write_text(json.dumps(invalid))
+            rejected = subprocess.run([sys.executable, str(root / 'build.py')], capture_output=True, text=True)
+            self.assertNotEqual(rejected.returncode, 0)
+            self.assertIn('mainFilmId no enlazado', rejected.stderr)
 
 
 if __name__ == '__main__':

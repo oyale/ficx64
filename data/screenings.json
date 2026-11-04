@@ -1290,7 +1290,9 @@
           "title": "Adolescencia, sexo y muerte en Campamento Miasma"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "adolescencia-sexo-y-muerte-en-campamento-miasma",
+      "mainFilmSource": "duration-proposal"
     },
     {
       "candidateId": "calendar-p05-g02-d14-2215",
@@ -2099,7 +2101,9 @@
           "title": "Gaulana"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "gaulana",
+      "mainFilmSource": "duration-proposal"
     },
     {
       "candidateId": "calendar-p07-g01-d15-2100",
@@ -2375,7 +2379,9 @@
           "title": "Sunny Dancer"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "sunny-dancer",
+      "mainFilmSource": "duration-proposal"
     },
     {
       "candidateId": "calendar-p08-g02-d16-930",
@@ -4096,7 +4102,8 @@
           "title": "asturias es jazz"
         }
       ],
-      "title": ""
+      "title": "Lucía Seles · POEX",
+      "titleSource": "editorial-reviewed"
     },
     {
       "candidateId": "calendar-p04-g01-d17-1900",
@@ -4263,7 +4270,9 @@
           "title": "Adolescencia, sexo y muerte en Campamento Miasma"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "adolescencia-sexo-y-muerte-en-campamento-miasma",
+      "mainFilmSource": "duration-proposal"
     },
     {
       "candidateId": "calendar-p05-g02-d17-1930",
@@ -4296,7 +4305,9 @@
           "title": "Kotodama, el camino del espejo"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "kotodama-el-camino-del-espejo",
+      "mainFilmSource": "duration-proposal"
     },
     {
       "candidateId": "calendar-p02-g01-d17-1945",
@@ -4464,7 +4475,8 @@
           "title": "El día que ella volvió"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "the-day-she-returns"
     },
     {
       "candidateId": "calendar-p05-g01-d17-2145",
@@ -4655,7 +4667,9 @@
           "title": "A Place to Heal"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "15-18-a-place-to-heal",
+      "mainFilmSource": "duration-proposal"
     },
     {
       "candidateId": "calendar-p04-g01-d18-1000",
@@ -4940,7 +4954,9 @@
           "title": "Silvia"
         }
       ],
-      "title": "María Silvia Esteve (I)"
+      "title": "María Silvia Esteve (I)",
+      "mainFilmId": "silvia",
+      "mainFilmSource": "manual"
     },
     {
       "candidateId": "calendar-p02-g01-d18-1700",
@@ -5023,7 +5039,8 @@
           "title": "El día que ella volvió"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "the-day-she-returns"
     },
     {
       "candidateId": "calendar-p06-g01-d18-1730",
@@ -5109,7 +5126,9 @@
           "title": "Why Do I See You in Everything?"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "why-do-i-see-you-in-everything",
+      "mainFilmSource": "manual"
     },
     {
       "candidateId": "calendar-p08-g02-d18-1930",
@@ -5485,7 +5504,9 @@
           "title": "Vade Retro"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "vade-retro",
+      "mainFilmSource": "duration-proposal"
     },
     {
       "candidateId": "calendar-p03-g01-d18-2215",
@@ -5686,7 +5707,9 @@
           "title": "A Place to Heal"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "15-18-a-place-to-heal",
+      "mainFilmSource": "duration-proposal"
     },
     {
       "candidateId": "calendar-p04-g01-d19-1000",
@@ -5910,7 +5933,9 @@
           "title": "Staubwelt"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "staubwelt",
+      "mainFilmSource": "manual"
     },
     {
       "candidateId": "calendar-p06-g01-d19-1700",
@@ -6225,7 +6250,9 @@
           "title": "La última miliciana"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "la-ultima-miliciana",
+      "mainFilmSource": "official-programme"
     },
     {
       "candidateId": "calendar-p09-g01-d19-1930",
@@ -6452,7 +6479,9 @@
           "title": "Mailin"
         }
       ],
-      "title": "María Silvia Esteve (II)"
+      "title": "María Silvia Esteve (II)",
+      "mainFilmId": "mailin",
+      "mainFilmSource": "manual"
     },
     {
       "candidateId": "calendar-p04-g01-d19-2145",
@@ -6572,7 +6601,9 @@
           "title": "La hija de un ladrón"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "la-hija-de-un-ladron",
+      "mainFilmSource": "duration-proposal"
     },
     {
       "candidateId": "calendar-p03-g01-d20-900",
@@ -6693,7 +6724,9 @@
           "title": "The Talented Mr. F."
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "the-talented-mr-f",
+      "mainFilmSource": "duration-proposal"
     },
     {
       "candidateId": "calendar-p02-g01-d20-1000",
@@ -7340,7 +7373,8 @@
           "title": "¿A dónde, Vauste?"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "a-donde-vauste"
     },
     {
       "candidateId": "calendar-p04-g01-d20-2100",
@@ -7374,7 +7408,9 @@
           "title": "Los tortuga"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "los-tortuga",
+      "mainFilmSource": "duration-proposal"
     },
     {
       "candidateId": "calendar-p07-g01-d20-2115",
@@ -7485,7 +7521,9 @@
           "title": "Staubwelt"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "staubwelt",
+      "mainFilmSource": "manual"
     },
     {
       "candidateId": "calendar-p05-g01-d20-2145",
@@ -7865,7 +7903,9 @@
           "title": "Why Do I See You in Everything?"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "why-do-i-see-you-in-everything",
+      "mainFilmSource": "manual"
     },
     {
       "candidateId": "calendar-p02-g01-d21-1900",
@@ -8213,7 +8253,9 @@
           "title": "Vade Retro"
         }
       ],
-      "title": ""
+      "title": "",
+      "mainFilmId": "vade-retro",
+      "mainFilmSource": "duration-proposal"
     }
   ]
 }

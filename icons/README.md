@@ -10,7 +10,8 @@ python3 scripts/generate_icons.py
 python3 build.py
 ```
 
-The generator requires `rsvg-convert` (librsvg).
+The generator requires `rsvg-convert` (librsvg). It also creates the transparent
+PDF logo at `src/pdf-assets/ficx-mark.png` from the same approved master.
 
 - `favicon.svg` follows the system color scheme. The HTML build embeds it so it
   also works in a downloaded standalone HTML file.

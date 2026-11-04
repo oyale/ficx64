@@ -2740,12 +2740,75 @@
     if (!note) return;
     const events = selectedPlanEvents();
     note.textContent = events.length
-      ? `${events.length} ${events.length === 1 ? "pase" : "pases"} en tu calendario`
+      ? `${events.length} ${events.length === 1 ? "pase" : "pases"} en tu programa`
       : "Añade pases a la parrilla para exportarlos";
+    const pdf = document.querySelector("#itinerary-pdf");
+    if (pdf) pdf.disabled = !events.length;
     const download = document.querySelector("#settings-ics");
     if (download) download.disabled = !events.length;
     const share = document.querySelector("#share-itinerary");
     if (share) share.disabled = !events.length;
+  }
+  function itineraryScreeningTitles(screening) {
+    const linked = (screening.films || []).filter((film) => film.title);
+    const filmLabel = (film) => {
+      const details = filmById.get(film.id);
+      const title = details?.title || film.title;
+      return Number.isFinite(details?.durationMinutes) && details.durationMinutes > 0 ? `${title} (${details.durationMinutes} min)` : title;
+    };
+    const main = screening.mainFilmId && (screening.filmIds || []).includes(screening.mainFilmId)
+      ? linked.find((film) => film.id === screening.mainFilmId) : null;
+    if (main) return {
+      title: filmById.get(main.id)?.title || main.title,
+      films: linked.filter((film) => film.id !== main.id).map(filmLabel),
+      filmsLabel: "Incluye",
+    };
+    const titles = linked.map((film) => film.title);
+    return {
+      title: titles.length === 1 ? titles[0] : (screening.title || (titles.length ? `Programa de ${titles.length} películas` : "Actividad del festival")),
+      films: titles.length > 1 ? linked.map(filmLabel) : [], filmsLabel: "",
+    };
+  }
+  function buildItineraryDocument(events = selectedPlanEvents(), generatedAt = new Date()) {
+    const { conflicts } = analyzeProgram(events);
+    const transportLabel = { walking: "Traslados a pie", cycling: "Traslados en bici", bus: "Traslados en bus", all: "Mejor traslado disponible" }[transportMode];
+    return {
+      alias: userAlias, generatedAt: generatedAt.toISOString(), transportLabel,
+      events: events.map((screening, index) => {
+        const presentation = itineraryScreeningTitles(screening);
+        const minutes = plannedMinutes(screening);
+        const endMinutes = startMinute(screening) + minutes;
+        const warnings = (conflicts.get(screening.candidateId) || []).map((conflict) =>
+          `${conflict.reason === "transfer" ? "No da tiempo al traslado" : "Solapa"} con el pase de las ${conflict.screening.time}`);
+        if (!minutes) warnings.push("Duración por confirmar");
+        const next = events[index + 1];
+        let transition = "", transitionWarning = false;
+        if (next && next.date === screening.date) {
+          const transfer = transferMinutes(screening, next);
+          if (!minutes) { transition = "Fin por confirmar; no se puede asegurar el siguiente traslado."; transitionWarning = true; }
+          else if (transfer === null) { transition = "Traslado al siguiente pase por confirmar."; transitionWarning = true; }
+          else {
+            const gap = startMinute(next) - endMinutes;
+            const margin = gap - transfer;
+            transitionWarning = compareScreenings(screening, next).status === "conflict";
+            transition = gap < 0 ? `El siguiente pase empieza ${Math.abs(gap)} min antes de que termine este.`
+              : gap > 240 ? `Pausa de ${Math.floor(gap / 60)} h${gap % 60 ? ` ${gap % 60} min` : ""} · traslado estimado: ${transfer} min`
+                : `Traslado estimado: ${transfer} min · ${margin < 0 ? `faltan ${Math.abs(margin)} min para llegar` : `margen de ${margin} min`}`;
+          }
+        }
+        return {
+          id: screening.candidateId, date: screening.date, time: screening.time,
+          end: minutes ? `${formatClock(endMinutes % 1440)}${endMinutes >= 1440 ? " (+1 día)" : ""}` : "",
+          ...presentation,
+          meeting: Boolean(screening.hasMeeting || screening.meetingMinutes),
+          venue: `${screening.venue || "Sede por confirmar"}${screening.room ? ` · ${screening.room}` : ""}`,
+          duration: minutes ? `${minutes} min de pase` : "",
+          details: [screening.accessType && screening.accessType !== "public" ? (screening.accessType === "restricted" ? "Prensa y acreditados" : "Acceso especial") : ""].filter(Boolean),
+          sections: sectionNames((screening.filmIds || []).map((id) => filmById.get(id)).filter(Boolean)),
+          warnings: [...new Set(warnings)], transition, transitionWarning,
+        };
+      }),
+    };
   }
   function buildCalendar(events = selectedPlanEvents()) {
     return [
@@ -2806,15 +2869,20 @@
     const input = document.querySelector("#alias-input");
     const counter = document.querySelector("#alias-counter");
     if (!dialog || !input) return Promise.resolve("");
+    const isPdf = kind === "pdf";
     const isItinerary = kind === "itinerary";
-    document.querySelector("#alias-intro").textContent = isItinerary
-      ? "Es opcional: aparecerá como «El itinerario de …» al abrir el enlace."
+    document.querySelector("#alias-title").textContent = isPdf ? "Nombre del itinerario" : "¿Cómo quieres aparecer?";
+    document.querySelector("#alias-accept").textContent = isPdf ? "Descargar PDF" : "Compartir";
+    document.querySelector("#alias-intro").textContent = isPdf
+      ? "Es opcional y solo se usa en este PDF. Si lo dejas vacío, se titulará «Tu itinerario»."
+      : isItinerary ? "Es opcional: aparecerá como «El itinerario de …» al abrir el enlace."
       : "Es opcional: aparecerá en la cabecera del enlace de tus listas.";
     document.querySelector("#alias-privacy-note").hidden = !isItinerary;
     // Con nombre guardado, el enlace sale ya firmado: basta confirmar.
     userAlias = readAlias();
     input.value = userAlias;
-    input.placeholder = randomAliasPlaceholder();
+    input.placeholder = isPdf ? "Tu nombre o apodo" : randomAliasPlaceholder();
+    dialog.returnValue = "";
     counter.textContent = `${input.value.length}/40`;
     return new Promise((resolve) => {
       let settled = false;
@@ -3500,6 +3568,33 @@
     });
   }
 
+  document.querySelector("#itinerary-pdf").addEventListener("click", async () => {
+    const button = document.querySelector("#itinerary-pdf");
+    const feedback = document.querySelector("#settings-calendar-feedback");
+    if (button.disabled || !selectedPlanEvents().length) return;
+    button.disabled = true;
+    feedback.textContent = "";
+    try {
+      const answer = await askAlias("pdf");
+      if (answer === null) return;
+      button.querySelector("span").textContent = "Preparando PDF…";
+      const model = buildItineraryDocument();
+      model.alias = answer.trim().slice(0, 40);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const pdf = FICXItineraryPDF.create(model);
+      const alias = model.alias.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      downloadBlob(pdf, "application/pdf", `ficx64-itinerario${alias ? `-${alias}` : ""}.pdf`);
+      feedback.textContent = "PDF preparado con todos tus días. Si cambias el itinerario, descárgalo de nuevo.";
+      showShareToast("PDF preparado para descargar");
+    } catch (_) {
+      feedback.textContent = "No se ha podido generar el PDF. Tus pases siguen guardados; puedes intentarlo de nuevo.";
+      showShareToast("No se ha podido generar el PDF. Puedes intentarlo de nuevo.");
+    } finally {
+      button.querySelector("span").textContent = "Descargar itinerario PDF";
+      button.disabled = !selectedPlanEvents().length;
+      if (document.querySelector("#program-calendar-panel").hidden) document.querySelector("#program-calendar-toggle").focus({ preventScroll: true });
+    }
+  });
   document.querySelector("#settings-ics").addEventListener("click", () => {
     downloadBlob(buildCalendar(), "text/calendar;charset=utf-8", "ficx64-programa.ics");
     document.querySelector("#settings-calendar-feedback").textContent = "Calendario descargado. Ábrelo para añadirlo a tu app de calendario.";
@@ -3718,6 +3813,7 @@
   function positionCalendarPanel() {
     const gap = 12;
     const anchor = calendarToggle.getBoundingClientRect();
+    calendarPanel.style.maxHeight = `${window.innerHeight - mobileBarHeight() - gap * 2}px`;
     const width = calendarPanel.offsetWidth;
     const height = calendarPanel.offsetHeight;
     const bottomLimit = window.innerHeight - mobileBarHeight() - gap;
