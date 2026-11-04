@@ -325,6 +325,15 @@
         && (!onlyMyLists || inMyLists) && (!query || searchable.includes(query));
     }).sort((a, b) => {
       const compare = a.title.localeCompare(b.title, "es", { sensitivity: "base" });
+      if (sort.value === "duration-asc" || sort.value === "duration-desc") {
+        const knownA = Number.isFinite(a.durationMinutes) && a.durationMinutes > 0;
+        const knownB = Number.isFinite(b.durationMinutes) && b.durationMinutes > 0;
+        if (knownA !== knownB) return knownA ? -1 : 1;
+        if (knownA && a.durationMinutes !== b.durationMinutes) {
+          return sort.value === "duration-desc" ? b.durationMinutes - a.durationMinutes : a.durationMinutes - b.durationMinutes;
+        }
+        return compare;
+      }
       return sort.value === "title-desc" ? -compare : compare;
     });
   }

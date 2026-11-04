@@ -255,3 +255,6 @@ enables the parent while keeping other excluded subsets unchecked.
 Film cards show their countries beside the filmmaker only when the complete line
 fits with at least 32 CSS pixels to spare. This is recalculated for each card on
 resize and after fonts load; compact cards keep the existing single credit line.
+
+Catalogue ordering supports shortest/longest first; unknown durations stay last,
+with alphabetical ordering as the tie-breaker.
