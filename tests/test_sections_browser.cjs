@@ -87,7 +87,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     const refineAll = async () => {
       assert.equal(await evaluate(`document.querySelector('#section-subfilters').hidden`), false);
       const name = await evaluate(`(() => {
-        const input = document.querySelector('#section-subfilters input[data-filter-section=""]');
+        const input = document.querySelector('#section-subfilters input');
         if(!input) throw new Error('Missing all-films refinements');
         const name=input.dataset.subfilter; input.checked=false;
         input.dispatchEvent(new Event('change',{bubbles:true})); return name;
@@ -125,16 +125,23 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       await check(['Albar','Sección Oficial',extra]);
       await choose(extra);
       await check(['Albar','Sección Oficial']);
-      // Exclusions belong to one selected section; another selected section can still include a film.
+      const chips = await evaluate(`Array.from(document.querySelectorAll('#section-subfilters label'), label => ({name: label.querySelector('input').dataset.subfilter, count:Number(label.querySelector('b').textContent)}))`);
+      assert.equal(new Set(chips.map(chip=>chip.name)).size,chips.length,'each refinement appears once');
+      assert.equal(await evaluate(`document.querySelectorAll('#section-subfilters .section-subfilter-group').length`),1);
+      for (const chip of chips) {
+        const expectedCount = await evaluate(`window.FICX_FILMS.filter(f=> ['Albar','Sección Oficial'].some(s=>f.sections.includes(s)) && f.sections.includes(${JSON.stringify(chip.name)})).length`);
+        assert.equal(chip.count,expectedCount,'films shared by selected sections count once');
+      }
+      // A refinement applies once to the union of selected sections.
       const subfilter = await evaluate(`(() => {
         const input = document.querySelector('#section-subfilters input');
         if(!input) return null;
-        const details={section:input.dataset.filterSection, excluded:input.dataset.subfilter};
+        const details={excluded:input.dataset.subfilter};
         input.checked=false; input.dispatchEvent(new Event('change',{bubbles:true})); return details;
       })()`);
       if (subfilter) {
         const actual = await evaluate(`Array.from(document.querySelectorAll('#film-list > li'), row => row.dataset.filmId).sort()`);
-        const expected = await evaluate(`window.FICX_FILMS.filter(f=> ['Albar','Sección Oficial'].some(s=>f.sections.includes(s) && (s!==${JSON.stringify(subfilter.section)} || !f.sections.includes(${JSON.stringify(subfilter.excluded)})))).map(f=>f.id).sort()`);
+        const expected = await evaluate(`window.FICX_FILMS.filter(f=> ['Albar','Sección Oficial'].some(s=>f.sections.includes(s)) && !f.sections.includes(${JSON.stringify(subfilter.excluded)})).map(f=>f.id).sort()`);
         assert.deepEqual(actual,expected);
       }
       await evaluate(`document.querySelector('#search-input').value='zzzz-no-film'; document.querySelector('#search-input').dispatchEvent(new Event('input'));`);
@@ -145,7 +152,19 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       await evaluate(`document.querySelector('#show-all-sections').click()`);
       await check([]);
     }
-    console.log('Chromium: cumulative sections, no duplicates, independent exclusions, additional sections, deselection and resets passed at 3 viewport sizes');
+    await send('Emulation.setDeviceMetricsOverride', {width:1280,height:800,deviceScaleFactor:1,mobile:false});
+    await evaluate(`document.querySelector('#clear-filters').click(); window.scrollTo({top:0,behavior:'instant'});
+      window.sectionScrollCalls=0; window.originalScrollIntoView=Element.prototype.scrollIntoView;
+      Element.prototype.scrollIntoView=function(...args) { window.sectionScrollCalls++; return window.originalScrollIntoView.apply(this,args); };`);
+    await choose('Albar'); await choose('Sección Oficial');
+    await pause(400);
+    assert.equal(await evaluate('window.sectionScrollCalls'),0,'desktop selection must not jump to results');
+    assert.equal(await evaluate('window.scrollY'),0,'desktop viewport stays at the section picker');
+    await check(['Albar','Sección Oficial']);
+    await send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true});
+    await choose('Retueyos');
+    assert.equal(await evaluate('window.sectionScrollCalls'),1,'mobile retains its results shortcut');
+    console.log('Chromium: cumulative sections, no duplicates, shared refinements, unique counts, desktop scroll preservation, additional sections, deselection and resets passed at 3 viewport sizes');
   } finally {
     clearTimeout(timeout);
     ws?.close();
