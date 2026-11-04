@@ -2114,3 +2114,15 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 @media (pointer: coarse), (max-width: 899px) {
   .filters kbd { display: none; }
 }
+
+.program-agenda-panel > .program-panel-heading { flex-wrap: wrap; align-items: center; row-gap: 10px; }
+.program-calendar-toggle { min-height: 44px; gap: 8px; font-size: 11px; letter-spacing: 0; }
+.export-action-icon { width: 20px; height: 20px; flex: 0 0 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.program-calendar-toggle .export-action-icon { width: 18px; height: 18px; }
+.program-calendar-panel .settings-action { justify-content: flex-start; gap: 11px; min-height: 48px; }
+.program-calendar-panel .settings-action::after, .program-calendar-panel .settings-action.is-primary::after { content: none; }
+.program-calendar-panel .settings-action.is-primary { background: var(--green-deep); color: var(--on-solid); }
+.program-calendar-panel .settings-action.is-primary:hover { background: #00695f; }
+.program-toolbar-options #clear-planned-screenings { min-height: 44px; font-size: 11px; color: var(--text-muted); }
+
+.program-export-note { margin: 0; padding: 11px 16px; border-top: 1px solid var(--line); color: var(--text-body); font-size: 11px; line-height: 1.5; }
