@@ -435,7 +435,8 @@ h1, h2, h3, p { margin-top: 0; }
 .sort-control select { padding: 6px 20px 6px 7px; }
 .filters { display: flex; align-items: center; gap: 13px; padding-bottom: 9px; border-bottom: 1px solid var(--line); }
 .search-box { min-width: 150px; flex: 1; display: flex; align-items: center; gap: 9px; }
-.search-icon { color: var(--blue); font-size: 22px; line-height: 1; }
+.search-icon { display: inline-flex; flex: 0 0 22px; width: 22px; height: 22px; color: var(--blue); }
+.search-icon svg { display: block; width: 100%; height: 100%; }
 .search-box input { width: 100%; min-width: 0; padding: 8px 0; border: 0; outline: 0; background: transparent; font-size: 11px; }
 .search-box input::placeholder { color: #8994a2; }
 kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-size: 8px; }
