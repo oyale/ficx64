@@ -87,7 +87,7 @@
   const prioritizedStorageKey = "ficx64-prioritized-v1";
   let prioritized = readPrioritized();
   let pinnedSections = readPinnedSections();
-  let activeSection = "";
+  const activeSections = new Set();
   let onlyMyLists = false;
   let showDiscarded = false;
   let expandedId = null;
@@ -269,16 +269,21 @@
   function filmsForSection(sectionName) {
     return films.filter((film) => !discarded.has(film.id) && (!sectionName || (film.sections || []).includes(sectionName)));
   }
-  function matchingFilms() {
+  function matchingFilms(applySubfilters = true) {
     const query = search.value.trim().toLocaleLowerCase("es");
-    const excluded = excludedSubfiltersBySection.get(activeSection) || new Set();
     return films.filter((film) => {
       // Mientras dura el acuse, la recién descartada sigue ocupando su sitio.
       if (discarded.has(film.id) !== showDiscarded && !(discardAck && discardAck.film.id === film.id)) return false;
       const names = film.sections || [];
       const searchable = `${film.title} ${directorText(film)} ${names.join(" ")}`.toLocaleLowerCase("es");
       const inMyLists = intentions.has(film.id);
-      return (!activeSection || names.includes(activeSection)) && !names.some((name) => excluded.has(name))
+      const scopes = activeSections.size ? [...activeSections] : [""];
+      const matchesSection = scopes.some((section) => {
+        const excluded = excludedSubfiltersBySection.get(section) || new Set();
+        return (!section || names.includes(section))
+          && (!applySubfilters || !names.some((name) => excluded.has(name)));
+      });
+      return matchesSection
         && (!onlyMyLists || inMyLists) && (!query || searchable.includes(query));
     }).sort((a, b) => {
       const compare = a.title.localeCompare(b.title, "es", { sensitivity: "base" });
@@ -307,36 +312,24 @@
 
   function renderSectionPicker() {
     const featured = document.querySelector("#featured-sections");
-    const present = pinnedSections.filter((name) => films.some((film) => (film.sections || []).includes(name)));
+    const present = [...new Set([...pinnedSections, ...activeSections])].filter((name) => films.some((film) => (film.sections || []).includes(name)));
     featured.innerHTML = present.map((name, index) => {
       const count = filmsForSection(name).length;
-      const selected = activeSection === name;
+      const selected = activeSections.has(name);
       const tagline = SECTION_TAGLINES[name] || "";
       return `<button class="cinema-card section-card${selected ? " is-selected" : ""}" type="button" data-section="${escapeHtml(name)}" aria-pressed="${selected}">
         <svg class="section-card-bolt" viewBox="0 0 180 250" aria-hidden="true"><path d="M112 0 25 114h52L0 250l155-155H99L180 0z"/></svg>
         <span class="section-card-name">${escapeHtml(name)}</span>
         ${tagline ? `<span class="section-card-tagline">${escapeHtml(tagline)}</span>` : ""}
         <span class="section-card-count" aria-hidden="true"><b>${count}</b><small>${count === 1 ? "película" : "películas"}</small></span>
-        <span class="sr-only">${count} ${count === 1 ? "película" : "películas"}; ${selected ? "seleccionada" : "pulsa para explorar"}</span>
+        <span class="sr-only">${count} ${count === 1 ? "película" : "películas"}; ${selected ? "seleccionada; pulsa para quitar" : "pulsa para añadir"}</span>
       </button>`;
     }).join("");
 
     const remaining = [...new Set(films.flatMap((film) => film.sections || []))]
-      .filter((name) => !pinnedSections.includes(name) && name.toLocaleLowerCase("es") !== "otras secciones").sort((a, b) => a.localeCompare(b, "es"));
-    moreSections.innerHTML = `<option value="">Más secciones…</option>${remaining.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)} · ${filmsForSection(name).length}</option>`).join("")}`;
-    moreSections.value = remaining.includes(activeSection) ? activeSection : "";
-    // First-run default: until the person picks a section, mark the main
-    // sections chosen by the festival so the screen is not an empty list.
-    if (!activeSection) {
-      featured.querySelectorAll(".section-card").forEach((card, index) => {
-        if (index < 4) {
-          card.classList.add("is-selected");
-          card.setAttribute("aria-pressed", "true");
-          const meta = card.querySelector(".section-card-meta span");
-          if (meta) meta.textContent = "Explorar";
-        }
-      });
-    }
+      .filter((name) => !pinnedSections.includes(name) && !activeSections.has(name) && name.toLocaleLowerCase("es") !== "otras secciones").sort((a, b) => a.localeCompare(b, "es"));
+    moreSections.innerHTML = `<option value="">Añadir otra sección…</option>${remaining.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)} · ${filmsForSection(name).length}</option>`).join("")}`;
+    moreSections.value = "";
     renderPinOptions();
   }
   function renderPinOptions() {
@@ -364,18 +357,23 @@
     }
   }
   function renderSubfilters() {
-    if (!activeSection) { sectionSubfilters.hidden = true; sectionSubfilters.innerHTML = ""; return; }
     const core = new Set(primarySections);
-    const counts = new Map();
-    films.filter((film) => (film.sections || []).includes(activeSection)).forEach((film) => {
-      (film.sections || []).forEach((name) => {
-        if (name !== activeSection && !core.has(name) && name.toLocaleLowerCase("es") !== "otras secciones") counts.set(name, (counts.get(name) || 0) + 1);
+    // Ignore refinements here so unchecked options remain available to restore.
+    const candidates = matchingFilms(false);
+    const scopes = activeSections.size ? [...activeSections] : [""];
+    const groups = scopes.map((section) => {
+      const counts = new Map();
+      candidates.filter((film) => !section || (film.sections || []).includes(section)).forEach((film) => {
+        (film.sections || []).forEach((name) => {
+          if (name !== section && !core.has(name) && name.toLocaleLowerCase("es") !== "otras secciones") counts.set(name, (counts.get(name) || 0) + 1);
+        });
       });
-    });
-    if (!counts.size) { sectionSubfilters.hidden = true; sectionSubfilters.innerHTML = ""; return; }
-    const excluded = excludedSubfiltersBySection.get(activeSection) || new Set();
-    sectionSubfilters.hidden = false;
-    sectionSubfilters.innerHTML = `<span class="subfilter-title">Afinar esta sección <small>Mostrar</small></span>${[...counts].sort(([a], [b]) => a.localeCompare(b, "es")).map(([name, count]) => `<label class="subfilter-chip"><input type="checkbox" data-subfilter="${escapeHtml(name)}"${excluded.has(name) ? "" : " checked"}><span>${escapeHtml(name)}</span><b>${count}</b></label>`).join("")}`;
+      if (!counts.size) return "";
+      const excluded = excludedSubfiltersBySection.get(section) || new Set();
+      return `<div class="section-subfilter-group"><span class="subfilter-title">Afinar ${section ? escapeHtml(section) : "todas las películas"} <small>Mostrar</small></span>${[...counts].sort(([a], [b]) => a.localeCompare(b, "es")).map(([name, count]) => `<label class="subfilter-chip"><input type="checkbox" data-subfilter="${escapeHtml(name)}" data-filter-section="${escapeHtml(section)}"${excluded.has(name) ? "" : " checked"}><span>${escapeHtml(name)}</span><b>${count}</b></label>`).join("")}</div>`;
+    }).join("");
+    sectionSubfilters.hidden = !groups;
+    sectionSubfilters.innerHTML = groups;
   }
   // Botones de intención de una película, con el aspecto del listado. `status` va aparte porque la
   // demo del asistente prueba un estado que no está guardado.
@@ -402,10 +400,11 @@
     // El repintado rehace las tarjetas: el acuse abierto se recoloca al final del pintado.
     if (discardAck && !discardAck.fromDialog) { const ack = discardAck; requestAnimationFrame(() => discardAck === ack && keepDiscardAck()); }
     const visible = matchingFilms();
-    const title = showDiscarded ? "Películas descartadas" : (activeSection ? `Películas en ${activeSection}` : "Todas las películas");
+    const sectionLabel = [...activeSections].join(", ");
+    const title = showDiscarded ? "Películas descartadas" : (sectionLabel ? `Películas en ${sectionLabel}` : "Todas las películas");
     document.querySelector("#browse-title").childNodes[0].textContent = `${title} `;
     document.querySelector("#browse-count").textContent = String(visible.length);
-    document.querySelector("#active-section-label").textContent = activeSection || "Todas las secciones";
+    document.querySelector("#active-section-label").textContent = sectionLabel || "Todas las secciones";
     document.querySelector("#empty-state").hidden = visible.length > 0;
     document.querySelector("#empty-state").textContent = showDiscarded ? "No has descartado ninguna película." : "No encontramos películas con esos filtros. Prueba otro título o sección.";
     renderSubfilters();
@@ -1533,7 +1532,7 @@
     returnToProgram = true;
     // Una apertura desde la parrilla anula el "volver a la búsqueda" de la anterior.
     returnToSessionSearch = false;
-    activeSection = "";
+    activeSections.clear(); excludedSubfiltersBySection.delete("");
     search.value = "";
     moreSections.value = "";
     // Las flechas recorren las películas de la parrilla, en el orden en que se ven.
@@ -1552,7 +1551,8 @@
   document.querySelector("#featured-sections").addEventListener("click", (event) => {
     const button = event.target.closest("button[data-section]");
     if (!button) return;
-    activeSection = activeSection === button.dataset.section ? "" : button.dataset.section;
+    const section = button.dataset.section;
+    if (activeSections.has(section)) activeSections.delete(section); else activeSections.add(section);
     moreSections.value = "";
     renderSectionPicker();
     renderFilms();
@@ -1590,16 +1590,16 @@
     renderFilms();
   });
   moreSections.addEventListener("change", () => {
-    activeSection = moreSections.value;
+    if (moreSections.value) activeSections.add(moreSections.value);
     renderSectionPicker();
     renderFilms();
   });
   sectionSubfilters.addEventListener("change", (event) => {
     const input = event.target.closest("input[data-subfilter]");
     if (!input) return;
-    const excluded = excludedSubfiltersBySection.get(activeSection) || new Set();
+    const excluded = excludedSubfiltersBySection.get(input.dataset.filterSection) || new Set();
     if (input.checked) excluded.delete(input.dataset.subfilter); else excluded.add(input.dataset.subfilter);
-    excludedSubfiltersBySection.set(activeSection, excluded);
+    excludedSubfiltersBySection.set(input.dataset.filterSection, excluded);
     renderFilms();
   });
   list.addEventListener("click", (event) => {
@@ -1642,7 +1642,7 @@
   function openFilmFromList(filmId, listStatus = "want") {
     const film = films.find((item) => item.id === filmId);
     if (!film) return;
-    activeSection = "";
+    activeSections.clear(); excludedSubfiltersBySection.delete("");
     search.value = "";
     moreSections.value = "";
     // Las flechas se quedan dentro de la lista desde la que se abrió.
@@ -1690,11 +1690,11 @@
   });
   document.querySelector("#next-to-sessions").addEventListener("click", () => switchScreen("sessions"));
   document.querySelector("#show-all-sections").addEventListener("click", () => {
-    activeSection = ""; search.value = ""; moreSections.value = ""; showDiscarded = false; syncFilterToggles(); renderSectionPicker(); renderFilms();
+    activeSections.clear(); excludedSubfiltersBySection.delete(""); search.value = ""; moreSections.value = ""; showDiscarded = false; syncFilterToggles(); renderSectionPicker(); renderFilms();
   });
   search.addEventListener("input", renderFilms);
   sort.addEventListener("change", renderFilms);
-  document.querySelector("#clear-filters").addEventListener("click", () => { search.value = ""; showDiscarded = false; syncFilterToggles(); renderFilms(); search.focus(); });
+  document.querySelector("#clear-filters").addEventListener("click", () => { activeSections.clear(); excludedSubfiltersBySection.delete(""); excludedSubfiltersBySection.clear(); search.value = ""; moreSections.value = ""; onlyMyLists = false; showDiscarded = false; syncFilterToggles(); renderSectionPicker(); renderFilms(); search.focus(); });
   const onlyMyListsButton = document.querySelector("#only-my-lists");
   const showDiscardedButton = document.querySelector("#show-discarded");
   function syncFilterToggles() {
@@ -1713,7 +1713,7 @@
     showDiscarded = !showDiscarded;
     if (showDiscarded) {
       onlyMyLists = false;
-      activeSection = "";
+      activeSections.clear(); excludedSubfiltersBySection.delete("");
       moreSections.value = "";
       renderSectionPicker();
     }
@@ -1863,7 +1863,7 @@
     filmNavigationIds = [...new Set([...document.querySelectorAll("#session-results-list button[data-open-film]")].map((item) => item.dataset.openFilm))];
     sessionSearchScrollY = window.scrollY;
     returnToSessionSearch = true;
-    activeSection = "";
+    activeSections.clear(); excludedSubfiltersBySection.delete("");
     search.value = "";
     moreSections.value = "";
     expandedId = film.id;
@@ -1894,7 +1894,7 @@
       returnToProgram = true;
       returnToSessionSearch = false;
       returnToShared = false;
-      activeSection = "";
+      activeSections.clear(); excludedSubfiltersBySection.delete("");
       search.value = "";
       moreSections.value = "";
       expandedId = film.id;
@@ -3452,7 +3452,7 @@
     filmNavigationIds = sharedListsOnly
       ? [...document.querySelectorAll("#shared-list [data-shared-row]")].map((row) => row.dataset.sharedRow)
       : [...new Set(sharedPasses.flatMap((id) => findScreening(id)?.filmIds || []))];
-    activeSection = "";
+    activeSections.clear(); excludedSubfiltersBySection.delete("");
     search.value = "";
     moreSections.value = "";
     expandedId = film.id;
