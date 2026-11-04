@@ -61,6 +61,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     await evaluate(`document.querySelectorAll('dialog[open]').forEach(d => d.close())`);
     assert.equal(await evaluate(`document.querySelector('#section-subfilters').hidden`),true,'refinements start collapsed');
     const openRefinements = () => evaluate(`if(document.querySelector('#toggle-refinements').getAttribute('aria-expanded')==='false') document.querySelector('#toggle-refinements').click()`);
+    assert.equal(await evaluate(`!!document.querySelector('.search-icon svg circle') && !!document.querySelector('.search-icon svg path')`),true,'search uses a magnifying-glass icon');
     const choose = name => evaluate(`document.querySelector('#featured-sections button[data-section="${name}"]').click()`);
     const check = async names => {
       const actual = await evaluate(`Array.from(document.querySelectorAll('#film-list > li'), row => row.dataset.filmId).sort()`);
