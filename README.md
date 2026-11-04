@@ -247,3 +247,7 @@ search, list/discard filters and section subfilters.
 
 The Explore search matches titles, filmmakers, countries and section names.
 Country search combines with selected sections and the other catalogue filters.
+
+The Cortometrajes refinement controls Asturies Curtiumetraxes, La Noche del Corto
+Español and Sección Oficial Cortometrajes together. Re-enabling one subset also
+enables the parent while keeping other excluded subsets unchecked.

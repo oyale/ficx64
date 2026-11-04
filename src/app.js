@@ -76,6 +76,15 @@
   const filmById = new Map(films.map((film) => [film.id, film]));
   const sectionSubfilters = document.querySelector("#section-subfilters");
   const excludedSubfilters = new Set();
+  const shortFilmSubsets = new Set(["Asturies Curtiumetraxes", "La Noche del Corto Español", "Sección Oficial Cortometrajes"]);
+
+  function setRefinementEnabled(name, enabled) {
+    const change = (tag) => enabled ? excludedSubfilters.delete(tag) : excludedSubfilters.add(tag);
+    change(name);
+    if (name === "Cortometrajes") shortFilmSubsets.forEach(change);
+    else if (enabled && shortFilmSubsets.has(name)) excludedSubfilters.delete("Cortometrajes");
+  }
+
   let remoteImagesEnabled = readRemoteImagesSetting();
   let intentions = readIntentions();
   let plannedScreenings = readPlannedScreenings();
@@ -1545,7 +1554,7 @@
     if (!button) return;
     const section = button.dataset.section;
     if (activeSections.has(section)) activeSections.delete(section);
-    else { activeSections.add(section); excludedSubfilters.delete(section); }
+    else { activeSections.add(section); setRefinementEnabled(section, true); }
     moreSections.value = "";
     renderSectionPicker();
     renderFilms();
@@ -1586,14 +1595,14 @@
     renderFilms();
   });
   moreSections.addEventListener("change", () => {
-    if (moreSections.value) { activeSections.add(moreSections.value); excludedSubfilters.delete(moreSections.value); }
+    if (moreSections.value) { activeSections.add(moreSections.value); setRefinementEnabled(moreSections.value, true); }
     renderSectionPicker();
     renderFilms();
   });
   sectionSubfilters.addEventListener("change", (event) => {
     const input = event.target.closest("input[data-subfilter]");
     if (!input) return;
-    if (input.checked) excludedSubfilters.delete(input.dataset.subfilter); else excludedSubfilters.add(input.dataset.subfilter);
+    setRefinementEnabled(input.dataset.subfilter, input.checked);
     renderFilms();
   });
   list.addEventListener("click", (event) => {
