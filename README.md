@@ -251,3 +251,7 @@ Country search combines with selected sections and the other catalogue filters.
 The Cortometrajes refinement controls Asturies Curtiumetraxes, La Noche del Corto
 Español and Sección Oficial Cortometrajes together. Re-enabling one subset also
 enables the parent while keeping other excluded subsets unchecked.
+
+Film cards show their countries beside the filmmaker only when the complete line
+fits with at least 32 CSS pixels to spare. This is recalculated for each card on
+resize and after fonts load; compact cards keep the existing single credit line.
