@@ -84,6 +84,23 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       await evaluate(`document.querySelector('#clear-filters').click()`);
       await check([]);
     };
+    const checkShortFilmSubsets = async () => {
+      await evaluate(`document.querySelector('#clear-filters').click()`);
+      const subsets = ['Asturies Curtiumetraxes', 'La Noche del Corto Español', 'Sección Oficial Cortometrajes'];
+      const toggle = name => evaluate(`document.querySelector('#section-subfilters input[data-subfilter="${name}"]').click()`);
+      const isChecked = name => evaluate(`document.querySelector('#section-subfilters input[data-subfilter="${name}"]').checked`);
+      await toggle('Cortometrajes');
+      for (const name of ['Cortometrajes',...subsets]) assert.equal(await isChecked(name),false);
+      assert.equal(await evaluate(`Array.from(document.querySelectorAll('#film-list > li')).some(row=> window.FICX_FILMS.find(f=>f.id===row.dataset.filmId).sections.includes('Cortometrajes'))`),false);
+      await toggle(subsets[0]);
+      assert.equal(await isChecked('Cortometrajes'),true);
+      assert.equal(await isChecked(subsets[0]),true);
+      for (const name of subsets.slice(1)) assert.equal(await isChecked(name),false);
+      await toggle('Cortometrajes');
+      await toggle('Cortometrajes');
+      for (const name of ['Cortometrajes',...subsets]) assert.equal(await isChecked(name),true);
+      await check([]);
+    };
     const refineAll = async () => {
       assert.equal(await evaluate(`document.querySelector('#section-subfilters').hidden`), false);
       const name = await evaluate(`(() => {
@@ -110,6 +127,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       await check([]);
       await refineAll();
       await checkCountrySearch();
+      await checkShortFilmSubsets();
       await choose('Albar');
       await check(['Albar']);
       assert.equal(await evaluate(`document.querySelector('#section-subfilters').hidden`), false);
