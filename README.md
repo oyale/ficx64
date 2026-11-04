@@ -202,6 +202,7 @@ Mobile film details also have a real Chromium regression check (Node 22+ and
 ```sh
 python3 build.py
 node tests/test_film_swipe.cjs
+node tests/test_sections_browser.cjs
 node tests/test_storage_failure_browser.cjs
 node tests/test_network_fallback_browser.cjs
 ```
@@ -230,3 +231,15 @@ and fragments. To generate a separate portable copy:
 ```sh
 python3 build.py --output /tmp/ficx64-portable/ficx64.html
 ```
+
+## Section filters
+
+In Explore, section cards can be combined: films from any selected section are
+shown once. Click a selected card again to remove it. The additional-section
+selector adds a section without replacing the selection; it appears as a selected
+card so it can be removed. Subfilters apply separately to their own section. They also appear when viewing
+all sections, whenever the current results have additional tags to filter.
+Available options follow search and list filters, but remain available when
+unchecked so they can be restored.
+“Ver todo el festival” clears the selected sections; “Limpiar filtros” also clears
+search, list/discard filters and section subfilters.
