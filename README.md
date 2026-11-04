@@ -179,6 +179,12 @@ only after the new cache is ready. “Update” activates the worker and reloads
 the controller changes. Dismissing the notice does not force a reload. Lists stay
 in `localStorage`; cleanup is limited to FICX caches.
 
+Documents use the network first. For the app's root and `index.html`, a cached
+copy is served after three seconds if the network is slow, or immediately after
+a network failure or HTTP 404/5xx. A late successful response refreshes the cache
+without reloading the open page. Without a cached copy, the app keeps waiting for
+the network.
+
 Automated checks:
 
 ```sh
@@ -192,6 +198,7 @@ Mobile film details also have a real Chromium regression check (Node 22+ and
 ```sh
 python3 build.py
 node tests/test_film_swipe.cjs
+node tests/test_network_fallback_browser.cjs
 ```
 
 It checks the first tap after swiping, vertical scrolling, complete paragraphs,

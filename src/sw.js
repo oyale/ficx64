@@ -1,6 +1,6 @@
 /* Service worker del programa del FICX.
    El documento va PRIMERO a la red: es donde está el programa y los enlaces compartidos, y
-   servir una copia vieja mostraría pases caducados. El caché solo entra cuando no hay red.
+   servir una copia vieja mostraría pases caducados. El caché entra cuando no hay red o la app devuelve un 404/5xx.
 
    La página se guarda bajo una única URL canónica (la raíz del ámbito) para que da igual si se
    entra por «/», por «/index.html» o con un fragmento «#pases=…»: el fragmento nunca llega al
@@ -8,6 +8,7 @@
 
 const CACHE_PREFIX = `ficx64:${self.registration.scope}:`;
 const VERSION = `${CACHE_PREFIX}__BUILD_VERSION__`;
+const NETWORK_WAIT_MS = 3000;
 const HOME = new URL("./", self.location).href;
 const SHELL = [
   // Solo la canónica: guardar también index.html dejaría dos copias de la misma página.
@@ -52,17 +53,34 @@ self.addEventListener("fetch", (event) => {
   const isDocument = isAppDocument || request.mode === "navigate" || request.destination === "document";
   if (isDocument) {
     // Red primero; si falla, la copia canónica. `caches.open(VERSION).then((cache) => cache.match(HOME))` no depende de la ruta pedida.
-    event.respondWith(
-      fetch(new Request(request, { cache: "no-cache" }))
-        .then((response) => {
+    const network = fetch(new Request(request, { cache: "no-cache" }))
+        .then(async (response) => {
+          if (isAppDocument && (response.status === 404 || response.status >= 500)) {
+            const cached = await caches.open(VERSION).then((cache) => cache.match(HOME));
+            return cached || response;
+          }
           if (isAppDocument && response && response.ok) {
             const copy = response.clone();
             event.waitUntil(caches.open(VERSION).then((cache) => cache.put(HOME, copy)).catch(() => {}));
           }
           return response;
         })
-        .catch(() => caches.open(VERSION).then((cache) => cache.match(HOME)))
-    );
+        .catch(() => caches.open(VERSION).then((cache) => cache.match(HOME)));
+    // Keep the request alive after the offline response, so a late success refreshes it.
+    event.waitUntil(network.then(() => {}, () => {}));
+    event.respondWith((async () => {
+      let cached;
+      try { cached = await caches.open(VERSION).then((cache) => cache.match(HOME)); }
+      catch (_) { /* A cache failure must not prevent a successful network response. */ }
+      if (!isAppDocument || !cached) return network;
+      let timer;
+      try {
+        return await Promise.race([
+          network,
+          new Promise((resolve) => { timer = setTimeout(() => resolve(cached), NETWORK_WAIT_MS); }),
+        ]);
+      } finally { clearTimeout(timer); }
+    })());
     return;
   }
 
