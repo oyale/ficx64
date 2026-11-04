@@ -68,6 +68,22 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       const selected = await evaluate(`Array.from(document.querySelectorAll('#featured-sections [aria-pressed="true"]'), b=>b.dataset.section).sort()`);
       assert.deepEqual(selected, [...names].sort());
     };
+    const checkCountrySearch = async () => {
+      for (const sections of [[], ['Albar', 'Retueyos']]) {
+        await evaluate(`document.querySelector('#clear-filters').click()`);
+        for (const section of sections) await choose(section);
+        await evaluate(`document.querySelector('#search-input').value='  fRaNcIa  '; document.querySelector('#search-input').dispatchEvent(new Event('input'));`);
+        const actual = await evaluate(`Array.from(document.querySelectorAll('#film-list > li'),row=>row.dataset.filmId).sort()`);
+        const expected = await evaluate(`window.FICX_FILMS.filter(f =>
+          (${JSON.stringify(sections)}.length===0 || f.sections.some(s=>${JSON.stringify(sections)}.includes(s))) &&
+          [f.title, ...(f.directors||[]), ...(f.countries||[]), ...(f.sections||[])].join(' ').toLocaleLowerCase('es').includes('francia')
+        ).map(f=>f.id).sort()`);
+        assert.ok(expected.length > 0, 'country fixture must return films');
+        assert.deepEqual(actual,expected);
+      }
+      await evaluate(`document.querySelector('#clear-filters').click()`);
+      await check([]);
+    };
     const refineAll = async () => {
       assert.equal(await evaluate(`document.querySelector('#section-subfilters').hidden`), false);
       const name = await evaluate(`(() => {
@@ -93,6 +109,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       await evaluate(`document.querySelector('#clear-filters').click()`);
       await check([]);
       await refineAll();
+      await checkCountrySearch();
       await choose('Albar');
       await check(['Albar']);
       assert.equal(await evaluate(`document.querySelector('#section-subfilters').hidden`), false);

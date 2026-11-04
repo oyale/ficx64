@@ -243,3 +243,6 @@ Available options follow search and list filters, but remain available when
 unchecked so they can be restored.
 “Ver todo el festival” clears the selected sections; “Limpiar filtros” also clears
 search, list/discard filters and section subfilters.
+
+The Explore search matches titles, filmmakers, countries and section names.
+Country search combines with selected sections and the other catalogue filters.
