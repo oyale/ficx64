@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import hashlib
+import base64
 import argparse
 import json
 from pathlib import Path
@@ -69,6 +70,9 @@ def main() -> None:
     # título tal como lo escribe el calendario, que puede diferir de la ficha); si falta, se
     # rellena con el título de la ficha.
     for screening in screenings:
+        main_id = screening.get("mainFilmId")
+        if main_id and (main_id not in screening.get("filmIds", []) or main_id not in by_id):
+            raise SystemExit(f"mainFilmId no enlazado en el pase {screening.get('candidateId')}")
         if not screening.get("films"):
             screening["films"] = [
                 {"id": by_id[i]["id"], "title": by_id[i].get("title", "")}
@@ -93,6 +97,21 @@ def main() -> None:
                         f"  <style>\n{(SOURCE / 'styles.css').read_text(encoding='utf-8')}\n  </style>")
     html = html.replace('  <script src="app.js"></script>',
                         f"  <script>\n{(SOURCE / 'app.js').read_text(encoding='utf-8')}\n  </script>")
+    # Embed the generator, fonts and licenses: PDF export also works in the portable HTML.
+    pdf_assets = SOURCE / "pdf-assets"
+    pdf_fonts = {font.name: base64.b64encode(font.read_bytes()).decode("ascii")
+                 for font in sorted(pdf_assets.glob("*.ttf"))}
+    pdf_renderer = (SOURCE / "pdf-itinerary.js").read_text(encoding="utf-8")
+    pdf_renderer = pdf_renderer.replace("/* __PDF_FONTS__ */ {}", compact(pdf_fonts))
+    pdf_logo = "data:image/png;base64," + base64.b64encode((pdf_assets / "ficx-mark.png").read_bytes()).decode("ascii")
+    pdf_renderer = pdf_renderer.replace('/* __PDF_LOGO__ */ ""', compact(pdf_logo))
+    pdf_library = (pdf_assets / "jspdf-4.2.1.umd.min.js").read_text(encoding="utf-8")
+    pdf_library = "\n".join(line for line in pdf_library.splitlines() if not line.startswith("//# sourceMappingURL="))
+    pdf_licenses = "\n".join(path.read_text(encoding="utf-8") for path in sorted(pdf_assets.glob("*.txt")))
+    pdf_bundle = "/*\n" + pdf_licenses + "\n*/\n" + pdf_library + "\n" + pdf_renderer
+    # Protect the containing HTML script even when vendored dependency text changes.
+    pdf_bundle = pdf_bundle.replace("</script", "<\\/script")
+    html = html.replace('  <script src="pdf-itinerary.js"></script>', f"  <script>\n{pdf_bundle}\n  </script>")
     # The fallback poster logo must also work in a downloaded offline HTML.
     mark = (ROOT / "icons" / "mark.svg").read_text(encoding="utf-8")
     html = html.replace('src="icons/mark.svg"', 'src="data:image/svg+xml,' + quote(mark, safe="") + '"')

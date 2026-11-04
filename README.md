@@ -116,7 +116,9 @@ things together.
 | `hasMeeting`, `meetingMinutes` | boolean, number | Q&A and the minutes it takes beforehand |
 | `filmIds` | string array | Films in the screening; joined with `films.json` at build time |
 | `films` | array of `{id, title}` | Titles exactly as the official programme writes them. The original spelling is kept even when it differs from the film page |
-| `title` | string | Screening title when there are no films (talks, events) |
+| `title` | string | Official block or activity title, when provided |
+| `mainFilmId` | optional string | Explicit principal film in a grouped screening; must reference one of its `filmIds`. No runtime inference |
+| `mainFilmSource` | optional string | `duration-proposal` marks a provisional offline approximation; absent or `manual` means curated data |
 
 ### `data/venue-transfers.json`
 
@@ -273,3 +275,72 @@ inline through “Afinar resultados”; active exclusions remain visible on the 
 when collapsed. Escape closes the panel and returns focus to its button. Clear is
 shown only while catalogue filters are active. Selecting sections never scrolls
 the page, on desktop or mobile; selection uses an edge and shadow, without checks.
+
+## Itinerary PDF
+
+In **Mi programa**, open **Exportar y compartir** and select **Descargar itinerario
+PDF**. Export asks for an optional name used only in that PDF: it does not change
+the app alias. Leave it blank for “Tu itinerario”; cancelling creates no file.
+The document includes every planned day even when the screen shows just one.
+Shared screenings appear once; standalone activities are included too.
+
+The compact A4 layout puts whole-screening duration beside the title and sections
+beside the venue. It uses the approved FICX mark and Barlow fonts, with an encounter
+badge rather than internal presentation minutes. End times include the pre-film
+presentation but not the subsequent discussion; the footer states that caveat.
+It uses the selected travel mode and preserves unknown times instead of inventing
+ends or journeys. Four ordinary screenings across two days fit on one page;
+long documents paginate without cutting off content.
+
+A grouped screening with a curated `mainFilmId` uses that film as the title and
+lists its accompanying films under “Incluye”, with their individual durations
+when known. The annotations identify the principal in Torino Shadow + El día que ella volvió,
+Las acogidas + ¿A dónde, Vauste?, María Silvia Esteve (I/II), and other reviewed
+grouped screenings. The shared Lucía Seles / POEX screening keeps its reviewed
+descriptive heading without assigning a principal. Otherwise the official block title is kept,
+or “Programa de N películas” is used. The app never guesses a principal film at runtime. Provisional offline
+approximations are recorded explicitly and remain reviewable. Editorial decisions and
+provenance are stored with the screening data, so the review report can be regenerated
+without losing them. The build rejects a `mainFilmId` outside the linked films.
+
+The PDF is a dated snapshot for reading or printing, not an importable data backup.
+Download it again after changing the plan. The menu points to **Ajustes → Exportar
+tu programa** for app data export. Empty plans cannot be exported; generation
+failures preserve the plan and allow another attempt.
+
+Generation is entirely local. jsPDF, fonts, artwork and licenses are bundled in
+the single HTML, including the portable download; no CDN or PDF service is used.
+The PDF contains selectable text, not a screenshot. It is not a tagged PDF.
+Asset provenance and licenses are documented in `src/pdf-assets/README.md`.
+
+PDF validation requires Node 22+, Chromium and Poppler's `pdftotext`
+(`poppler-utils` on Debian/Ubuntu). The tests cover pagination and page bounds,
+Unicode, primary-film annotations, name/cancellation, all-day export, error
+recovery and actual downloads after an offline reload and from an isolated
+portable HTML.
+
+```sh
+python3 build.py
+node --test tests/test_itinerary_pdf.cjs
+CHROMIUM_BIN=/usr/lib/chromium/chromium node tests/test_itinerary_pdf_browser.cjs
+# Preserve the downloaded browser-test sample for inspection:
+FICX_PDF_SAMPLE=/tmp/ficx-itinerary.pdf node tests/test_itinerary_pdf_browser.cjs
+```
+
+## Reviewing principal films
+
+`review/main-films.md` lists doubtful cases first, followed by applied provisional
+approximations and the full grouped-screening inventory. The accompanying JSON
+records all screening IDs, durations, provenance and input hashes.
+
+```sh
+python3 scripts/review_main_films.py              # report only; no data changes
+python3 scripts/review_main_films.py --apply-clear # annotate clear unconfigured pairs
+```
+
+The offline helper applies only unnamed pairs with a film of at least 60 minutes,
+an accompaniment of at most 20 minutes and a ratio of at least 4:1. It never
+overwrites an existing role or chooses a lead for a named programme. These are
+proposals, not official confirmation: they are marked `mainFilmSource:
+duration-proposal`. Remove that marker (or set it to `manual`) after approval;
+remove both fields to undo the proposal. The app/build does not run this helper.
