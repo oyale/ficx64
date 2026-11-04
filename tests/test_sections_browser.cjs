@@ -89,7 +89,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     const checkShortFilmSubsets = async () => {
       await openRefinements();
       await evaluate(`document.querySelector('#clear-filters').click()`);
-      const subsets = ['Asturies Curtiumetraxes', 'La Noche del Corto Español', 'Sección Oficial Cortometrajes'];
+      const subsets = ['Catalyst Shorts', 'Asturies Curtiumetraxes', 'La Noche del Corto Español', 'Sección Oficial Cortometrajes'];
       const toggle = name => evaluate(`document.querySelector('#section-subfilters input[data-subfilter="${name}"]').click()`);
       const isChecked = name => evaluate(`document.querySelector('#section-subfilters input[data-subfilter="${name}"]').checked`);
       await toggle('Cortometrajes');
