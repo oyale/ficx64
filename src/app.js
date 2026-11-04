@@ -118,7 +118,7 @@
   const refineToggle = document.querySelector("#toggle-refinements");
   let refinementsOpen = false;
   const excludedSubfilters = new Set();
-  const shortFilmSubsets = new Set(["Asturies Curtiumetraxes", "La Noche del Corto Español", "Sección Oficial Cortometrajes"]);
+  const shortFilmSubsets = new Set(["Catalyst Shorts", "Asturies Curtiumetraxes", "La Noche del Corto Español", "Sección Oficial Cortometrajes"]);
 
   function setRefinementEnabled(name, enabled) {
     const change = (tag) => enabled ? excludedSubfilters.delete(tag) : excludedSubfilters.add(tag);
