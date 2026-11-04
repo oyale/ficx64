@@ -271,17 +271,18 @@
           <div class="browse-main">
             <div class="browse-heading">
               <div><p class="eyebrow">FICX 64 · <span id="active-section-label">Todas las secciones</span></p><h2 id="browse-title">Todas las películas <span id="browse-count" class="count-badge">—</span></h2></div>
-              <label class="sort-control">Orden
-                <select id="sort-order" aria-label="Ordenar películas"><option value="title">A—Z</option><option value="title-desc">Z—A</option><option value="duration-asc">Más cortas primero</option><option value="duration-desc">Más largas primero</option></select>
-              </label>
             </div>
-            <div id="section-subfilters" class="section-subfilters" hidden></div>
             <div class="filters">
               <label class="search-box"><span class="search-icon" aria-hidden="true">⌕</span><span class="sr-only">Buscar por título, cineasta o país</span><input id="search-input" type="search" placeholder="Título, cineasta o país…" autocomplete="off"><kbd>/</kbd></label>
-              <button class="filter-toggle" id="only-my-lists" type="button" aria-pressed="false">Solo mis listas</button>
-              <button class="filter-toggle" id="show-discarded" type="button" aria-pressed="false">Descartadas</button>
-              <button class="clear-filters" id="clear-filters" type="button">Limpiar filtros</button>
+              <div class="filter-actions">
+                <button class="filter-toggle refine-toggle" id="toggle-refinements" type="button" aria-expanded="false" aria-controls="section-subfilters" hidden><span>Afinar resultados</span><span class="refine-indicator" aria-hidden="true"></span></button>
+                <label class="sort-control"><span class="sr-only">Orden</span><select id="sort-order" aria-label="Ordenar películas"><option value="title">Orden: A—Z</option><option value="title-desc">Orden: Z—A</option><option value="duration-asc">Más cortas primero</option><option value="duration-desc">Más largas primero</option></select></label>
+                <button class="filter-toggle" id="only-my-lists" type="button" aria-pressed="false">Solo mis listas</button>
+                <button class="filter-toggle" id="show-discarded" type="button" aria-pressed="false">Descartadas</button>
+              </div>
+              <div class="filter-summary" id="filter-summary" hidden><span>Filtros activos</span><button class="clear-filters" id="clear-filters" type="button">Limpiar</button></div>
             </div>
+            <section id="section-subfilters" class="section-subfilters" aria-label="Afinar resultados" hidden></section>
             <ol class="film-list" id="film-list" aria-live="polite"></ol>
             <p class="empty-state" id="empty-state" hidden>No encontramos películas con esos filtros. Prueba otro título o sección.</p>
           </div>

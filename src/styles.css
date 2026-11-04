@@ -2078,3 +2078,38 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 /* Only revealed when the entire credit and country list fit with spare room. */
 .film-card-countries { white-space: nowrap; }
 .film-card-countries[hidden] { display: none; }
+
+/* Selection keeps the section's palette and gains a stronger edge and short shadow. */
+.section-card.is-selected { outline: 2px solid var(--ink); outline-offset: 1px; box-shadow: 0 4px 10px var(--shadow); }
+.section-card:focus-visible { outline: 2px dashed var(--ink); outline-offset: 4px; }
+.filters { display: grid; gap: 10px; container-type: inline-size; }
+.filters .search-box { box-sizing: border-box; width: 100%; min-width: 0; gap: 10px; padding: 0 12px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface-float); }
+.filters .search-box:focus-within { border-color: var(--blue); outline: 2px solid var(--blue); outline-offset: 2px; }
+.filters .search-box input { min-height: 46px; padding: 10px 0; font-size: 16px; box-sizing: border-box; color: var(--ink); }
+.filters .search-box input::placeholder { color: var(--gray); }
+.filter-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.filter-actions > .filter-toggle, .filter-actions .sort-control select { box-sizing: border-box; width: 100%; min-width: 0; min-height: 44px; padding: 10px 8px; font-size: 12px; line-height: 1.3; }
+.filter-actions .filter-toggle { border-radius: 4px; }
+.filter-actions .sort-control { display: block; min-width: 0; margin: 0; }
+.filter-actions .sort-control select { max-width: none; padding-right: 25px; font-weight: 600; border-radius: 4px; }
+.refine-toggle { display: flex; justify-content: center; align-items: center; gap: 8px; }
+.refine-indicator { width: 7px; height: 7px; border: 1.5px solid currentColor; border-top: 0; border-left: 0; transform: translateY(-2px) rotate(45deg); }
+.refine-toggle[aria-expanded="true"] .refine-indicator { transform: translateY(2px) rotate(225deg); }
+.refine-toggle.is-active { background: var(--green-deep); border-color: var(--green-deep); color: var(--on-solid); }
+.filter-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--gray); }
+.filter-summary .clear-filters { min-height: 44px; padding: 8px 0 8px 16px; font-size: 12px; }
+.filter-summary[hidden], .refine-toggle[hidden], .section-subfilters[hidden] { display: none; }
+.section-subfilters { margin: 4px 0 12px; padding: 12px; border: 1px solid var(--line); border-radius: 4px; }
+.section-subfilter-group { align-items: stretch; gap: 8px; }
+.section-subfilters .subfilter-title { width: 100%; margin: 0 0 4px; font-size: 13px; }
+.section-subfilters .subfilter-title small { display: inline; margin-left: 8px; font-size: 12px; }
+.section-subfilters .subfilter-chip { min-height: 44px; box-sizing: border-box; margin: 0; padding: 8px 10px; gap: 8px; }
+.section-subfilters .subfilter-chip span, .section-subfilters .subfilter-chip b { font-size: 12px; }
+.section-subfilters .subfilter-chip input { width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--blue); }
+.refine-empty { margin: 0; font-size: 13px; color: var(--gray); }
+@container (min-width: 650px) {
+  .filter-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (pointer: coarse), (max-width: 899px) {
+  .filters kbd { display: none; }
+}

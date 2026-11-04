@@ -115,6 +115,8 @@
   const clearSaved = document.querySelector("#clear-saved");
   const filmById = new Map(films.map((film) => [film.id, film]));
   const sectionSubfilters = document.querySelector("#section-subfilters");
+  const refineToggle = document.querySelector("#toggle-refinements");
+  let refinementsOpen = false;
   const excludedSubfilters = new Set();
   const shortFilmSubsets = new Set(["Asturies Curtiumetraxes", "La Noche del Corto Español", "Sección Oficial Cortometrajes"]);
 
@@ -420,10 +422,16 @@
         if (!activeSections.has(name) && !core.has(name) && name.toLocaleLowerCase("es") !== "otras secciones") counts.set(name, (counts.get(name) || 0) + 1);
       });
     });
-    sectionSubfilters.hidden = !counts.size;
+    const hasExclusions = excludedSubfilters.size > 0;
+    refineToggle.hidden = !counts.size && !hasExclusions;
+    refineToggle.classList.toggle("is-active", hasExclusions);
+    refineToggle.setAttribute("aria-label", hasExclusions ? "Afinar resultados; hay exclusiones activas" : "Afinar resultados");
+    refineToggle.setAttribute("aria-expanded", String(refinementsOpen && !refineToggle.hidden));
+    sectionSubfilters.hidden = !refinementsOpen || refineToggle.hidden;
+    document.querySelector("#filter-summary").hidden = !(activeSections.size || hasExclusions || search.value.trim() || onlyMyLists || showDiscarded);
     sectionSubfilters.innerHTML = counts.size
       ? `<div class="section-subfilter-group"><span class="subfilter-title">Afinar resultados <small>Mostrar</small></span>${[...counts].sort(([a], [b]) => a.localeCompare(b, "es")).map(([name, count]) => `<label class="subfilter-chip"><input type="checkbox" data-subfilter="${escapeHtml(name)}"${excludedSubfilters.has(name) ? "" : " checked"}><span>${escapeHtml(name)}</span><b>${count}</b></label>`).join("")}</div>`
-      : "";
+      : `<p class="refine-empty">No hay opciones para afinar con esta búsqueda.</p>`;
   }
   // Botones de intención de una película, con el aspecto del listado. `status` va aparte porque la
   // demo del asistente prueba un estado que no está guardado.
@@ -1610,9 +1618,6 @@
     renderSectionPicker();
     renderFilms();
     document.querySelector(`#featured-sections button[data-section="${CSS.escape(section)}"]`)?.focus({ preventScroll: true });
-    if (window.matchMedia("(max-width: 899px)").matches) {
-      document.querySelector("#browse-area")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
   });
   document.querySelector("#toggle-pin-config").addEventListener("click", (event) => {
     const panel = document.querySelector("#pin-config");
@@ -1649,6 +1654,17 @@
     if (moreSections.value) { activeSections.add(moreSections.value); setRefinementEnabled(moreSections.value, true); }
     renderSectionPicker();
     renderFilms();
+  });
+  refineToggle.addEventListener("click", () => {
+    refinementsOpen = !refinementsOpen;
+    renderSubfilters();
+  });
+  sectionSubfilters.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    refinementsOpen = false;
+    renderSubfilters();
+    refineToggle.focus({ preventScroll: true });
   });
   sectionSubfilters.addEventListener("change", (event) => {
     const input = event.target.closest("input[data-subfilter]");
