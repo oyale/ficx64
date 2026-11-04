@@ -75,7 +75,7 @@
   const clearSaved = document.querySelector("#clear-saved");
   const filmById = new Map(films.map((film) => [film.id, film]));
   const sectionSubfilters = document.querySelector("#section-subfilters");
-  const excludedSubfiltersBySection = new Map();
+  const excludedSubfilters = new Set();
   let remoteImagesEnabled = readRemoteImagesSetting();
   let intentions = readIntentions();
   let plannedScreenings = readPlannedScreenings();
@@ -278,13 +278,9 @@
       const countries = Array.isArray(film.countries) ? film.countries.join(" ") : "";
       const searchable = `${film.title} ${directorText(film)} ${countries} ${names.join(" ")}`.toLocaleLowerCase("es");
       const inMyLists = intentions.has(film.id);
-      const scopes = activeSections.size ? [...activeSections] : [""];
-      const matchesSection = scopes.some((section) => {
-        const excluded = excludedSubfiltersBySection.get(section) || new Set();
-        return (!section || names.includes(section))
-          && (!applySubfilters || !names.some((name) => excluded.has(name)));
-      });
-      return matchesSection
+      const matchesSection = !activeSections.size || [...activeSections].some((section) => names.includes(section));
+      const matchesRefinements = !applySubfilters || !names.some((name) => excludedSubfilters.has(name));
+      return matchesSection && matchesRefinements
         && (!onlyMyLists || inMyLists) && (!query || searchable.includes(query));
     }).sort((a, b) => {
       const compare = a.title.localeCompare(b.title, "es", { sensitivity: "base" });
@@ -359,22 +355,17 @@
   }
   function renderSubfilters() {
     const core = new Set(primarySections);
-    // Ignore refinements here so unchecked options remain available to restore.
-    const candidates = matchingFilms(false);
-    const scopes = activeSections.size ? [...activeSections] : [""];
-    const groups = scopes.map((section) => {
-      const counts = new Map();
-      candidates.filter((film) => !section || (film.sections || []).includes(section)).forEach((film) => {
-        (film.sections || []).forEach((name) => {
-          if (name !== section && !core.has(name) && name.toLocaleLowerCase("es") !== "otras secciones") counts.set(name, (counts.get(name) || 0) + 1);
-        });
+    // Count the union once, ignoring exclusions so options remain available to restore.
+    const counts = new Map();
+    matchingFilms(false).forEach((film) => {
+      new Set(film.sections || []).forEach((name) => {
+        if (!activeSections.has(name) && !core.has(name) && name.toLocaleLowerCase("es") !== "otras secciones") counts.set(name, (counts.get(name) || 0) + 1);
       });
-      if (!counts.size) return "";
-      const excluded = excludedSubfiltersBySection.get(section) || new Set();
-      return `<div class="section-subfilter-group"><span class="subfilter-title">Afinar ${section ? escapeHtml(section) : "todas las películas"} <small>Mostrar</small></span>${[...counts].sort(([a], [b]) => a.localeCompare(b, "es")).map(([name, count]) => `<label class="subfilter-chip"><input type="checkbox" data-subfilter="${escapeHtml(name)}" data-filter-section="${escapeHtml(section)}"${excluded.has(name) ? "" : " checked"}><span>${escapeHtml(name)}</span><b>${count}</b></label>`).join("")}</div>`;
-    }).join("");
-    sectionSubfilters.hidden = !groups;
-    sectionSubfilters.innerHTML = groups;
+    });
+    sectionSubfilters.hidden = !counts.size;
+    sectionSubfilters.innerHTML = counts.size
+      ? `<div class="section-subfilter-group"><span class="subfilter-title">Afinar resultados <small>Mostrar</small></span>${[...counts].sort(([a], [b]) => a.localeCompare(b, "es")).map(([name, count]) => `<label class="subfilter-chip"><input type="checkbox" data-subfilter="${escapeHtml(name)}"${excludedSubfilters.has(name) ? "" : " checked"}><span>${escapeHtml(name)}</span><b>${count}</b></label>`).join("")}</div>`
+      : "";
   }
   // Botones de intención de una película, con el aspecto del listado. `status` va aparte porque la
   // demo del asistente prueba un estado que no está guardado.
@@ -1533,7 +1524,7 @@
     returnToProgram = true;
     // Una apertura desde la parrilla anula el "volver a la búsqueda" de la anterior.
     returnToSessionSearch = false;
-    activeSections.clear(); excludedSubfiltersBySection.delete("");
+    activeSections.clear(); excludedSubfilters.clear();
     search.value = "";
     moreSections.value = "";
     // Las flechas recorren las películas de la parrilla, en el orden en que se ven.
@@ -1553,11 +1544,15 @@
     const button = event.target.closest("button[data-section]");
     if (!button) return;
     const section = button.dataset.section;
-    if (activeSections.has(section)) activeSections.delete(section); else activeSections.add(section);
+    if (activeSections.has(section)) activeSections.delete(section);
+    else { activeSections.add(section); excludedSubfilters.delete(section); }
     moreSections.value = "";
     renderSectionPicker();
     renderFilms();
-    document.querySelector("#browse-area")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.querySelector(`#featured-sections button[data-section="${CSS.escape(section)}"]`)?.focus({ preventScroll: true });
+    if (window.matchMedia("(max-width: 899px)").matches) {
+      document.querySelector("#browse-area")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   });
   document.querySelector("#toggle-pin-config").addEventListener("click", (event) => {
     const panel = document.querySelector("#pin-config");
@@ -1591,16 +1586,14 @@
     renderFilms();
   });
   moreSections.addEventListener("change", () => {
-    if (moreSections.value) activeSections.add(moreSections.value);
+    if (moreSections.value) { activeSections.add(moreSections.value); excludedSubfilters.delete(moreSections.value); }
     renderSectionPicker();
     renderFilms();
   });
   sectionSubfilters.addEventListener("change", (event) => {
     const input = event.target.closest("input[data-subfilter]");
     if (!input) return;
-    const excluded = excludedSubfiltersBySection.get(input.dataset.filterSection) || new Set();
-    if (input.checked) excluded.delete(input.dataset.subfilter); else excluded.add(input.dataset.subfilter);
-    excludedSubfiltersBySection.set(input.dataset.filterSection, excluded);
+    if (input.checked) excludedSubfilters.delete(input.dataset.subfilter); else excludedSubfilters.add(input.dataset.subfilter);
     renderFilms();
   });
   list.addEventListener("click", (event) => {
@@ -1643,7 +1636,7 @@
   function openFilmFromList(filmId, listStatus = "want") {
     const film = films.find((item) => item.id === filmId);
     if (!film) return;
-    activeSections.clear(); excludedSubfiltersBySection.delete("");
+    activeSections.clear(); excludedSubfilters.clear();
     search.value = "";
     moreSections.value = "";
     // Las flechas se quedan dentro de la lista desde la que se abrió.
@@ -1691,11 +1684,11 @@
   });
   document.querySelector("#next-to-sessions").addEventListener("click", () => switchScreen("sessions"));
   document.querySelector("#show-all-sections").addEventListener("click", () => {
-    activeSections.clear(); excludedSubfiltersBySection.delete(""); search.value = ""; moreSections.value = ""; showDiscarded = false; syncFilterToggles(); renderSectionPicker(); renderFilms();
+    activeSections.clear(); excludedSubfilters.clear(); search.value = ""; moreSections.value = ""; showDiscarded = false; syncFilterToggles(); renderSectionPicker(); renderFilms();
   });
   search.addEventListener("input", renderFilms);
   sort.addEventListener("change", renderFilms);
-  document.querySelector("#clear-filters").addEventListener("click", () => { activeSections.clear(); excludedSubfiltersBySection.delete(""); excludedSubfiltersBySection.clear(); search.value = ""; moreSections.value = ""; onlyMyLists = false; showDiscarded = false; syncFilterToggles(); renderSectionPicker(); renderFilms(); search.focus(); });
+  document.querySelector("#clear-filters").addEventListener("click", () => { activeSections.clear(); excludedSubfilters.clear(); search.value = ""; moreSections.value = ""; onlyMyLists = false; showDiscarded = false; syncFilterToggles(); renderSectionPicker(); renderFilms(); search.focus(); });
   const onlyMyListsButton = document.querySelector("#only-my-lists");
   const showDiscardedButton = document.querySelector("#show-discarded");
   function syncFilterToggles() {
@@ -1714,7 +1707,7 @@
     showDiscarded = !showDiscarded;
     if (showDiscarded) {
       onlyMyLists = false;
-      activeSections.clear(); excludedSubfiltersBySection.delete("");
+      activeSections.clear(); excludedSubfilters.clear();
       moreSections.value = "";
       renderSectionPicker();
     }
@@ -1864,7 +1857,7 @@
     filmNavigationIds = [...new Set([...document.querySelectorAll("#session-results-list button[data-open-film]")].map((item) => item.dataset.openFilm))];
     sessionSearchScrollY = window.scrollY;
     returnToSessionSearch = true;
-    activeSections.clear(); excludedSubfiltersBySection.delete("");
+    activeSections.clear(); excludedSubfilters.clear();
     search.value = "";
     moreSections.value = "";
     expandedId = film.id;
@@ -1895,7 +1888,7 @@
       returnToProgram = true;
       returnToSessionSearch = false;
       returnToShared = false;
-      activeSections.clear(); excludedSubfiltersBySection.delete("");
+      activeSections.clear(); excludedSubfilters.clear();
       search.value = "";
       moreSections.value = "";
       expandedId = film.id;
@@ -3453,7 +3446,7 @@
     filmNavigationIds = sharedListsOnly
       ? [...document.querySelectorAll("#shared-list [data-shared-row]")].map((row) => row.dataset.sharedRow)
       : [...new Set(sharedPasses.flatMap((id) => findScreening(id)?.filmIds || []))];
-    activeSections.clear(); excludedSubfiltersBySection.delete("");
+    activeSections.clear(); excludedSubfilters.clear();
     search.value = "";
     moreSections.value = "";
     expandedId = film.id;

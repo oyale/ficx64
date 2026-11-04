@@ -243,7 +243,8 @@ python3 build.py --output /tmp/ficx64-portable/ficx64.html
 In Explore, section cards can be combined: films from any selected section are
 shown once. Click a selected card again to remove it. The additional-section
 selector adds a section without replacing the selection; it appears as a selected
-card so it can be removed. Subfilters apply separately to their own section. They also appear when viewing
+card so it can be removed. Desktop selection keeps the current scroll position;
+on smaller screens it scrolls to the results. Refinements use one shared list for the union of selected sections, with each film counted once. They also appear when viewing
 all sections, whenever the current results have additional tags to filter.
 Available options follow search and list filters, but remain available when
 unchecked so they can be restored.
