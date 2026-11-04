@@ -56,18 +56,26 @@
     if (!country || !countryMeasure) return;
     const style = getComputedStyle(credit);
     countryMeasure.font = style.font;
-    const text = credit.textContent;
+    const director = credit.firstChild.textContent;
+    const full = ` | (${country.dataset.countries})`;
+    const compact = Number(country.dataset.countryCount) > 1
+      ? ` | (${country.dataset.firstCountry} +${Number(country.dataset.countryCount) - 1})` : full;
     const letterSpacing = parseFloat(style.letterSpacing) || 0;
-    const required = countryMeasure.measureText(text).width + letterSpacing * text.length;
-    // Keep a generous gap; countries must not wrap or make the card taller.
-    const hide = required + 32 > width;
-    return { country, hide };
+    const fits = (suffix) => {
+      const text = director + suffix;
+      return countryMeasure.measureText(text).width + letterSpacing * text.length + 32 <= width;
+    };
+    const text = fits(full) ? full : compact;
+    return { country, hide: !fits(text), text };
   }
   function fitCardCountries(entries) {
     // Read all dimensions before writing visibility to avoid repeated layout work.
     const changes = entries.map(({ target, width }) => measureCardCountries(target, width));
     changes.forEach((change) => {
-      if (change && change.country.hidden !== change.hide) change.country.hidden = change.hide;
+      if (!change) return;
+      const label = change.country.querySelector(".film-country-label");
+      if (label.textContent !== change.text) label.textContent = change.text;
+      if (change.country.hidden !== change.hide) change.country.hidden = change.hide;
     });
   }
   const countryCreditWidths = new WeakMap();
@@ -520,7 +528,7 @@
         ${!isExpanded ? `<div class="film-body">
           <div class="film-copy">
             <span class="film-title-line">${escapeHtml(film.title)}${filmStar(film, { action: true })}</span>
-            <p class="film-credit">${escapeHtml(credits) || "Sin datos de dirección"}${countries.length ? `<span class="film-card-countries" hidden> · ${escapeHtml(countries.join(" · "))}</span>` : ""}</p>
+            <p class="film-credit">${escapeHtml(credits) || "Sin datos de dirección"}${countries.length ? `<span class="film-card-countries" data-countries="${escapeHtml(countries.join(" · "))}" data-first-country="${escapeHtml(countries[0])}" data-country-count="${countries.length}" title="${escapeHtml(countries.join(" · "))}" hidden><span class="film-country-label" aria-hidden="true"> | (${escapeHtml(countries.join(" · "))})</span><span class="sr-only">Países: ${escapeHtml(countries.join(", "))}</span></span>` : ""}</p>
             ${facts || tags || cicloTags ? `<p class="film-meta-line">${facts ? `<span class="film-facts">${facts}</span>` : ""}${tags}${cicloTags}</p>` : ""}
           </div>
           <div class="film-actions" aria-label="Añadir ${escapeHtml(film.title)} a una lista">${intentButtons}</div>

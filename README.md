@@ -258,3 +258,7 @@ resize and after fonts load; compact cards keep the existing single credit line.
 
 Catalogue ordering supports shortest/longest first; unknown durations stay last,
 with alphabetical ordering as the tie-breaker.
+
+Country credits use `Filmmaker | (Country · Country)` and abbreviate to
+`Filmmaker | (First country +N)` when space is limited. The complete list remains
+available to assistive technology and as a tooltip.
