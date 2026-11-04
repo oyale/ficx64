@@ -50,6 +50,38 @@
     }
   }
 
+  const countryMeasure = document.createElement("canvas").getContext("2d");
+  function measureCardCountries(credit, width = credit.getBoundingClientRect().width) {
+    const country = credit.querySelector(".film-card-countries");
+    if (!country || !countryMeasure) return;
+    const style = getComputedStyle(credit);
+    countryMeasure.font = style.font;
+    const text = credit.textContent;
+    const letterSpacing = parseFloat(style.letterSpacing) || 0;
+    const required = countryMeasure.measureText(text).width + letterSpacing * text.length;
+    // Keep a generous gap; countries must not wrap or make the card taller.
+    const hide = required + 32 > width;
+    return { country, hide };
+  }
+  function fitCardCountries(entries) {
+    // Read all dimensions before writing visibility to avoid repeated layout work.
+    const changes = entries.map(({ target, width }) => measureCardCountries(target, width));
+    changes.forEach((change) => {
+      if (change && change.country.hidden !== change.hide) change.country.hidden = change.hide;
+    });
+  }
+  const countryCreditWidths = new WeakMap();
+  const countryCreditObserver = typeof ResizeObserver === "function"
+    ? new ResizeObserver((entries) => {
+      const changed = entries.filter((entry) => countryCreditWidths.get(entry.target) !== entry.contentRect.width);
+      changed.forEach((entry) => countryCreditWidths.set(entry.target, entry.contentRect.width));
+      fitCardCountries(changed.map((entry) => ({ target: entry.target, width: entry.contentRect.width })));
+    })
+    : null;
+  document.fonts?.ready.then(() => {
+    fitCardCountries([...document.querySelectorAll("#film-list .film-credit")].map((target) => ({ target })));
+  });
+
   const films = Array.isArray(window.FICX_FILMS) ? window.FICX_FILMS : [];
   const screeningRecords = Array.isArray(window.FICX_SCREENINGS) ? window.FICX_SCREENINGS : [];
   const venueTransfers = window.FICX_VENUE_TRANSFERS || {};
@@ -398,6 +430,7 @@
     return `<button class="intent-button intent-maybe${selected("maybe")}" type="button" data-action="intent" data-status="maybe" data-id="${id}" aria-pressed="${status === "maybe"}" title="Mmm… quizás"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3h11A1.5 1.5 0 0 1 19 4.5V21l-7-4-7 4V4.5Z"/><path d="M9.5 7.5a2.5 2.5 0 0 1 4.6 1.3c0 1.5-2.1 1.7-2.1 3.2M12 15h.01"/></svg><span class="intent-copy"><b>${status === "maybe" ? "Quizás" : "Mmm… quizás"}</b><small>${status === "maybe" ? "Para más tarde" : "Lo estoy pensando"}</small></span></button>`;
   }
   function renderFilms() {
+    countryCreditObserver?.disconnect();
     // El repintado rehace las tarjetas: el acuse abierto se recoloca al final del pintado.
     if (discardAck && !discardAck.fromDialog) { const ack = discardAck; requestAnimationFrame(() => discardAck === ack && keepDiscardAck()); }
     const visible = matchingFilms();
@@ -478,7 +511,7 @@
         ${!isExpanded ? `<div class="film-body">
           <div class="film-copy">
             <span class="film-title-line">${escapeHtml(film.title)}${filmStar(film, { action: true })}</span>
-            <p class="film-credit">${escapeHtml(credits) || "Sin datos de dirección"}</p>
+            <p class="film-credit">${escapeHtml(credits) || "Sin datos de dirección"}${countries.length ? `<span class="film-card-countries" hidden> · ${escapeHtml(countries.join(" · "))}</span>` : ""}</p>
             ${facts || tags || cicloTags ? `<p class="film-meta-line">${facts ? `<span class="film-facts">${facts}</span>` : ""}${tags}${cicloTags}</p>` : ""}
           </div>
           <div class="film-actions" aria-label="Añadir ${escapeHtml(film.title)} a una lista">${intentButtons}</div>
@@ -487,6 +520,7 @@
       </li>`;
     }).join("");
     const detailDialog = list.querySelector("dialog.film-expanded");
+    if (!detailDialog) list.querySelectorAll(".film-credit:has(.film-card-countries)").forEach((credit) => countryCreditObserver?.observe(credit));
     if (detailDialog) {
       detailDialog.addEventListener("cancel", (event) => {
         event.preventDefault();

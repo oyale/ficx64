@@ -2074,3 +2074,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .storage-warning button:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
 
 .section-subfilter-group { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; width: 100%; }
+
+/* Only revealed when the entire credit and country list fit with spare room. */
+.film-card-countries { white-space: nowrap; }
+.film-card-countries[hidden] { display: none; }
