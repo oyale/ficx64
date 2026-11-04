@@ -275,7 +275,8 @@
       // Mientras dura el acuse, la recién descartada sigue ocupando su sitio.
       if (discarded.has(film.id) !== showDiscarded && !(discardAck && discardAck.film.id === film.id)) return false;
       const names = film.sections || [];
-      const searchable = `${film.title} ${directorText(film)} ${names.join(" ")}`.toLocaleLowerCase("es");
+      const countries = Array.isArray(film.countries) ? film.countries.join(" ") : "";
+      const searchable = `${film.title} ${directorText(film)} ${countries} ${names.join(" ")}`.toLocaleLowerCase("es");
       const inMyLists = intentions.has(film.id);
       const scopes = activeSections.size ? [...activeSections] : [""];
       const matchesSection = scopes.some((section) => {
