@@ -1232,7 +1232,6 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .film-detail-poster { min-height: 220px; aspect-ratio: 16 / 9; padding: 14px; }
   /* Phones: the card fills the screen, so the text scales up with it. */
   .film-expanded .film-detail-copy { padding: 18px 18px 0; }
-  .film-expanded .detail-countryline { font-size: 10px; letter-spacing: .1em; }
   .film-expanded .film-detail-copy h4 { font-size: clamp(22px, 6.4vw, 26px); margin-bottom: 8px; }
   .film-expanded .detail-synopsis { font-size: clamp(14px, 4.1vw, 16px); line-height: 1.62; max-width: 60ch; }
   .film-expanded .detail-provenance, .film-expanded .film-web-link { font-size: 10px; }
@@ -2014,19 +2013,15 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
  .film-expanded .film-detail-copy { padding: 14px 18px 0; }
  .film-expanded .film-detail-copy h4 { font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--text); margin: 0; }
  .film-expanded .detail-synopsis { font-size: 15px; line-height: 1.5; margin-bottom: 16px; }
- .film-expanded .detail-countryline { margin-bottom: 8px; }
  .film-expanded-screenings { margin-top: 0; }
  .film-expanded-actions .intent-copy small { display: none; }
 }
 
-/* En móvil, el país y la ficha oficial comparten una fila que admite varias líneas. */
+/* En móvil, el país, la sinopsis y el enlace fluyen a ancho completo. */
 @media (max-width: 650px) {
-  .film-expanded .film-detail-copy { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-items: baseline; }
-  .film-expanded .film-detail-copy > .detail-countryline { grid-column: 1; grid-row: 1; min-width: 0; margin: 0 0 10px; overflow-wrap: anywhere; }
-  .film-expanded .film-synopsis-heading { grid-column: 2; grid-row: 1; width: auto; margin: 0 0 10px; }
-  .film-expanded .film-synopsis-heading h4 { display: none; }
-  .film-expanded .film-synopsis-heading .film-web-link { white-space: nowrap; }
-  .film-expanded .film-detail-copy > .detail-synopsis { grid-column: 1 / -1; }
+  .film-expanded .film-detail-copy { display: block; }
+  .film-expanded .detail-countryline { font-size: 10px; letter-spacing: .1em; margin: 0 0 8px; overflow-wrap: anywhere; }
+  .film-expanded .film-synopsis-heading { width: 100%; margin-bottom: 8px; }
 }
 
 /* Sinopsis móvil completa: tamaño adaptable con un mínimo legible. */
@@ -2075,10 +2070,6 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .storage-warning button:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
 
 .section-subfilter-group { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; width: 100%; }
-
-/* Only revealed when the entire credit and country list fit with spare room. */
-.film-card-countries { white-space: nowrap; }
-.film-card-countries[hidden] { display: none; }
 
 /* Selection keeps the section's palette and gains a stronger edge and short shadow. */
 .section-card.is-selected { outline: 2px solid var(--ink); outline-offset: 1px; box-shadow: 0 4px 10px var(--shadow); }

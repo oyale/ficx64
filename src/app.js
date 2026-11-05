@@ -50,45 +50,6 @@
     }
   }
 
-  const countryMeasure = document.createElement("canvas").getContext("2d");
-  function measureCardCountries(credit, width = credit.getBoundingClientRect().width) {
-    const country = credit.querySelector(".film-card-countries");
-    if (!country || !countryMeasure) return;
-    const style = getComputedStyle(credit);
-    countryMeasure.font = style.font;
-    const director = credit.firstChild.textContent;
-    const full = ` | (${country.dataset.countries})`;
-    const compact = Number(country.dataset.countryCount) > 1
-      ? ` | (${country.dataset.firstCountry} +${Number(country.dataset.countryCount) - 1})` : full;
-    const letterSpacing = parseFloat(style.letterSpacing) || 0;
-    const fits = (suffix) => {
-      const text = director + suffix;
-      return countryMeasure.measureText(text).width + letterSpacing * text.length + 32 <= width;
-    };
-    const text = fits(full) ? full : compact;
-    return { country, hide: !fits(text), text };
-  }
-  function fitCardCountries(entries) {
-    // Read all dimensions before writing visibility to avoid repeated layout work.
-    const changes = entries.map(({ target, width }) => measureCardCountries(target, width));
-    changes.forEach((change) => {
-      if (!change) return;
-      const label = change.country.querySelector(".film-country-label");
-      if (label.textContent !== change.text) label.textContent = change.text;
-      if (change.country.hidden !== change.hide) change.country.hidden = change.hide;
-    });
-  }
-  const countryCreditWidths = new WeakMap();
-  const countryCreditObserver = typeof ResizeObserver === "function"
-    ? new ResizeObserver((entries) => {
-      const changed = entries.filter((entry) => countryCreditWidths.get(entry.target) !== entry.contentRect.width);
-      changed.forEach((entry) => countryCreditWidths.set(entry.target, entry.contentRect.width));
-      fitCardCountries(changed.map((entry) => ({ target: entry.target, width: entry.contentRect.width })));
-    })
-    : null;
-  document.fonts?.ready.then(() => {
-    fitCardCountries([...document.querySelectorAll("#film-list .film-credit")].map((target) => ({ target })));
-  });
 
   const films = Array.isArray(window.FICX_FILMS) ? window.FICX_FILMS : [];
   const screeningRecords = Array.isArray(window.FICX_SCREENINGS) ? window.FICX_SCREENINGS : [];
@@ -455,7 +416,6 @@
     return `<button class="intent-button intent-maybe${selected("maybe")}" type="button" data-action="intent" data-status="maybe" data-id="${id}" aria-pressed="${status === "maybe"}" title="Mmm… quizás"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3h11A1.5 1.5 0 0 1 19 4.5V21l-7-4-7 4V4.5Z"/><path d="M9.5 7.5a2.5 2.5 0 0 1 4.6 1.3c0 1.5-2.1 1.7-2.1 3.2M12 15h.01"/></svg><span class="intent-copy"><b>${status === "maybe" ? "Quizás" : "Mmm… quizás"}</b><small>${status === "maybe" ? "Para más tarde" : "Lo estoy pensando"}</small></span></button>`;
   }
   function renderFilms() {
-    countryCreditObserver?.disconnect();
     // El repintado rehace las tarjetas: el acuse abierto se recoloca al final del pintado.
     if (discardAck && !discardAck.fromDialog) { const ack = discardAck; requestAnimationFrame(() => discardAck === ack && keepDiscardAck()); }
     const visible = matchingFilms();
@@ -536,7 +496,7 @@
         ${!isExpanded ? `<div class="film-body">
           <div class="film-copy">
             <span class="film-title-line">${escapeHtml(film.title)}${filmStar(film, { action: true })}</span>
-            <p class="film-credit">${escapeHtml(credits) || "Sin datos de dirección"}${countries.length ? `<span class="film-card-countries" data-countries="${escapeHtml(countries.join(" · "))}" data-first-country="${escapeHtml(countries[0])}" data-country-count="${countries.length}" title="${escapeHtml(countries.join(" · "))}" hidden><span class="film-country-label" aria-hidden="true"> | (${escapeHtml(countries.join(" · "))})</span><span class="sr-only">Países: ${escapeHtml(countries.join(", "))}</span></span>` : ""}</p>
+            <p class="film-credit">${escapeHtml(credits) || "Sin datos de dirección"}</p>
             ${facts || tags || cicloTags ? `<p class="film-meta-line">${facts ? `<span class="film-facts">${facts}</span>` : ""}${tags}${cicloTags}</p>` : ""}
           </div>
           <div class="film-actions" aria-label="Añadir ${escapeHtml(film.title)} a una lista">${intentButtons}</div>
@@ -545,7 +505,6 @@
       </li>`;
     }).join("");
     const detailDialog = list.querySelector("dialog.film-expanded");
-    if (!detailDialog) list.querySelectorAll(".film-credit:has(.film-card-countries)").forEach((credit) => countryCreditObserver?.observe(credit));
     if (detailDialog) {
       detailDialog.addEventListener("cancel", (event) => {
         event.preventDefault();
@@ -2545,6 +2504,7 @@
       const state = sharedListState(filmId);
       // La misma ficha que en el catálogo: título, dirección, año y duración, y sus etiquetas.
       const credits = directorText(film);
+      const countries = Array.isArray(film.countries) ? film.countries.filter(Boolean) : [];
       const facts = [film.year, film.durationMinutes ? `${film.durationMinutes} min` : ""].filter(Boolean).map(escapeHtml).join(" · ");
       const tags = (film.sections || []).filter((name) => !["otras secciones", "cortometrajes"].includes(String(name).toLocaleLowerCase("es")))
         .map((name) => `<span class="film-section">${escapeHtml(name)}</span>`).join("");
