@@ -482,6 +482,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   #film-list .film-row .film-copy .film-star-button svg { width: 20px; height: 20px; }
   #film-list .film-row .film-credit { font-size: 12px; line-height: 1.4; }
   #film-list .film-row .film-facts { margin-top: 3px; font-size: 11px; }
+  #film-list .film-row .film-meta-line .film-facts { flex-basis: 100%; }
   #film-list .film-row .film-section,
   #film-list .film-row .film-ciclo { margin: 0; padding: 4px 7px; font-size: 10px; }
   #film-list .film-row .film-meta-line { gap: 5px 6px; margin-top: 7px; }
