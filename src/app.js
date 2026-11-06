@@ -61,6 +61,7 @@
   const maxPinnedSections = 8;
   const pinStorageKey = "ficx64-pinned-sections-v1";
   const plannedScreeningsStorageKey = "ficx64-planned-screenings-v1";
+  const ownedTicketsStorageKey = "ficx64-owned-tickets-v1";
   const transportStorageKey = "ficx64-transport-mode-v1";
   const remoteImagesStorageKey = "ficx64-remote-images-enabled-v1";
   const aliasStorageKey = "ficx64-alias-v1";
@@ -91,6 +92,7 @@
   let remoteImagesEnabled = readRemoteImagesSetting();
   let intentions = readIntentions();
   let plannedScreenings = readPlannedScreenings();
+  let ownedTickets = readOwnedTickets();
   // Activities/talks without a linked film are planned by candidate id only.
   const standaloneStorageKey = "ficx64-planned-standalone-v1";
   let plannedStandalone = readPlannedStandalone();
@@ -186,6 +188,24 @@
         && screeningRecords.some((screening) => screening.candidateId === candidateId && screening.filmIds.includes(filmId))
       ));
     } catch (_) { return new Map(); }
+  }
+  function readOwnedTickets() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(ownedTicketsStorageKey) || "[]");
+      if (!Array.isArray(saved)) return new Set();
+      const validCandidates = new Set(screeningRecords.map((screening) => screening.candidateId));
+      return new Set(saved.filter((id) => typeof id === "string" && validCandidates.has(id)));
+    } catch (_) { return new Set(); }
+  }
+  function persistOwnedTickets() {
+    try { saveLocalValue(ownedTicketsStorageKey, JSON.stringify([...ownedTickets])); } catch (_) { /* Keep the marks for this session. */ }
+  }
+  function toggleOwnedTicket(candidateId) {
+    if (!screeningRecords.some((screening) => screening.candidateId === candidateId)) return false;
+    if (ownedTickets.has(candidateId)) ownedTickets.delete(candidateId);
+    else ownedTickets.add(candidateId);
+    persistOwnedTickets();
+    return true;
   }
   function persist() {
     try { saveLocalValue(storageKey, JSON.stringify(Object.fromEntries(intentions))); } catch (_) { /* Local storage may be disabled. */ }
@@ -1107,6 +1127,7 @@
       conflictList.length ? `<span class="program-conflict-tag">${conflictList.some((item) => item.reason === "transfer") ? "No da tiempo al traslado" : "Solapa con " + conflictList.map((item) => escapeHtml(item.screening.time)).join(", ")}</span>` : "",
       uncertain.has(screening.candidateId) || !screening.durationMinutes ? `<span class="program-duration-unknown">Duración por confirmar</span>` : "",
       screening.accessType !== "public" ? `<span class="program-access-tag">${screening.accessType === "restricted" ? "Prensa/acreditados" : "Escolares"}</span>` : "",
+      `<button class="program-ticket-toggle${ownedTickets.has(screening.candidateId) ? " is-owned" : ""}" type="button" data-program-action="toggle-owned-ticket" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-pressed="${ownedTickets.has(screening.candidateId)}" aria-label="${ownedTickets.has(screening.candidateId) ? "Quitar la marca Tengo entrada de" : "Marcar que tienes entrada para"} ${escapeHtml((screening.films || []).map((film) => film.title).join(", ") || screening.title || "este pase")}">${ownedTickets.has(screening.candidateId) ? "✓ Tengo entrada" : "Tengo entrada"}</button>`,
     ].filter(Boolean).join("");
     return `<article class="cinema-card program-event${conflictList.length ? " has-conflict" : ""}${screening.candidateId === chosenId ? " is-demo-chosen" : ""}"><time class="program-event-time" datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}">${escapeHtml(screening.time)}</time><div class="program-event-body"><div class="program-event-venue">${escapeHtml(screening.venue)}${screening.room ? ` · ${escapeHtml(screening.room)}` : ""}${endMeta}</div>${blockTitle}<div class="program-event-films">${demoChosenTag(screening, chosenId)}${eventTitles(screening)}</div>${sectionChips((screening.filmIds || []).map((id) => filmById.get(id)).filter(Boolean), "screening-section-line program-section-line")}<div class="program-event-flags">${flags}</div></div><button class="program-calendar-event" type="button" data-program-action="calendar-event" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-haspopup="menu" aria-expanded="false" aria-label="Añadir ${escapeHtml((screening.films || []).map((film) => film.title).join(", ") || screening.title || "este pase")} al calendario" title="Añadir al calendario"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg></button><button class="program-share-event" type="button" data-program-action="share-screening" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-label="Compartir este pase" title="Compartir este pase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.6 6.8-4M8.6 13.4l6.8 4"/></svg></button><button class="program-remove-event" type="button" data-program-action="remove-program-screening" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-label="Quitar pase de ${escapeHtml((screening.films || []).map((film) => film.title).join(", "))}" title="Quitar pase"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></article>`;
   }
@@ -1953,6 +1974,16 @@
       sharePassLink([candidateId]).catch(() => {});
       return;
     }
+    if (programAction === "toggle-owned-ticket") {
+      if (!toggleOwnedTicket(candidateId)) return;
+      const owned = ownedTickets.has(candidateId);
+      button.classList.toggle("is-owned", owned);
+      button.setAttribute("aria-pressed", String(owned));
+      button.textContent = owned ? "✓ Tengo entrada" : "Tengo entrada";
+      const passName = (findScreening(candidateId)?.films || []).map((film) => film.title).join(", ") || findScreening(candidateId)?.title || "este pase";
+      button.setAttribute("aria-label", `${owned ? "Quitar la marca Tengo entrada de" : "Marcar que tienes entrada para"} ${passName}`);
+      return;
+    }
     if (programAction === "remove-program-screening") {
       plannedStandalone.delete(candidateId);
       persistStandalone();
@@ -2159,7 +2190,7 @@
   const settingsTransport = document.querySelector("#settings-transport");
 
   function hasUserData() {
-    return intentions.size > 0 || plannedScreenings.size > 0 || discarded.size > 0 || prioritized.size > 0;
+    return intentions.size > 0 || plannedScreenings.size > 0 || discarded.size > 0 || prioritized.size > 0 || ownedTickets.size > 0;
   }
   function encodeProgram(payload) {
     const bytes = new TextEncoder().encode(JSON.stringify(payload));
@@ -2763,7 +2794,7 @@
           meeting: Boolean(screening.hasMeeting || screening.meetingMinutes),
           venue: `${screening.venue || "Sede por confirmar"}${screening.room ? ` · ${screening.room}` : ""}`,
           duration: minutes ? `${minutes} min de pase` : "",
-          details: [screening.accessType && screening.accessType !== "public" ? (screening.accessType === "restricted" ? "Prensa y acreditados" : "Acceso especial") : ""].filter(Boolean),
+          details: [screening.accessType && screening.accessType !== "public" ? (screening.accessType === "restricted" ? "Prensa y acreditados" : "Acceso especial") : "", ownedTickets.has(screening.candidateId) ? "Tengo entrada" : ""].filter(Boolean),
           sections: sectionNames((screening.filmIds || []).map((id) => filmById.get(id)).filter(Boolean)),
           warnings: [...new Set(warnings)], transition, transitionWarning,
         };
@@ -2991,6 +3022,7 @@
       exportedAt: new Date().toISOString(),
       filmIntentions: Object.fromEntries(intentions),
       plannedScreenings: Object.fromEntries(plannedScreenings),
+      ownedTickets: [...ownedTickets],
       discarded: [...discarded],
       prioritized: [...prioritized],
       pinnedSections,
@@ -3035,7 +3067,33 @@
   // ---- Asistente de bienvenida ----
   const wizardStepKey = "ficx64-onboarding-step-v1";
   const wizardDoneKey = "ficx64-onboarding-done-v1";
+  const ticketIntroSeenKey = "ficx64-ticket-intro-seen-v1";
   const wizard = document.querySelector("#wizard");
+  const ticketIntro = document.querySelector("#ticket-intro");
+  let ticketIntroSeenThisSession = false;
+  function hasSeenTicketIntro() {
+    if (ticketIntroSeenThisSession) return true;
+    try { return localStorage.getItem(ticketIntroSeenKey) === "true"; } catch (_) { return false; }
+  }
+  function markTicketIntroSeen() {
+    ticketIntroSeenThisSession = true;
+    try { saveLocalValue(ticketIntroSeenKey, "true"); } catch (_) { /* The current session still counts as seen. */ }
+  }
+  function showTicketIntro(force = false) {
+    if ((!force && hasSeenTicketIntro()) || wizard.open || ticketIntro.open) return;
+    ticketIntro.showModal();
+  }
+  function closeTicketIntro(openProgram = false) {
+    markTicketIntroSeen();
+    if (ticketIntro.open) ticketIntro.close();
+    if (openProgram) switchScreen("program");
+  }
+  document.querySelector("#ticket-intro-close").addEventListener("click", () => closeTicketIntro());
+  document.querySelector("#ticket-intro-dismiss").addEventListener("click", () => closeTicketIntro());
+  document.querySelector("#ticket-intro-program").addEventListener("click", () => closeTicketIntro(true));
+  ticketIntro.addEventListener("cancel", (event) => { event.preventDefault(); closeTicketIntro(); });
+  ticketIntro.addEventListener("click", (event) => { if (event.target === ticketIntro) closeTicketIntro(); });
+  document.querySelector("#replay-ticket-intro").addEventListener("click", () => showTicketIntro(true));
   const wizardStepLabels = { 1: "Bienvenida", 2: "Ajustes", 3: "Mi lista", 4: "Tu parrilla", 5: "Llévatelo" };
   const isEmbeddedBrowser = /WhatsApp|FBAN|FBAV|Instagram/i.test(navigator.userAgent)
     || (navigator.userAgent.includes(" wv)"));
@@ -3130,6 +3188,7 @@
   }
   function goToOnboardingStep(step) {
     wizardStep = Math.min(5, Math.max(1, step));
+    if (wizardStep === 4) markTicketIntroSeen();
     saveWizardStep(wizardStep);
     if (wizard.open) renderWizardChoices();
     renderWizard();
@@ -3159,6 +3218,7 @@
       try { localStorage.removeItem(wizardStepKey); } catch (_) { /* Nothing to forget. */ }
     }
     if (wizard.open) wizard.close();
+    queueMicrotask(() => showTicketIntro());
   }
   document.querySelector("#wizard-next").addEventListener("click", () => {
     if (wizardStep === 5) closeOnboarding(true);
@@ -3322,7 +3382,7 @@
       + wizardDemoChain(demo);
     // Los botones de la tarjeta (calendario, compartir, quitar) son de la parrilla del usuario y
     // aquí no habría nada que quitarte: la demo queda solo con lo que se lee.
-    cards.querySelectorAll(".program-event-actions, .program-calendar-event, .program-share-event, .program-remove-event").forEach((button) => button.remove());
+    cards.querySelectorAll(".program-event-actions, .program-calendar-event, .program-share-event, .program-remove-event, .program-ticket-toggle").forEach((button) => button.remove());
   }
   // Encadenado del día tal como lo leería «Mi programa», con las horas y sedes de los pases
   // que se ven. Solo con un pase elegido; si no, no hay nada que enseñar.
@@ -3439,6 +3499,7 @@
     let done = false;
     try { done = localStorage.getItem(wizardDoneKey) === "true"; } catch (_) { /* Fall back to showing it. */ }
     if (!done && !hasUserData()) openOnboarding();
+    else showTicketIntro();
   }
   function importProgram(payload) {
     if (!payload || typeof payload !== "object") throw new Error("invalid");
@@ -3451,6 +3512,7 @@
     const validCandidates = new Set(screeningRecords.map((screening) => screening.candidateId));
     let addedIntents = 0;
     let addedPasses = 0;
+    let addedOwnedTickets = 0;
     if (payload.filmIntentions && typeof payload.filmIntentions === "object") {
       for (const [id, status] of Object.entries(payload.filmIntentions)) {
         if (validIds.has(id) && !discarded.has(id) && ["want", "maybe"].includes(status)) { intentions.set(id, status); addedIntents += 1; }
@@ -3459,6 +3521,11 @@
     if (payload.plannedScreenings && typeof payload.plannedScreenings === "object") {
       for (const [id, candidateId] of Object.entries(payload.plannedScreenings)) {
         if (validIds.has(id) && !discarded.has(id) && validCandidates.has(candidateId)) { plannedScreenings.set(id, candidateId); addedPasses += 1; }
+      }
+    }
+    if (Array.isArray(payload.ownedTickets)) {
+      for (const candidateId of payload.ownedTickets) {
+        if (validCandidates.has(candidateId) && !ownedTickets.has(candidateId)) { ownedTickets.add(candidateId); addedOwnedTickets += 1; }
       }
     }
     if (Array.isArray(payload.discarded)) {
@@ -3482,8 +3549,8 @@
         if (available.includes(name) && !pinnedSections.includes(name) && pinnedSections.length < maxPinnedSections) pinnedSections.push(name);
       }
     }
-    persist(); persistPlannedScreenings(); persistDiscarded(); persistPrioritized(); persistPinnedSections(); renderSaved();
-    return { addedIntents, addedPasses };
+    persist(); persistPlannedScreenings(); persistOwnedTickets(); persistDiscarded(); persistPrioritized(); persistPinnedSections(); renderSaved();
+    return { addedIntents, addedPasses, addedOwnedTickets };
   }
   function handleImportText(text) {
     const trimmed = (text || "").trim();
@@ -3501,12 +3568,13 @@
       return;
     }
     try {
-      const { addedIntents, addedPasses } = importProgram(payload);
+      const { addedIntents, addedPasses, addedOwnedTickets } = importProgram(payload);
       // Imported discarded films also change the visible count.
       countVisibleFilms();
       renderFilms();
       const parts = [`${addedIntents} ${addedIntents === 1 ? "película" : "películas"}`];
       if (addedPasses) parts.push(`${addedPasses} ${addedPasses === 1 ? "pase" : "pases"}`);
+      if (addedOwnedTickets) parts.push(`${addedOwnedTickets} ${addedOwnedTickets === 1 ? "entrada marcada" : "entradas marcadas"}`);
       settingsFeedback.textContent = `Importado: ${parts.join(" y ")}.`;
       settingsFeedback.className = "settings-feedback is-ok";
       setTimeout(showSettingsMain, 1400);
@@ -3841,13 +3909,14 @@
   });
   document.querySelector("#settings-clear").addEventListener("click", () => {
     if (!hasUserData()) return;
-    if (!window.confirm("¿Borrar todas tus listas, tu parrilla, las películas descartadas, las prioridades y las secciones fijadas? Esta acción no se puede deshacer.")) return;
+    if (!window.confirm("¿Borrar tus listas, la parrilla, las marcas de entrada, las películas descartadas, las prioridades y las secciones fijadas? Esta acción no se puede deshacer.")) return;
     intentions.clear();
     plannedScreenings.clear();
+    ownedTickets.clear();
     discarded.clear();
     prioritized.clear();
     pinnedSections = [];
-    persist(); persistPlannedScreenings(); persistDiscarded(); persistPrioritized(); persistPinnedSections(); countVisibleFilms(); renderSectionPicker(); renderFilms(); renderSaved();
+    persist(); persistPlannedScreenings(); persistOwnedTickets(); persistDiscarded(); persistPrioritized(); persistPinnedSections(); countVisibleFilms(); renderSectionPicker(); renderFilms(); renderSaved();
   });
   settingsTransport.value = transportMode;
   settingsTransport.addEventListener("change", () => {

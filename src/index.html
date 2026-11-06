@@ -124,6 +124,7 @@
             </div>
             <p class="wizard-hint" id="wizard-layer-hint">Cada pase que añades trae lo que pasa entre uno y otro: el tiempo de traslado, o el aviso de que se solapan.</p>
             <p class="wizard-hint" id="wizard-pass-note">Así lo verás en «Mi programa», con el tiempo entre sedes ya calculado.</p>
+            <div class="wizard-ticket-note"><span class="eyebrow">NUEVO · EN MI PROGRAMA</span><b>¿Ya tienes entrada?</b><span>Marca cada pase desde tu itinerario. Es un recordatorio personal: la app no compra ni reserva entradas.</span></div>
           </section>
 
           <section class="wizard-step" id="wizard-step-5" hidden>
@@ -159,6 +160,21 @@
           <button type="button" class="settings-action is-primary" id="wizard-next">Siguiente</button>
         </div>
       </footer>
+    </div>
+  </dialog>
+  <dialog class="ticket-intro" id="ticket-intro" aria-labelledby="ticket-intro-title">
+    <button type="button" class="ticket-intro-close" id="ticket-intro-close" aria-label="Cerrar">×</button>
+    <p class="eyebrow">NUEVO · MI PROGRAMA</p>
+    <h2 id="ticket-intro-title">¿Ya tienes <span>entrada?</span></h2>
+    <p class="ticket-intro-copy">Márcalo en el pase para reconocerlo enseguida en tu itinerario.</p>
+    <div class="ticket-intro-preview" aria-label="Ejemplo de un pase marcado como entrada obtenida">
+      <time>18:00</time>
+      <div><b>El agente secreto</b><span>Teatro Jovellanos · Sala 1</span><strong>✓ Tengo entrada</strong></div>
+    </div>
+    <p class="ticket-intro-note">Es un recordatorio personal. La app no compra ni reserva entradas.</p>
+    <div class="ticket-intro-actions">
+      <button type="button" class="settings-action is-ghost" id="ticket-intro-dismiss">Ahora no</button>
+      <button type="button" class="settings-action is-primary" id="ticket-intro-program">Ver Mi programa</button>
     </div>
   </dialog>
   <div class="app-shell">
@@ -384,7 +400,7 @@
             <li><b>Tu parrilla</b> por días, con solapes y tiempos entre sedes.</li>
             <li><b>Calendario</b> (.ics) y <b>enlace para compartir</b> tu itinerario.</li>
           </ul>
-          <div class="help-replay"><p class="eyebrow">INTRODUCCIÓN</p><p>La primera vez se muestra un asistente de cinco pasos que configura la app y enseña a usarla.</p><button type="button" class="settings-action" id="replay-wizard">Volver a ver la introducción</button></div>
+          <div class="help-replay"><p class="eyebrow">INTRODUCCIÓN</p><p>La primera vez se muestra un asistente de cinco pasos que configura la app y enseña a usarla. La novedad «Tengo entrada» se explica en el paso de la parrilla o en un aviso al abrir.</p><button type="button" class="settings-action" id="replay-wizard">Volver a ver la introducción</button><button type="button" class="settings-action" id="replay-ticket-intro">Volver a ver «Tengo entrada»</button></div>
           <div class="help-replay" id="help-instalar">
             <h3 id="help-install-title">Instalar la app</h3>
             <p id="help-installed" class="help-installed" role="status" hidden><strong>Ya la tienes instalada.</strong><span>Puedes abrirla desde su icono y consultar el programa sin conexión.</span></p>
@@ -429,6 +445,7 @@
             <li><b>Mi lista y Quizás</b> son excluyentes entre sí: una película está en una o en otra. Quitarla de la lista quita también su pase de la parrilla.</li>
             <li><b>La estrella</b> vive junto al título y convive con las dos listas. Se apaga si descartas la película o te quedas sin lista.</li>
             <li><b>Descartar</b> es excluyente con todo: sale del listado, de las listas y de la parrilla. Se recupera desde el interruptor «Descartadas» de Explorar.</li>
+            <li><b>Tengo entrada</b> se marca por pase en «Mi programa». Es una nota personal: no reserva ni compra la entrada y no se comparte con otras personas.</li>
             <li><b>Compartir</b> genera un enlace con los pases dentro, o con tus listas desde «Mis listas». Quien lo abre elige qué añadir: en el itinerario marca como «Coincidimos» el que ya tiene, «Choca con tu pase» el que solapa y «Ya la tienes en otro horario» la misma película en otro pase; en las listas, ve qué películas quiere ver y cuáles está dudando.</li>
             <li><b>Calendario</b>: el fichero <code>.ics</code> vale para Google, Apple, Outlook y cualquier app que lo importe.</li>
             <li><b>Itinerario PDF</b>: en «Mi programa → Exportar y compartir» puedes descargar todos tus días para consultar o imprimir, también sin conexión. Es una copia: descárgala de nuevo si cambias los pases. Para recuperar tus datos en la app, usa la exportación de Ajustes.</li>
