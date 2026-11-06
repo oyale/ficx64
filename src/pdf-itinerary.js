@@ -84,9 +84,11 @@
         lines.push({ gap });
       }
       font(15.5, "display");
-      const titleLines = doc.splitTextToSize(clean(event.title), contentWidth - (event.duration ? 26 : 0));
-      titleLines.forEach((text, index) => lines.push({ text, size: 15.5, weight: "display", color: "ink", height: 5.2, duration: index === 0 ? event.duration : "" }));
+      const paperCheck = event.ticketDisplay === "paper";
+      const titleLines = doc.splitTextToSize(clean(event.title), contentWidth - (event.duration ? 26 : 0) - (paperCheck ? 7 : 0));
+      titleLines.forEach((text, index) => lines.push({ text, size: 15.5, weight: "display", color: "ink", height: 5.2, duration: index === 0 ? event.duration : "", checkbox: paperCheck && index === 0 }));
       lines.push({ gap: .6 });
+      if (event.ticketDisplay === "owned" && event.ticketOwned) paragraph("Con entrada", 8.2, "bold", "teal", 3.6, .4, true);
       if (event.films?.length) paragraph(`${event.filmsLabel ? event.filmsLabel + ": " : ""}${event.films.join(" · ")}`, 9, "normal", "muted", 3.9);
       paragraph([event.venue, ...(event.sections || [])].filter(Boolean).join(" · "), 9, "normal", "ink", 3.9);
       paragraph(event.details?.join(" · "), 8.2, "normal", "muted", 3.6);
@@ -121,6 +123,9 @@
             doc.setFillColor(...colors.warningBg); doc.rect(contentX - 1.5, baseline - 3, contentWidth + 1.5, line.height + .2, "F");
           }
           font(line.size, line.weight, line.color);
+          if (line.checkbox) {
+            doc.setDrawColor(...colors.teal); doc.setLineWidth(.45); doc.roundedRect(contentX, baseline - 3.3, 3.2, 3.2, .4, .4, "S");
+          }
           if (line.badge) {
             doc.setFillColor(230, 246, 242); doc.roundedRect(contentX - 1, baseline - 3.2, doc.getTextWidth(line.text) + 9, 5.3, 1, 1, "F");
             doc.setDrawColor(...colors.teal); doc.setLineWidth(.3);
@@ -130,7 +135,7 @@
             doc.line(contentX + 2.9, baseline + .5, contentX + 2.9, baseline - .7);
             doc.line(contentX + 1.65, baseline + .5, contentX + 1.65, baseline + 1.2);
           }
-          doc.text(line.text, contentX + (line.badge ? 6 : 0), baseline);
+          doc.text(line.text, contentX + (line.badge ? 6 : line.checkbox ? 5 : 0), baseline);
           if (line.duration) { font(8.2, "normal", "muted"); doc.text(line.duration, right, baseline, { align: "right" }); }
           baseline += height; cursor++; rendered++;
         }

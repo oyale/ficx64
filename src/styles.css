@@ -740,6 +740,8 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .finder-screening-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 11px; }
 .finder-screening-heading time { color: var(--blue-deep); font-size: 15px; font-weight: 900; }
 .finder-screening-heading span { color: var(--text-body); font-size: 9px; }
+.finder-ticket-marker { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 3px 8px; border: 1px solid #a9ddd5; border-radius: 999px; background: var(--cyan-pale); color: var(--green-deep) !important; font-size: 9px !important; font-weight: 800; line-height: 1.2; white-space: nowrap; }
+.finder-ticket-marker svg { display: block; width: 14px; height: 14px; flex: 0 0 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .finder-duration { color: var(--text-faint); font-variant-numeric: tabular-nums; }
 .finder-film-titles { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 8px; margin-top: 4px; }
 .finder-film-titles.is-multi { display: block; line-height: 1.35; }
@@ -936,6 +938,10 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .program-calendar-panel { width: min(340px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow-y: auto; overscroll-behavior: contain; padding: 0; border: 1px solid #cfe8e4; border-radius: 14px; background: var(--surface-float); color: var(--ink); box-shadow: 0 16px 40px var(--shadow); }
 .program-calendar-panel::before { content: ""; display: block; height: 4px; background: linear-gradient(90deg, var(--cyan), #4fd1c5 70%, #9be7dd); }
 .program-calendar-note { margin: 0; padding: 13px 16px 11px; color: #00786b; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.export-options { display: grid; gap: 7px; margin: 0; padding: 11px 16px; border: 0; border-top: 1px solid var(--line); color: var(--text-body); }
+.export-options legend { padding: 0 5px 0 0; color: var(--green-deep); font-size: 10px; font-weight: 850; }
+.export-options label { display: flex; align-items: flex-start; gap: 8px; font-size: 10px; line-height: 1.35; cursor: pointer; }
+.export-options input { flex: 0 0 auto; margin: 1px 0 0; accent-color: var(--green-deep); }
 .program-calendar-panel .settings-actions { display: grid; gap: 0; margin: 0; }
 .program-calendar-panel .settings-action { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 12px 16px; border: 0; border-top: 1px solid #e8f1f0; border-radius: 0; background: transparent; color: #00786b; font-size: 12px; font-weight: 700; text-align: left; }
 .program-calendar-panel .settings-action::after { content: "↗"; color: rgba(0, 120, 107, .45); font-weight: 400; }
@@ -1140,6 +1146,9 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .finder-screening-actions { margin-top: 6px; }
 @media (min-width: 651px) {
   .finder-screening .pass-quick-actions { margin-top: 8px; }
+  .screening-tags .pass-quick-actions { flex: 0 0 100%; width: 100%; margin: 8px 0 0; }
+  .finder-ticket-marker { vertical-align: middle; }
+  .screening-tags .pass-quick-actions .pass-quick.is-plan { min-height: 36px; padding: 8px 14px; border-radius: 8px; font-size: 10px; }
 }
 .program-pass-brief { cursor: help; border-bottom: 1px dotted transparent; }
 .program-pass-brief:hover { border-bottom-color: var(--text-faint); }
@@ -1650,6 +1659,10 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .alias-field input:focus-visible { outline: 3px solid var(--blue); outline-offset: 1px; }
 .alias-counter { margin: -4px 0 0; color: var(--gray); font-size: 9px; text-align: right; }
 .alias-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.alias-ticket-options { display: grid; gap: 7px; margin: 0; padding: 10px; border: 1px solid var(--line); border-radius: 8px; }
+.alias-ticket-options legend { padding: 0 4px; color: var(--green-deep); font-size: 10px; font-weight: 850; }
+.alias-ticket-options label { display: flex; gap: 8px; align-items: flex-start; color: var(--text-body); font-size: 10px; line-height: 1.4; cursor: pointer; }
+.alias-ticket-options input { flex: 0 0 auto; margin: 1px 0 0; accent-color: var(--green-deep); }
 
 .share-dialog .alias-field input { font-size: 11px; color: var(--text-body); }
 /* Menú del calendario de un pase: Google o .ics, sin salir de la app a la fuerza. */
