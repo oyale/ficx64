@@ -825,7 +825,7 @@
       const passContent = hasDiscardedFilm
         ? `<details class="finder-pass-foldout"><summary><span class="finder-fold-titles">${summaryNames || "Título por identificar"}</span><span class="finder-discarded-note">${discardedFilmCount === 1 ? "Incluye 1 película descartada" : `Incluye ${discardedFilmCount} películas descartadas`} · Ver detalles</span></summary><div class="finder-pass-foldout-content">${passDetails}</div></details>`
         : passDetails;
-      return `<li class="cinema-card finder-screening${hasDiscardedFilm ? " has-discarded-film" : ""}${hasFilmAlreadyPlanned ? " has-film-in-plan" : ""}"><time class="finder-date" datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}"><span>${weekday}</span><b>${day}</b><small>${month}</small></time><div class="finder-screening-content"><div class="finder-screening-heading"><time datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}">${escapeHtml(screening.time)}</time><span>${escapeHtml(screening.venue)}${screening.room ? ` · ${escapeHtml(screening.room)}` : ""}</span>${durationText}</div>${passContent}</div></li>`;
+      return `<li class="cinema-card finder-screening${hasDiscardedFilm ? " has-discarded-film" : ""}${hasFilmAlreadyPlanned ? " has-film-in-plan" : ""}"><time class="finder-date" datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}"><span>${weekday}</span><b>${day}</b><small>${month}</small></time><div class="finder-screening-content"><div class="finder-screening-heading"><time datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}">${escapeHtml(screening.time)}</time><span>${escapeHtml(screening.venue)}${screening.room ? ` · ${escapeHtml(screening.room)}` : ""}</span>${durationText}${passTicketMarker(screening)}</div>${passContent}</div></li>`;
     }).join("") : `<li class="finder-no-results">No hay pases con estos filtros. Prueba con más días, franjas u otras sedes.</li>`;
     document.querySelector("#session-results-title").textContent = `${filtered.length} ${filtered.length === 1 ? "pase" : "pases"} · ${dateText} · ${timeText}${venueText}`;
   }
@@ -1478,6 +1478,16 @@
     }).join("");
     return `<details class="pass-conflict-warning"><summary aria-label="Ver con qué pases chocaría" title="Ver conflictos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 22 21H2L12 3Z"/><path d="M12 9v5m0 3h.01"/></svg></summary><div class="pass-conflict-popover" role="status"><b>Chocaría con tu parrilla</b><ul>${details}</ul></div></details>`;
   }
+  function screeningIsPlanned(screening) {
+    const ids = Array.isArray(screening.filmIds) ? screening.filmIds : [];
+    return ids.length
+      ? ids.every((id) => plannedScreenings.get(id) === screening.candidateId)
+      : plannedStandalone.has(screening.candidateId);
+  }
+  function passTicketMarker(screening) {
+    if (!screeningIsPlanned(screening) || !ownedTickets.has(screening.candidateId)) return "";
+    return `<span class="finder-ticket-marker" title="Has marcado que ya tienes entrada para este pase"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4V5Z"/><path d="M10 6.5v7"/></svg>Con entrada</span>`;
+  }
   function renderPassQuickActions(screening, { planOnly = false } = {}) {
     const ids = Array.isArray(screening.filmIds) ? screening.filmIds : [];
     // A discarded film gets no action buttons: discarding is the final decision.
@@ -1485,9 +1495,7 @@
     if (ids.length && !liveIds.length) return "";
     // Talks and activities without a linked film can still be added to the agenda
     // by their candidate id alone.
-    const planned = ids.length
-      ? ids.every((id) => plannedScreenings.get(id) === screening.candidateId)
-      : plannedStandalone.has(screening.candidateId);
+    const planned = screeningIsPlanned(screening);
     const label = planned ? "✓ En la parrilla" : "＋ A la parrilla";
     const planButton = `<button type="button" class="pass-quick is-plan${planned ? " is-done" : ""}" data-quick-action="plan" data-ids="${escapeHtml(liveIds.join(","))}" data-candidate="${escapeHtml(screening.candidateId)}" aria-pressed="${planned}">${label}</button>`;
     const conflictWarning = passConflictWarning(screening);
@@ -2127,6 +2135,7 @@
       const passName = (findScreening(candidateId)?.films || []).map((film) => film.title).join(", ") || findScreening(candidateId)?.title || "este pase";
       button.setAttribute("aria-label", `${owned ? "Quitar la marca Tengo entrada de" : "Marcar que tienes entrada para"} ${passName}`);
       renderFilms();
+      updateSessionSummary();
       return;
     }
     if (programAction === "remove-program-screening") {
@@ -2848,6 +2857,28 @@
     const stamp = `${date.slice(0, 7)}-${String(day).padStart(2, "0")}T${formatClock(((total % 1440) + 1440) % 1440).replace(":", "")}00`;
     return stamp;
   }
+  function calendarTransferNote(from, to) {
+    const minutes = plannedMinutes(from);
+    if (!minutes) return `Siguiente pase: ${to.time} en ${to.venue}. Fin del pase anterior por confirmar; revisa el traslado.`;
+    const end = startMinute(from) + minutes;
+    const gap = startMinute(to) - end;
+    const sameVenue = (from.venueGroup && from.venueGroup === to.venueGroup) || String(from.venue).trim().toLocaleLowerCase("es") === String(to.venue).trim().toLocaleLowerCase("es");
+    const transfer = transferMinutes(from, to);
+    const prefix = `Siguiente pase: ${to.time} en ${to.venue}${to.room ? ` · ${to.room}` : ""}.`;
+    if (gap < 0) return `${prefix} Empieza ${Math.abs(gap)} min antes de que termine este pase.`;
+    if (sameVenue) return `${prefix} Misma sede; calcula ${transfer || 5} min para el cambio.`;
+    if (transfer === null) return `${prefix} Traslado por confirmar; comprueba la ruta antes de salir.`;
+    const exit = venueEnterExitMinutes(from.venueGroup);
+    const enter = venueEnterExitMinutes(to.venueGroup);
+    let detail = `${transfer} min estimados (${exit} min para salir + desplazamiento + ${enter} min para entrar)`;
+    if (["bus", "all"].includes(transportMode)) {
+      const bus = busDetail(from, to, from.date, formatClock(end));
+      if (bus) detail += `. Bus ${bus.lines.join("/")}: ${bus.board_stop} → ${bus.alight_stop}${bus.walk_notes ? `. ${bus.walk_notes}` : ""}`;
+    }
+    const margin = gap - transfer;
+    return `${prefix} ${detail}. ${margin < 0 ? `Faltan ${Math.abs(margin)} min` : `Margen de ${margin} min`} antes del siguiente pase.`;
+  }
+
   function calendarEvent(screening) {
     const ids = screening.filmIds || [];
     const titles = (screening.films || []).map((film) => film.title).filter(Boolean);
@@ -2856,10 +2887,15 @@
       : (titles[0] || screening.title || "FICX 64");
     const minutes = plannedMinutes(screening) || 90;
     const where = `${screening.venue}${screening.room ? ` · ${screening.room}` : ""}`;
+    const allEvents = selectedPlanEvents();
+    const eventIndex = allEvents.findIndex((item) => item.candidateId === screening.candidateId);
+    const next = eventIndex >= 0 ? allEvents.slice(eventIndex + 1).find((item) => item.date === screening.date) : null;
     const notes = [
       ids.length > 1 ? `Programa de ${ids.length} películas` : "",
       screening.meetingMinutes ? "Encuentro con el equipo" : "",
       screening.reviewStatus !== "reviewed" ? "Pase pendiente de confirmar por el festival" : "",
+      document.querySelector("#ics-ticket-notes")?.checked ? (ownedTickets.has(screening.candidateId) ? "Entrada: marcada como obtenida en FICX 64" : "Entrada: todavía no marcada como obtenida en FICX 64") : "",
+      next ? calendarTransferNote(screening, next) : "",
       "Programa personal FICX 64",
     ].filter(Boolean).join("\n");
     return [
@@ -2920,7 +2956,7 @@
       films: titles.length > 1 ? linked.map(filmLabel) : [], filmsLabel: "",
     };
   }
-  function buildItineraryDocument(events = selectedPlanEvents(), generatedAt = new Date()) {
+  function buildItineraryDocument(events = selectedPlanEvents(), generatedAt = new Date(), ticketDisplay = "none") {
     const { conflicts } = analyzeProgram(events);
     const transportLabel = { walking: "Traslados a pie", cycling: "Traslados en bici", bus: "Traslados en bus", all: "Mejor traslado disponible" }[transportMode];
     return {
@@ -2954,7 +2990,8 @@
           meeting: Boolean(screening.hasMeeting || screening.meetingMinutes),
           venue: `${screening.venue || "Sede por confirmar"}${screening.room ? ` · ${screening.room}` : ""}`,
           duration: minutes ? `${minutes} min de pase` : "",
-          details: [screening.accessType && screening.accessType !== "public" ? (screening.accessType === "restricted" ? "Prensa y acreditados" : "Acceso especial") : "", ownedTickets.has(screening.candidateId) ? "Tengo entrada" : ""].filter(Boolean),
+          details: [screening.accessType && screening.accessType !== "public" ? (screening.accessType === "restricted" ? "Prensa y acreditados" : "Acceso especial") : ""].filter(Boolean),
+          ticketOwned: ownedTickets.has(screening.candidateId), ticketDisplay,
           sections: sectionNames((screening.filmIds || []).map((id) => filmById.get(id)).filter(Boolean)),
           warnings: [...new Set(warnings)], transition, transitionWarning,
         };
@@ -3029,6 +3066,12 @@
       : isItinerary ? "Es opcional: aparecerá como «El itinerario de …» al abrir el enlace."
       : "Es opcional: aparecerá en la cabecera del enlace de tus listas.";
     document.querySelector("#alias-privacy-note").hidden = !isItinerary;
+    const ticketOptions = document.querySelector("#pdf-ticket-options");
+    if (ticketOptions) ticketOptions.hidden = !isPdf;
+    if (isPdf) {
+      const defaultPdfDisplay = document.querySelector('input[name="pdf-ticket-display"][value="none"]');
+      if (defaultPdfDisplay) defaultPdfDisplay.checked = true;
+    }
     // Con nombre guardado, el enlace sale ya firmado: basta confirmar.
     userAlias = readAlias();
     input.value = userAlias;
@@ -3048,7 +3091,7 @@
       };
       const onInput = () => { counter.textContent = `${input.value.length}/40`; };
       // Esc o el botón cerrar disparan "close" sin value: cuenta como cancelar.
-      const onClose = () => finish(dialog.returnValue === "ok" ? input.value : null);
+      const onClose = () => finish(dialog.returnValue === "ok" ? (isPdf ? { alias: input.value, ticketDisplay: document.querySelector('input[name="pdf-ticket-display"]:checked')?.value || "none" } : input.value) : null);
       const onCancel = () => finish(null);
       input.addEventListener("input", onInput);
       dialog.addEventListener("close", onClose);
@@ -3766,8 +3809,9 @@
       const answer = await askAlias("pdf");
       if (answer === null) return;
       button.querySelector("span").textContent = "Preparando PDF…";
-      const model = buildItineraryDocument();
-      model.alias = answer.trim().slice(0, 40);
+      const model = buildItineraryDocument(selectedPlanEvents(), new Date(), answer.ticketDisplay);
+      model.alias = answer.alias.trim().slice(0, 40);
+      model.ticketDisplay = answer.ticketDisplay;
       await new Promise((resolve) => setTimeout(resolve, 0));
       const pdf = FICXItineraryPDF.create(model);
       const alias = model.alias.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
