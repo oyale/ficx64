@@ -20,7 +20,7 @@ function context() {
   const a={candidateId:'a',date:'2026-11-16',time:'13:00',durationMinutes:60,meetingMinutes:15,venue:'Teatro Jovellanos',accessType:'public',filmIds:['one','two'],films:[{id:'one',title:'La película pequeña'},{id:'two',title:'Memória e coração'}],title:'Una sesión compartida'};
   const b={candidateId:'b',date:'2026-11-16',time:'14:20',durationMinutes:80,venue:'OCINE',room:'Sala 1',accessType:'restricted',filmIds:['three'],films:[{id:'three',title:'Por fortuna o por desgracia, tú nunca morirás'}]};
   const c={candidateId:'c',date:'2026-11-17',time:'19:00',durationMinutes:null,venue:'Antiguo Instituto',filmIds:[],films:[],title:'Encuentro sin película'};
-  const sandbox=vm.createContext({screeningRecords:[c,b,a], plannedScreenings:new Map([['one','a'],['two','a'],['three','b'],['stale','missing']]), plannedStandalone:new Set(['c']),
+  const sandbox=vm.createContext({screeningRecords:[c,b,a], plannedScreenings:new Map([['one','a'],['two','a'],['three','b'],['stale','missing']]), plannedStandalone:new Set(['c']), ownedTickets:new Set(),
     filmById:new Map([['one',{sections:['Albar'],durationMinutes:12}],['two',{sections:['Cortometrajes']}],['three',{sections:['Retueyos']}]]),
     transportMode:'walking',userAlias:'Ángela', transferMinutes:()=>10, Date, Intl});
   vm.runInContext(['findScreening','selectedPlanEvents','plannedMinutes','startMinute','formatClock','compareScreenings','analyzeProgram','sectionNames','itineraryScreeningTitles','buildItineraryDocument'].map(extract).join('\n'),sandbox);
@@ -42,6 +42,13 @@ test('PDF snapshot includes every day, shared sessions once and standalone activ
   assert.equal(model.events[2].title,'Encuentro sin película');
   assert.equal(model.events[2].end,'');
   assert.match(model.events[2].warnings.join(' '),/Duración por confirmar/);
+});
+test('PDF snapshot labels only the screening marked as already ticketed',()=>{
+  const sandbox=context();
+  sandbox.ownedTickets.add('a');
+  const model=vm.runInContext('buildItineraryDocument()',sandbox);
+  assert.match(model.events[0].details.join(' '),/Tengo entrada/);
+  assert.doesNotMatch(model.events[1].details.join(' '),/Tengo entrada/);
 });
 test('unknown transfer and unknown end never become invented travel/finish times',()=>{
   const sandbox=context(); vm.runInContext('transferMinutes=()=>null',sandbox);
