@@ -5365,7 +5365,7 @@
           "eventLabels": [
             "INAUGURACIÓN"
           ],
-          "accessType": "public",
+          "accessType": "restricted",
           "reviewStatus": "reviewed",
           "durationMinutes": 90,
           "durationSource": "calendar-block",
