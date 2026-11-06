@@ -253,6 +253,28 @@
   function directorText(film) {
     return Array.isArray(film.directors) ? film.directors.join(", ") : (film.directors || "Dirección no disponible");
   }
+  function compactPassLabel(screening) {
+    if (!screening) return "";
+    const date = new Date(`${screening.date}T12:00:00`);
+    const weekdayName = new Intl.DateTimeFormat("es-ES", { weekday: "long" }).format(date).toLocaleLowerCase("es");
+    const day = new Intl.DateTimeFormat("es-ES", { day: "2-digit" }).format(date);
+    const venue = { "escuela-comercio": "EC", "ocine": "OC", "yelmo": "Y", "teatro-jovellanos": "TJ", "laboral": "LAB", "antiguo-instituto": "AI", "pumarin": "SUR" }[screening.venueGroup] || "";
+    const time = String(screening.time || "").replace(":00", "h").replace(":", "h");
+    return `${WEEKDAY_INITIALS[weekdayName] || "?"}${day} · ${time} · ${venue}`;
+  }
+  function filmOwnedPass(film) {
+    return [...ownedTickets].map(findScreening).find((screening) => screening?.filmIds.includes(film?.id)) || null;
+  }
+  function filmPlanBadge(film) {
+    if (!film?.id) return "";
+    const ownedPass = filmOwnedPass(film);
+    const planned = findScreening(plannedScreenings.get(film.id));
+    const screening = ownedPass || planned;
+    if (!screening) return "";
+    const label = ownedPass ? "Entrada" : "En parrilla";
+    const icon = ownedPass ? `<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4V5Z"/><path d="M10 6.5v7"/></svg>` : `<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="13" rx="2"/><path d="M6 2v4m8-4v4M3 8h14"/></svg>`;
+    return `<span class="film-plan-badge${ownedPass ? " is-ticket" : ""}" title="${label}: ${escapeHtml(formatProgramDate(screening.date))}, ${escapeHtml(screening.time)}, ${escapeHtml(screening.venue)}">${icon}<span>${label} · ${escapeHtml(compactPassLabel(screening))}</span></span>`;
+  }
   function screeningCard(screening) {
     const date = new Date(`${screening.date}T12:00:00`);
     const weekday = new Intl.DateTimeFormat("es-ES", { weekday: "short" }).format(date).replace(/\.$/, "").toLocaleUpperCase("es");
@@ -280,23 +302,28 @@
       </div>
     </li>`;
   }
-  function finderFilmEntry(film) {
+  function finderFilmEntry(film, screening) {
     if (!film.id) return `<span class="screening-film-unlinked">${escapeHtml(film.title)}</span>`;
+    if (discarded.has(film.id)) return `<span class="finder-discarded-film"><span>${escapeHtml(film.title)}</span><small>Descartada</small></span>`;
     // The intent is already shown by the "Mi lista" / "Quizás" buttons below.
     const status = intentions.get(film.id);
+    const plannedCandidateId = plannedScreenings.get(film.id);
+    const plannedScreening = plannedCandidateId && plannedCandidateId !== screening.candidateId ? findScreening(plannedCandidateId) : null;
     return `<span class="finder-film-entry${status ? " has-intention" : ""}"><button type="button" class="screening-film-link" data-open-film="${escapeHtml(film.id)}">${escapeHtml(film.title)}</button></span>`;
   }
   function renderFilmScreenings(film) {
-    const screenings = Array.isArray(film.screenings) ? film.screenings : [];
+    const screenings = (Array.isArray(film.screenings) ? film.screenings : [])
+      .filter((screening) => !discarded.has(film.id))
+      .sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`));
     const publicScreenings = screenings.filter((screening) => screening.accessType === "public");
     const specialScreenings = screenings.filter((screening) => screening.accessType !== "public");
-    const emptyMessage = !screenings.length ? `<p class="screenings-empty">No hay pases para esta película.</p>` : "";
+    const emptyMessage = !screenings.length ? `<p class="screenings-empty">${discarded.has(film.id) ? "Los pases están ocultos porque has descartado esta película." : "No hay pases para esta película."}</p>` : "";
     const specialList = specialScreenings.length ? `<details class="special-screenings"><summary>Pases con acceso especial <span>${specialScreenings.length}</span></summary><p>Incluye pases escolares o reservados a prensa y acreditados.</p><ul class="screening-list">${specialScreenings.map(screeningCard).join("")}</ul></details>` : "";
     // Passes start folded. Only an explicit Mi lista / Quizás click opens them;
     // marking the opposite intent again closes them.
     const open = openPassesId === film.id ? " open" : "";
     const passContent = screenings.length ? `${publicScreenings.length ? `<ul class="screening-list">${publicScreenings.map(screeningCard).join("")}</ul>` : `<p class="screenings-empty">No hay pases abiertos al público.</p>`}${specialList}` : emptyMessage;
-    return `<section class="film-screenings" aria-label="Pases de ${escapeHtml(film.title)}"><details class="film-screenings-foldout"${open}><summary><span>Pases</span><b>${screenings.length}</b></summary><div class="film-screenings-content">${passContent}</div></details></section>`;
+    return `<section class="film-screenings" aria-label="Pases de ${escapeHtml(film.title)}"><details class="film-screenings-foldout"${open}><summary><span>Pases</span>${filmPlanBadge(film)}<b>${screenings.length}</b></summary><div class="film-screenings-content">${passContent}</div></details></section>`;
   }
   function filmsForSection(sectionName) {
     return films.filter((film) => !discarded.has(film.id) && (!sectionName || (film.sections || []).includes(sectionName)));
@@ -463,6 +490,8 @@
         ? `<span class="poster-format-badge poster-format-${film.format}" role="img" aria-label="${formatLabel}" title="${formatLabel}"><svg viewBox="0 0 36 18" aria-hidden="true"><rect x="1" y="1" width="34" height="16" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="6" y="6" width="24" height="6" rx=".5" fill="currentColor"/><path d="M5 2v2m6-2v2m6-2v2m6-2v2m6-2v2M5 14v2m6-2v2m6-2v2m6-2v2m6-2v2" stroke="currentColor" stroke-width="1.5"/></svg></span>`
         : "";
       const discardedFlag = discarded.has(film.id);
+      const ownedPass = filmOwnedPass(film);
+      const plannedPass = findScreening(plannedScreenings.get(film.id));
       // Jerarquía única en Explorar y en la ficha: Mi lista y Quizás juntos, Descartar aparte.
       // Descartar solo se ofrece mientras no hay decisión: con intención ya elegida, no aparece.
       const canDiscard = !discardedFlag && status !== "want" && status !== "maybe";
@@ -517,9 +546,9 @@
           <div class="film-copy">
             <span class="film-title-line">${escapeHtml(film.title)}${filmStar(film, { action: true })}</span>
             <p class="film-credit">${escapeHtml(credits) || "Sin datos de dirección"}</p>
-            ${facts || tags || cicloTags ? `<p class="film-meta-line">${facts ? `<span class="film-facts">${facts}</span>` : ""}${tags}${cicloTags}</p>` : ""}
+            ${facts || tags || cicloTags || plannedPass ? `<p class="film-meta-line">${facts ? `<span class="film-facts">${facts}</span>` : ""}${tags}${cicloTags}${plannedPass && !ownedPass ? filmPlanBadge(film) : ""}</p>` : ""}
           </div>
-          <div class="film-actions" aria-label="Añadir ${escapeHtml(film.title)} a una lista">${intentButtons}</div>
+          <div class="film-actions" aria-label="${ownedPass && !discardedFlag ? `Entrada para ${escapeHtml(film.title)}` : `Añadir ${escapeHtml(film.title)} a una lista`}">${ownedPass && !discardedFlag ? `<div class="film-owned-summary"><span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4V5Z"/><path d="M10 6.5v7"/></svg>Entrada</span><small>${escapeHtml(compactPassLabel(ownedPass))}</small></div>` : intentButtons}</div>
         </div>` : ""}
         ${details}
       </li>`;
@@ -766,8 +795,19 @@
     });
     const resultList = document.querySelector("#session-results-list");
     resultList.innerHTML = filtered.length ? filtered.map((screening) => {
-      const names = (screening.films || []).map((film, index) => `${index ? '<span class="film-separator" aria-hidden="true">·</span>' : ""}${finderFilmEntry(film)}`).join("");
-      const sections = sectionChips((screening.filmIds || []).map((id) => filmById.get(id)).filter(Boolean));
+      const filmIds = screening.filmIds || [];
+      const hasFilmAlreadyPlanned = filmIds.some((id) => plannedScreenings.has(id) && plannedScreenings.get(id) !== screening.candidateId);
+      const discardedFilmCount = filmIds.filter((id) => discarded.has(id)).length;
+      const hasDiscardedFilm = discardedFilmCount > 0;
+      const liveIds = new Set(filmIds.filter((id) => !discarded.has(id)));
+      const screeningFilms = screening.films || [];
+      const names = screeningFilms.map((film, index) => `${index ? '<span class="film-separator" aria-hidden="true"> / </span>' : ""}${finderFilmEntry(film, screening)}`).join("");
+      const summaryNames = screeningFilms.map((film, index) => `${index ? '<span class="film-separator" aria-hidden="true"> / </span>' : ""}<span class="finder-fold-title${film.id && discarded.has(film.id) ? " is-discarded" : ""}">${escapeHtml(film.title)}</span>`).join("");
+      const plannedNotes = screeningFilms.filter((film) => film.id && plannedScreenings.has(film.id) && plannedScreenings.get(film.id) !== screening.candidateId).map((film) => {
+        const planned = findScreening(plannedScreenings.get(film.id));
+        return planned ? `<span class="finder-planned-note" title="Ya está en tu parrilla: ${escapeHtml(formatProgramDate(planned.date))}, ${escapeHtml(planned.time)}, ${escapeHtml(planned.venue)}"><b>${escapeHtml(film.title)}:</b> Ya en parrilla · ${escapeHtml(compactPassLabel(planned))}</span>` : "";
+      }).filter(Boolean).join("");
+      const sections = sectionChips([...liveIds].map((id) => filmById.get(id)).filter(Boolean));
       const date = new Date(`${screening.date}T12:00:00`);
       const weekday = new Intl.DateTimeFormat("es-ES", { weekday: "short" }).format(date).replace(/\.$/, "").toLocaleUpperCase("es");
       const day = new Intl.DateTimeFormat("es-ES", { day: "2-digit" }).format(date);
@@ -781,7 +821,11 @@
 
       const slotMinutes = plannedMinutes(screening);
       const durationText = slotMinutes ? `<span class="finder-duration">${slotMinutes} min</span>` : "";
-      return `<li class="cinema-card finder-screening"><time class="finder-date" datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}"><span>${weekday}</span><b>${day}</b><small>${month}</small></time><div class="finder-screening-content"><div class="finder-screening-heading"><time datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}">${escapeHtml(screening.time)}</time><span>${escapeHtml(screening.venue)}${screening.room ? ` · ${escapeHtml(screening.room)}` : ""}</span>${durationText}</div>${screening.meetingMinutes ? `<p class="screening-meeting"><span class="meeting-icon" aria-hidden="true">🎙</span>Encuentro con el equipo</p>` : ""}${blockTitle}<div class="finder-film-titles${screening.filmIds.length > 1 ? " is-multi" : ""}">${names || `<span class="screening-film-unlinked">Título por identificar</span>`}</div>${sections}<div class="screening-tags">${access}${shared}${labels}${renderPassQuickActions(screening, { planOnly: true })}</div></div></li>`;
+      const passDetails = `${screening.meetingMinutes ? `<p class="screening-meeting"><span class="meeting-icon" aria-hidden="true">🎙</span>Encuentro con el equipo</p>` : ""}${blockTitle}<div class="finder-film-titles${filmIds.length > 1 ? " is-multi" : ""}">${names || `<span class="screening-film-unlinked">Título por identificar</span>`}</div>${sections}<div class="screening-tags">${access}${shared}${labels}${plannedNotes ? `<div class="finder-planned-notes">${plannedNotes}</div>` : ""}${renderPassQuickActions(screening, { planOnly: true })}</div>`;
+      const passContent = hasDiscardedFilm
+        ? `<details class="finder-pass-foldout"><summary><span class="finder-fold-titles">${summaryNames || "Título por identificar"}</span><span class="finder-discarded-note">${discardedFilmCount === 1 ? "Incluye 1 película descartada" : `Incluye ${discardedFilmCount} películas descartadas`} · Ver detalles</span></summary><div class="finder-pass-foldout-content">${passDetails}</div></details>`
+        : passDetails;
+      return `<li class="cinema-card finder-screening${hasDiscardedFilm ? " has-discarded-film" : ""}${hasFilmAlreadyPlanned ? " has-film-in-plan" : ""}"><time class="finder-date" datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}"><span>${weekday}</span><b>${day}</b><small>${month}</small></time><div class="finder-screening-content"><div class="finder-screening-heading"><time datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}">${escapeHtml(screening.time)}</time><span>${escapeHtml(screening.venue)}${screening.room ? ` · ${escapeHtml(screening.room)}` : ""}</span>${durationText}</div>${passContent}</div></li>`;
     }).join("") : `<li class="finder-no-results">No hay pases con estos filtros. Prueba con más días, franjas u otras sedes.</li>`;
     document.querySelector("#session-results-title").textContent = `${filtered.length} ${filtered.length === 1 ? "pase" : "pases"} · ${dateText} · ${timeText}${venueText}`;
   }
@@ -993,6 +1037,20 @@
       hasOtherEvents: hypothetical.some((item) => item.candidateId !== screening.candidateId),
     };
   }
+  function programFitRank(film, events) {
+    const selectedId = plannedScreenings.get(film.id) || events.find((event) => event.filmIds.includes(film.id))?.candidateId;
+    const candidates = selectedId ? [findScreening(selectedId)].filter(Boolean) : visiblePlanChoices(film.id);
+    if (!candidates.length) return 3;
+    return Math.min(...candidates.map((screening) => {
+      const fit = evaluatePlanChoice(screening, film.id, events);
+      return fit.conflicts.length ? 2 : fit.uncertain ? 1 : 0;
+    }));
+  }
+  function sortPlanFilms(items, events) {
+    return [...items].sort((a, b) => programFitRank(a, events) - programFitRank(b, events)
+      || Number(prioritized.has(b.id)) - Number(prioritized.has(a.id))
+      || a.title.localeCompare(b.title, "es"));
+  }
   function fitBadge(screening, filmId, events) {
     const fit = evaluatePlanChoice(screening, filmId, events);
     if (fit.conflicts.length) return `<span class="program-fit-badge is-conflict">${fit.conflicts.some((item) => item.reason === "transfer") ? "No da tiempo al traslado" : "Choca con tu parrilla"}</span>`;
@@ -1103,6 +1161,22 @@
     const intentAction = `<button class="program-intent-remove" type="button" data-program-action="remove-intent" data-film-id="${escapeHtml(film.id)}" aria-label="Quitar ${escapeHtml(film.title)} de las listas" title="Quitar de Mis listas">✕</button>`;
     return `<details class="program-film-pick${current || includedByShared ? " has-choice" : ""}">${filmPickSummary({ film, duration: filmDuration, passText: `${passCountText}${briefInfo}`, detailsLine, badgeText: summaryState, badgeClass: summaryClass, removeButton: intentAction })}<div class="program-film-options">${unselectAction}${picks}</div></details>`;
   }
+  function renderGroupedProgramFilms(container, pending, selected, events, renderFilm) {
+    const openRanks = new Map([...container.querySelectorAll(".program-subtype-fold")].map((fold) => [fold.dataset.fitRank, fold.open]));
+    const selectedOpen = container.querySelector(".program-selected-fold")?.open || false;
+    const groups = [
+      [0, "Encaja"], [1, "Por confirmar"], [2, "Choca"], [3, "Sin alternativa"],
+    ].map(([rank, label]) => {
+      const filmsInGroup = pending.filter((film) => programFitRank(film, events) === rank);
+      if (!filmsInGroup.length) return "";
+      const isOpen = openRanks.has(String(rank)) ? openRanks.get(String(rank)) : true;
+      return `<details class="program-subtype-fold" data-fit-rank="${rank}"${isOpen ? " open" : ""}><summary><span>${label}</span><b>${filmsInGroup.length}</b></summary><div class="program-subtype-films">${filmsInGroup.map(renderFilm).join("")}</div></details>`;
+    }).join("");
+    const selectedGroup = selected.length
+      ? `<details class="program-selected-fold"${selectedOpen ? " open" : ""}><summary>Ya seleccionadas <b>${selected.length}</b></summary><div class="program-selected-films">${selected.map(renderFilm).join("")}</div></details>`
+      : "";
+    return groups + selectedGroup;
+  }
   // Cada título del pase abre la ficha de su película, como en Buscar pases.
   function eventTitles(screening) {
     const filmsInPass = screening.films || [];
@@ -1112,6 +1186,55 @@
         ? `<button type="button" class="program-event-film" data-open-film="${escapeHtml(film.id)}">${escapeHtml(film.title)}</button>`
         : `<span class="program-event-film">${escapeHtml(film.title)}</span>`}`
     ).join("");
+  }
+  function accessGuidance(screening) {
+    const labels = (screening.eventLabels || []).map((label) => String(label).trim().toLocaleUpperCase("es"));
+    const officialUrl = "https://ficx.tv/festival-de-cine-de-gijon/entradas/";
+    const dayBeforeAtNoon = (date) => {
+      const previous = new Date(`${date}T12:00:00`);
+      previous.setDate(previous.getDate() - 1);
+      return `${formatProgramDate(previous.toISOString().slice(0, 10), { weekday: "long", day: "numeric", month: "long" })} a las 12:00`;
+    };
+    if (labels.includes("ACTO DE INAUGURACIÓN") || labels.includes("ACTO DE CLAUSURA")) {
+      const opening = labels.includes("ACTO DE INAUGURACIÓN");
+      const release = dayBeforeAtNoon(screening.date);
+      return {
+        label: opening ? "Acto de inauguración" : "Acto de clausura",
+        text: `Entrada numerada: se pone a la venta online y en las taquillas del Teatro Jovellanos el ${release}. No se admiten bonos, pases ni acreditaciones.`,
+        officialUrl,
+      };
+    }
+    const school = labels.includes("ESCOLARES") || screening.accessType === "conditional";
+    const press = labels.includes("PRENSA Y ACREDITADOS") || screening.accessType === "restricted";
+    const free = labels.includes("ENTRADA LIBRE") || labels.includes("ACCESO LIBRE");
+    if (school) {
+      const conflict = free ? " La ficha también marca entrada libre; confirma con el festival cuál condición prevalece." : "";
+      return {
+        label: "Sesión escolar",
+        text: `Desde el 11 de noviembre, las entradas no reservadas se venden solo online. Los grupos con reserva previa tienen prioridad de acceso y acomodación; el público individual espera a que se acomoden.${conflict}`,
+        officialUrl,
+      };
+    }
+    if (press) {
+      const pressRule = screening.venue === "Escuela de Comercio"
+        ? "En Escuela de Comercio, prensa: entrada online o en taquilla desde las 07:00 del día anterior; otras acreditaciones o bonos, desde las 19:00. Es obligatorio retirar o canjear entrada."
+        : "Hay que retirar o canjear una entrada para el pase; consulta con taquilla las condiciones de acceso de tu acreditación.";
+      const freeRule = free ? " La ficha también indica entrada libre, pero esa modalidad exige retirar entrada en taquilla el mismo día (máximo 4 por persona); confirma con el festival qué condición prevalece." : "";
+      return { label: "Prensa y acreditados", text: `${pressRule}${freeRule}`, officialUrl };
+    }
+    if (free) {
+      return { label: labels.includes("ENTRADA LIBRE") ? "Entrada libre" : "Acceso libre", text: "Aunque sea gratuita, es imprescindible retirar la entrada en taquilla el mismo día de la sesión: máximo 4 por persona.", officialUrl };
+    }
+    return null;
+  }
+  function programEntryControl(screening) {
+    const guidance = accessGuidance(screening);
+    if (guidance) {
+      return `<details class="program-access-help"><summary aria-label="Cómo acceder: ${escapeHtml(guidance.label)}" title="Cómo acceder"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v5m0-8h.01"/></svg><span>${escapeHtml(guidance.label)}</span></summary><div><p>${escapeHtml(guidance.text)} <a href="${guidance.officialUrl}" target="_blank" rel="noopener">Normas oficiales del FICX</a></p></div></details>`;
+    }
+    const owned = ownedTickets.has(screening.candidateId);
+    const name = (screening.films || []).map((film) => film.title).join(", ") || screening.title || "este pase";
+    return `<button class="program-ticket-toggle${owned ? " is-owned" : ""}" type="button" data-program-action="toggle-owned-ticket" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-pressed="${owned}" aria-label="${owned ? "Quitar la marca Tengo entrada de" : "Marcar que tienes entrada para"} ${escapeHtml(name)}" title="${owned ? "Tienes entrada" : "Tengo entrada"}"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4V5Z"/><path d="M10 6.5v7"/></svg><span>Tengo entrada</span></button>`;
   }
   function renderProgramEvent(screening, conflicts, uncertain, chosenId) {
     const conflictList = conflicts.get(screening.candidateId) || [];
@@ -1127,9 +1250,9 @@
       conflictList.length ? `<span class="program-conflict-tag">${conflictList.some((item) => item.reason === "transfer") ? "No da tiempo al traslado" : "Solapa con " + conflictList.map((item) => escapeHtml(item.screening.time)).join(", ")}</span>` : "",
       uncertain.has(screening.candidateId) || !screening.durationMinutes ? `<span class="program-duration-unknown">Duración por confirmar</span>` : "",
       screening.accessType !== "public" ? `<span class="program-access-tag">${screening.accessType === "restricted" ? "Prensa/acreditados" : "Escolares"}</span>` : "",
-      `<button class="program-ticket-toggle${ownedTickets.has(screening.candidateId) ? " is-owned" : ""}" type="button" data-program-action="toggle-owned-ticket" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-pressed="${ownedTickets.has(screening.candidateId)}" aria-label="${ownedTickets.has(screening.candidateId) ? "Quitar la marca Tengo entrada de" : "Marcar que tienes entrada para"} ${escapeHtml((screening.films || []).map((film) => film.title).join(", ") || screening.title || "este pase")}">${ownedTickets.has(screening.candidateId) ? "✓ Tengo entrada" : "Tengo entrada"}</button>`,
     ].filter(Boolean).join("");
-    return `<article class="cinema-card program-event${conflictList.length ? " has-conflict" : ""}${screening.candidateId === chosenId ? " is-demo-chosen" : ""}"><time class="program-event-time" datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}">${escapeHtml(screening.time)}</time><div class="program-event-body"><div class="program-event-venue">${escapeHtml(screening.venue)}${screening.room ? ` · ${escapeHtml(screening.room)}` : ""}${endMeta}</div>${blockTitle}<div class="program-event-films">${demoChosenTag(screening, chosenId)}${eventTitles(screening)}</div>${sectionChips((screening.filmIds || []).map((id) => filmById.get(id)).filter(Boolean), "screening-section-line program-section-line")}<div class="program-event-flags">${flags}</div></div><button class="program-calendar-event" type="button" data-program-action="calendar-event" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-haspopup="menu" aria-expanded="false" aria-label="Añadir ${escapeHtml((screening.films || []).map((film) => film.title).join(", ") || screening.title || "este pase")} al calendario" title="Añadir al calendario"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg></button><button class="program-share-event" type="button" data-program-action="share-screening" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-label="Compartir este pase" title="Compartir este pase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.6 6.8-4M8.6 13.4l6.8 4"/></svg></button><button class="program-remove-event" type="button" data-program-action="remove-program-screening" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-label="Quitar pase de ${escapeHtml((screening.films || []).map((film) => film.title).join(", "))}" title="Quitar pase"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></article>`;
+    const actionName = (screening.films || []).map((film) => film.title).join(", ") || screening.title || "este pase";
+    return `<article class="cinema-card program-event${conflictList.length ? " has-conflict" : ""}${screening.candidateId === chosenId ? " is-demo-chosen" : ""}"><time class="program-event-time" datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}">${escapeHtml(screening.time)}</time><div class="program-event-body"><div class="program-event-venue">${escapeHtml(screening.venue)}${screening.room ? ` · ${escapeHtml(screening.room)}` : ""}${endMeta}</div>${blockTitle}<div class="program-event-films">${demoChosenTag(screening, chosenId)}${eventTitles(screening)}</div>${sectionChips((screening.filmIds || []).map((id) => filmById.get(id)).filter(Boolean), "screening-section-line program-section-line")}<div class="program-event-flags">${flags}</div></div><div class="program-event-actions"><button class="program-calendar-event" type="button" data-program-action="calendar-event" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-haspopup="menu" aria-expanded="false" aria-label="Añadir ${escapeHtml(actionName)} al calendario" title="Añadir al calendario"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg></button><button class="program-share-event" type="button" data-program-action="share-screening" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-label="Compartir este pase" title="Compartir este pase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.6 6.8-4M8.6 13.4l6.8 4"/></svg></button><button class="program-remove-event" type="button" data-program-action="remove-program-screening" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-label="Quitar pase de ${escapeHtml(actionName)}" title="Quitar pase"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div><div class="program-event-controls">${programEntryControl(screening)}</div></article>`;
   }
   // Etiqueta del pase elegido en la demo del asistente (ver renderWizardTransfers). En la
   // parrilla real nunca hay pase elegido y no pinta nada.
@@ -1211,7 +1334,7 @@
     const maybeRemove = `<button class="program-intent-remove" type="button" data-program-action="remove-intent" data-film-id="${escapeHtml(film.id)}" aria-label="Quitar ${escapeHtml(film.title)} de las listas" title="Quitar de Mis listas">✕</button>`;
     // A "quizás" with a chosen pass stays listed but folds into its compact row,
     // exactly like a film in Mi lista.
-    const plannedId = plannedScreenings.get(film.id);
+    const plannedId = plannedScreenings.get(film.id) || events.find((screening) => screening.filmIds.includes(film.id))?.candidateId;
     const planned = plannedId ? findScreening(plannedId) : null;
     if (planned) {
       const duration = planned.durationMinutes ? ` · ${planned.durationMinutes} min` : "";
@@ -1280,10 +1403,10 @@
     picksPanel.classList.toggle("all-fitted", !hasPending);
     // Desktop keeps the column expanded; only the phone view folds it.
     const compactPicks = window.matchMedia("(max-width: 650px)").matches;
-    const foldState = compactPicks ? (hasWantedPending ? "pending" : "complete") : "desktop";
-    // Solo al cambiar de situación: los repintados conservan el plegado manual.
+    const foldState = compactPicks ? "mobile" : "desktop";
+    // El panel exterior no oculta las secciones individuales al completar la parrilla.
     if (picksFold.dataset.autoState !== foldState) {
-      picksFold.open = !compactPicks || hasWantedPending;
+      picksFold.open = true;
       picksFold.dataset.autoState = foldState;
     }
     updateMobileTabState();
@@ -1306,11 +1429,19 @@
       : allEvents.length
         ? `<div class="cinema-card program-empty"><h3>No hay pases ese día</h3><p>Prueba otro día para ver tu selección.</p></div>`
         : `<div class="cinema-card program-empty"><h3>Tu parrilla empieza con un pase</h3><p>Elige sesiones de las películas que has añadido. Si todavía no has guardado ninguna, vuelve a explorar.</p><button type="button" data-program-action="explore-films">Explorar películas</button></div>`;
-    document.querySelector("#program-wanted-list").innerHTML = wanted.length
-      ? [...wanted].sort((a, b) => (coverage.has(a.id) ? 1 : 0) - (coverage.has(b.id) ? 1 : 0)).map((film) => renderWantedFilmPick(film, allEvents)).join("")
+    const sortedWanted = sortPlanFilms(wanted, allEvents);
+    const pendingWanted = sortedWanted.filter((film) => !coverage.has(film.id));
+    const selectedWanted = sortedWanted.filter((film) => coverage.has(film.id));
+    const wantedList = document.querySelector("#program-wanted-list");
+    wantedList.innerHTML = wanted.length
+      ? renderGroupedProgramFilms(wantedList, pendingWanted, selectedWanted, allEvents, (film) => renderWantedFilmPick(film, allEvents))
       : `<p class="program-picks-empty">Añade películas a Mi lista desde Explorar y aparecerán aquí para encajarlas.</p>`;
-    document.querySelector("#program-maybe-list").innerHTML = maybes.length
-      ? maybes.map((film) => renderMaybeSuggestion(film, allEvents)).join("")
+    const maybeList = document.querySelector("#program-maybe-list");
+    const sortedMaybes = sortPlanFilms(maybes, allEvents);
+    const unselectedMaybes = sortedMaybes.filter((film) => !coverage.has(film.id));
+    const selectedMaybes = sortedMaybes.filter((film) => coverage.has(film.id));
+    maybeList.innerHTML = maybes.length
+      ? renderGroupedProgramFilms(maybeList, unselectedMaybes, selectedMaybes, allEvents, (film) => renderMaybeSuggestion(film, allEvents))
       : `<p class="program-picks-empty">No tienes más películas en “Quizás”.</p>`;
     updateCalendarNote();
   }
@@ -1318,7 +1449,7 @@
   // Shared-program screenings list their films with a visible separator.
   function filmTitlesSeparated(films, className) {
     return (films || []).map((film, index) =>
-      `${index ? '<span class="film-separator" aria-hidden="true">·</span>' : ""}${filmStar(film)}<span class="${className}">${escapeHtml(film.title)}</span>`
+      `${index ? '<span class="film-separator" aria-hidden="true"> / </span>' : ""}${filmStar(film)}<span class="${className}">${escapeHtml(film.title)}</span>`
     ).join("");
   }
   // Single-film passes carry no separated title list, so the star needs its own prefix.
@@ -1334,6 +1465,19 @@
   function starButtonMarkup(film, on) {
     return `<button class="film-star-button${on ? " is-on" : ""}" type="button" data-action="prioritize" data-id="${escapeHtml(film.id)}" aria-pressed="${on}" aria-label="${on ? `Quitar la prioridad a ${escapeHtml(film.title)}` : `Priorizar ${escapeHtml(film.title)} en caso de conflicto`}" title="${on ? "Quitar la prioridad" : "Priorizar en caso de conflicto"}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>`;
   }
+  function passConflictWarning(screening) {
+    const conflicts = selectedPlanEvents().filter((planned) => planned.candidateId !== screening.candidateId)
+      .map((planned) => ({ screening: planned, comparison: compareScreenings(planned, screening) }))
+      .filter((item) => item.comparison.status === "conflict");
+    if (!conflicts.length) return "";
+    const details = conflicts.map(({ screening: planned, comparison }) => {
+      const reason = comparison.reason === "same-time" ? "empieza a la misma hora"
+        : comparison.reason === "overlap" ? "se solapa en horario" : "no deja tiempo para el traslado";
+      const title = (planned.films || []).map((film) => film.title).join(", ") || planned.title || "otro pase";
+      return `<li><b>${escapeHtml(title)}</b>, ${escapeHtml(planned.time)} · ${escapeHtml(planned.venue)}: ${reason}.</li>`;
+    }).join("");
+    return `<details class="pass-conflict-warning"><summary aria-label="Ver con qué pases chocaría" title="Ver conflictos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 22 21H2L12 3Z"/><path d="M12 9v5m0 3h.01"/></svg></summary><div class="pass-conflict-popover" role="status"><b>Chocaría con tu parrilla</b><ul>${details}</ul></div></details>`;
+  }
   function renderPassQuickActions(screening, { planOnly = false } = {}) {
     const ids = Array.isArray(screening.filmIds) ? screening.filmIds : [];
     // A discarded film gets no action buttons: discarding is the final decision.
@@ -1346,16 +1490,17 @@
       : plannedStandalone.has(screening.candidateId);
     const label = planned ? "✓ En la parrilla" : "＋ A la parrilla";
     const planButton = `<button type="button" class="pass-quick is-plan${planned ? " is-done" : ""}" data-quick-action="plan" data-ids="${escapeHtml(liveIds.join(","))}" data-candidate="${escapeHtml(screening.candidateId)}" aria-pressed="${planned}">${label}</button>`;
-    if (!ids.length) return `<span class="pass-quick-actions">${planButton}</span>`;
-    if (planOnly) return `<span class="pass-quick-actions">${planButton}</span>`;
+    const conflictWarning = passConflictWarning(screening);
+    if (!ids.length) return `<span class="pass-quick-actions">${planButton}${conflictWarning}</span>`;
+    if (planOnly) return `<span class="pass-quick-actions">${planButton}${conflictWarning}</span>`;
     // Un pase compartido ofrece las dos intenciones para cada película, una por fila.
     const intentRow = (filmId) => {
       const intent = intentions.get(filmId);
       const title = filmById.get(filmId)?.title || "";
       return `<span class="pass-quick-row"><span class="pass-quick-film">${escapeHtml(title)}</span><button type="button" class="pass-quick pass-quick-want${intent === "want" ? " is-done" : ""}" data-quick-action="want" data-ids="${escapeHtml(filmId)}" aria-pressed="${intent === "want"}" aria-label="Añadir ${escapeHtml(title)} a mi lista"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m7.5 12.2 3 3 6-6.2"/></svg>Mi lista</button><button type="button" class="pass-quick pass-quick-maybe${intent === "maybe" ? " is-done" : ""}" data-quick-action="maybe" data-ids="${escapeHtml(filmId)}" aria-pressed="${intent === "maybe"}" aria-label="Marcar ${escapeHtml(title)} como quizás"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.5 6.3L21 12l-6.5 2.7L12 21l-2.5-6.3L3 12l6.5-2.7L12 3Z"/></svg>Quizás</button></span>`;
     };
-    if (liveIds.length > 1) return `<span class="pass-quick-actions">${planButton}${liveIds.map(intentRow).join("")}</span>`;
-    return `<span class="pass-quick-actions">${planButton}${intentRow(ids[0])}</span>`;
+    if (liveIds.length > 1) return `<span class="pass-quick-actions">${planButton}${conflictWarning}${liveIds.map(intentRow).join("")}</span>`;
+    return `<span class="pass-quick-actions">${planButton}${conflictWarning}${intentRow(ids[0])}</span>`;
   }
   function handleQuickAction(button) {
     const { quickAction, ids: idList, candidate } = button.dataset;
@@ -1979,12 +2124,27 @@
       const owned = ownedTickets.has(candidateId);
       button.classList.toggle("is-owned", owned);
       button.setAttribute("aria-pressed", String(owned));
-      button.textContent = owned ? "✓ Tengo entrada" : "Tengo entrada";
       const passName = (findScreening(candidateId)?.films || []).map((film) => film.title).join(", ") || findScreening(candidateId)?.title || "este pase";
       button.setAttribute("aria-label", `${owned ? "Quitar la marca Tengo entrada de" : "Marcar que tienes entrada para"} ${passName}`);
+      renderFilms();
       return;
     }
     if (programAction === "remove-program-screening") {
+      if (!button.classList.contains("is-confirming")) {
+        button.classList.add("is-confirming");
+        button.textContent = "¿Quitar?";
+        button.title = "Pulsa otra vez para confirmar";
+        button.setAttribute("aria-label", "Confirmar: quitar este pase de la parrilla");
+        clearTimeout(button._confirmTimer);
+        button._confirmTimer = setTimeout(() => {
+          button.classList.remove("is-confirming");
+          button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
+          button.title = "Quitar pase";
+          button.setAttribute("aria-label", `Quitar pase de ${(findScreening(candidateId)?.films || []).map((film) => film.title).join(", ")}`);
+        }, 2600);
+        return;
+      }
+      clearTimeout(button._confirmTimer);
       plannedStandalone.delete(candidateId);
       persistStandalone();
       for (const [plannedFilmId, plannedCandidateId] of plannedScreenings) {
@@ -3382,7 +3542,7 @@
       + wizardDemoChain(demo);
     // Los botones de la tarjeta (calendario, compartir, quitar) son de la parrilla del usuario y
     // aquí no habría nada que quitarte: la demo queda solo con lo que se lee.
-    cards.querySelectorAll(".program-event-actions, .program-calendar-event, .program-share-event, .program-remove-event, .program-ticket-toggle").forEach((button) => button.remove());
+    cards.querySelectorAll(".program-event-actions, .program-event-controls, .program-calendar-event, .program-share-event, .program-remove-event, .program-ticket-toggle, .program-access-help").forEach((button) => button.remove());
   }
   // Encadenado del día tal como lo leería «Mi programa», con las horas y sedes de los pases
   // que se ven. Solo con un pase elegido; si no, no hay nada que enseñar.
@@ -3861,6 +4021,8 @@
   window.addEventListener("resize", () => { if (!calendarPanel.hidden) positionCalendarPanel(); }, { passive: true });
   window.addEventListener("scroll", () => { if (!calendarPanel.hidden) positionCalendarPanel(); }, { passive: true });
   document.addEventListener("click", (event) => {
+    const openAccessHelp = document.querySelector(".program-access-help[open]");
+    if (openAccessHelp && !event.target.closest(".program-access-help")) openAccessHelp.open = false;
     if (calendarPanel.hidden) return;
     if (event.target.closest("#program-calendar-panel, #program-calendar-toggle")) return;
     calendarPanel.hidden = true;
