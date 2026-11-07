@@ -104,6 +104,30 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       const colors = await evaluate(`(() => {const b=document.querySelector(${JSON.stringify(selector)});const before=getComputedStyle(b).backgroundColor; b.click(); return {before,after:getComputedStyle(b).backgroundColor,pressed:b.getAttribute('aria-pressed')};})()`);
       assert.notEqual(colors.before, colors.after, `ticket state must change color at ${width}px: ${JSON.stringify(colors)}`);
     }
+    await evaluate(`(() => {const b=document.querySelector(${JSON.stringify(selector)}); if(b.getAttribute('aria-pressed')!=='true')b.click();})()`);
+    assert.equal(await evaluate(`document.querySelector('#program-ticket-filter').textContent`),'Entradas: todas');
+    await evaluate(`document.querySelector('#program-ticket-filter').click()`);
+    assert.equal(await evaluate(`document.querySelectorAll('#program-agenda .program-event').length`),1);
+    assert.equal(await evaluate(`document.querySelector('#program-ticket-filter').textContent`),'Entradas: con entrada');
+    await evaluate(`document.querySelector('#program-ticket-filter').click()`);
+    assert.equal(await evaluate(`document.querySelectorAll('#program-agenda .program-event').length`),0);
+    assert.equal(await evaluate(`document.querySelector('#program-ticket-filter').textContent`),'Entradas: sin entrada');
+    await evaluate(`document.querySelector('#program-ticket-filter').click()`);
+    assert.equal(await evaluate(`document.querySelectorAll('#program-agenda .program-event').length`),1);
+    for (const width of [320,390,650,900,1280]) {
+      await send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<=650});
+      const positions=[];
+      for (let state=0;state<3;state++) {
+        positions.push(await evaluate(`(() => {const r=document.querySelector('#program-transport').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width};})()`));
+        await evaluate(`document.querySelector('#program-ticket-filter').click()`);
+      }
+      assert.deepEqual(positions[0],positions[1],`transport must stay still at ${width}px`);
+      assert.deepEqual(positions[1],positions[2],`transport must stay still at ${width}px`);
+      await evaluate(`document.querySelector('.program-toolbar').scrollIntoView();window.scrollBy(0,-80)`);
+      await pause(100);
+      const shot=await send('Page.captureScreenshot',{format:'png'});
+      fs.writeFileSync(`/tmp/ficx-toolbar-${width}.png`,Buffer.from(shot.data,'base64'));
+    }
   } finally {
     clearTimeout(timeout);
     if (ws) ws.close();
