@@ -2179,7 +2179,7 @@
     if (programAction === "remove-program-screening") {
       if (!button.classList.contains("is-confirming")) {
         button.classList.add("is-confirming");
-        button.textContent = "¿Quitar?";
+        button.textContent = "?";
         button.title = "Pulsa otra vez para confirmar";
         button.setAttribute("aria-label", "Confirmar: quitar este pase de la parrilla");
         clearTimeout(button._confirmTimer);

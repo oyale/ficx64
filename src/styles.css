@@ -981,7 +981,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .program-panel-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; }
 .program-panel-heading .eyebrow { margin-bottom: 4px; font-size: 8px; }
 .program-panel-heading h2 { margin: 0; font-size: 27px; font-weight: 900; letter-spacing: -.045em; }
-.program-counter { display: grid; min-width: 25px; height: 25px; place-items: center; border-radius: 50%; background: var(--ok-pale); color: #fff; font-size: 11px; font-weight: 800; }
+.program-counter { display: grid; min-width: 25px; height: 25px; place-items: center; border-radius: 50%; background: var(--ok-pale); color: var(--ok); font-size: 11px; font-weight: 800; }
 .program-travel-note { margin: 9px 0 17px; color: var(--gray); font-size: 9px; line-height: 1.45; }
 .program-day { margin-top: 14px; border-top: 1px solid var(--ink); }
 .program-day > header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 0 5px; }
@@ -1001,7 +1001,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .program-event-film:hover, .program-event-film:focus-visible { color: var(--blue); text-decoration-color: #9cb5d8; }
 .program-event-flags, .program-pass-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 7px; }
 .program-event-flags:empty { display: none; }
-.program-ticket-toggle { display: inline-flex; min-height: 32px; align-items: center; gap: 7px; padding: 5px 10px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface-float); color: var(--text-body); font-size: 10px; font-weight: 750; cursor: pointer; }
+.program-ticket-toggle { display: inline-flex; min-height: 36px; align-items: center; gap: 7px; padding: 5px 10px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface-float); color: var(--text-body); font-size: 10px; font-weight: 750; cursor: pointer; }
 .program-ticket-toggle::before { display: none; }
 .program-ticket-toggle svg { width: 15px; height: 15px; flex: 0 0 15px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
 .program-ticket-toggle:hover { color: var(--green-deep); }
@@ -1082,7 +1082,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .program-access-help > summary:hover, .program-access-help[open] > summary { border-color: var(--blue); background: var(--blue-pale); color: var(--blue-deep); }
 .program-access-help > summary svg { width: 18px; height: 18px; }
 .program-access-help > summary span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
-.program-event-control .program-access-help > summary { display: inline-flex; width: 116px; min-width: 116px; min-height: 44px; height: 44px; align-items: center; justify-content: center; gap: 9px; padding: 0 14px; border-radius: 999px; }
+.program-event-control .program-access-help > summary { display: inline-flex; width: 116px; min-width: 116px; min-height: 36px; height: 36px; align-items: center; justify-content: center; gap: 9px; padding: 0 14px; border-radius: 999px; }
 .program-event-control .program-access-help > summary span { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: nowrap; font-size: 10px; font-weight: 750; }
 .program-access-help > div { position: absolute; top: calc(100% + 8px); right: 0; z-index: 10; display: none; width: min(340px, calc(100vw - 48px)); max-height: min(220px, 45vh); overflow: auto; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-float); box-shadow: 0 8px 24px var(--shadow); color: var(--text-body); font-size: 10px; line-height: 1.4; pointer-events: auto; }
 .program-access-help[open] > div { display: block; }
@@ -1385,7 +1385,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .film-expanded .screening-meeting { font-size: 11px; }
   .film-expanded .intent-button { min-height: 48px; font-size: 12px; }
   .film-expanded .intent-copy small { font-size: 9px; }
-  .film-detail-poster.poster-has-image::after { background: linear-gradient(180deg, transparent 38%, rgba(3, 15, 36, .18) 64%, rgba(3, 15, 36, .72) 100%); }
+  .film-detail-poster.poster-has-image::after { background: linear-gradient(180deg, transparent 25%, rgba(3, 15, 36, .16) 42%, rgba(3, 15, 36, .58) 62%, rgba(3, 15, 36, .78) 100%); }
   .poster-image { object-fit: contain; }
   .poster-topline, .poster-edition { opacity: .9; }
   .poster-bolt { top: 13px; right: -9px; width: 92px; height: 130px; opacity: .13; }
@@ -1411,8 +1411,9 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .film-actions .intent-discard > svg { flex-basis: 22px; width: 22px; height: 22px; }
   .poster-mobile-metadata h2 { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
   /* La estrella va anclada: su aparición no puede mover el título ni una línea. */
-  .poster-mobile-metadata h2 { position: relative; padding-right: 38px; min-height: 36px; align-items: flex-start; }
+  .poster-mobile-metadata h2 { position: relative; padding-right: 38px; min-height: 32px; margin-bottom: 0; align-items: flex-start; }
   .poster-mobile-metadata .film-star-button { position: absolute; top: 0; right: 0; width: 32px; height: 32px; margin: 0; color: inherit; }
+  .poster-mobile-metadata .film-star-button { filter: drop-shadow(0 1px 2px rgba(3, 15, 36, .5)); }
   .poster-mobile-metadata .film-star-button:hover { background: rgba(127, 127, 127, .18); }
   .poster-mobile-metadata .film-star-button.is-on { color: #ffd964; }
   /* Barra de acciones fija dentro del diálogo (no de la página): siempre a la vista. */
@@ -2087,7 +2088,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .program-event-actions { position: absolute; top: 7px; right: 7px; z-index: 3; display: grid; grid-column: auto; gap: 6px; }
   .program-calendar-event, .program-share-event, .program-remove-event { position: static; width: 36px; height: 36px; margin: 0; }
   .program-remove-event { position: absolute; top: 7px; right: 7px; bottom: auto; width: 34px; height: 34px; margin: 0; }
-  .program-remove-event.is-confirming { width: auto; min-width: 82px; padding: 0 8px; font-size: 11px; font-weight: 800; }
+  .program-remove-event.is-confirming { width: 36px; min-width: 36px; height: 36px; padding: 0; font-size: 17px; font-weight: 900; line-height: 1; }
   .program-event-actions .program-remove-event { position: static; width: 36px; height: 36px; }
   .program-event-control .program-ticket-toggle { display: grid; width: 44px; min-width: 44px; min-height: 44px; height: 44px; place-items: center; padding: 0; }
   .program-event-control .program-ticket-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
@@ -2149,6 +2150,29 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .program-event-actions .program-calendar-event, .program-event-actions .program-share-event, .program-event-actions .program-remove-event { width: 36px; height: 36px; }
   .program-event-control .program-ticket-toggle { display: grid; width: 36px; min-width: 36px; min-height: 36px; height: 36px; place-items: center; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface-float); color: var(--text-muted); }
   .program-event-control .program-ticket-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+}
+
+/* En escritorio estrecho, las acciones comparten una columna fija y el
+   control de entrada queda debajo sin abrir una fila ni invadir el texto. */
+@media (min-width: 651px) and (max-width: 1100px) {
+  .program-event { min-height: 124px; grid-template-columns: 48px minmax(0, 1fr); gap: 0 10px; padding: 12px 145px 12px 22px; }
+  .program-event-time { grid-column: 1; grid-row: 1; padding-top: 1px; font-size: 19px; }
+  .program-event-body { grid-column: 2; grid-row: 1; min-width: 0; }
+  .program-event-control { position: absolute; top: 51px; right: 7px; left: auto; grid-column: auto; grid-row: auto; display: flex; width: max-content; min-width: 116px; min-height: 44px; margin: 0; justify-content: flex-end; }
+  .program-event-actions { position: absolute; top: 7px; right: 7px; z-index: 3; display: flex; grid-column: auto; grid-row: auto; gap: 8px; }
+  .program-event-actions .program-calendar-event,
+  .program-event-actions .program-share-event,
+  .program-event-actions .program-remove-event { width: 36px; height: 36px; }
+  .program-event-control .program-ticket-toggle { display: inline-flex; width: max-content; min-width: 116px; min-height: 36px; height: 36px; align-items: center; justify-content: center; padding: 0 10px; border-radius: 999px; white-space: nowrap; }
+  .program-event-control .program-ticket-toggle span { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: nowrap; }
+  .program-event-control .program-access-help > summary { width: 116px; min-width: 116px; min-height: 36px; height: 36px; padding: 0 10px; }
+  .program-event-control .program-access-help > summary span { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: nowrap; }
+}
+
+/* En escritorio, los pases sin etiquetas reservan su altura para que las
+   tarjetas alineen aunque algunas tengan información de acceso adicional. */
+@media (min-width: 651px) {
+  .program-event-flags:empty { display: flex; visibility: hidden; min-height: 20px; }
 }
 
 /* Firefox: los pasos largos deben desbordar dentro del scroll, sin encogerse

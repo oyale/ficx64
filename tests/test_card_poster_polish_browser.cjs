@@ -67,8 +67,10 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       await pause(50);
     }
     await evaluate(`document.querySelectorAll('dialog[open]').forEach(d => d.close());document.querySelector('#go-program').click()`);
-    const controlState = async (selector) => evaluate(`(() => {const card=document.querySelector(${JSON.stringify(selector)});const control=card?.querySelector('.program-event-control');const info=control?.querySelector('.program-access-help > summary');const ticket=control?.querySelector('.program-ticket-toggle');const time=card?.querySelector('.program-event-time');const actions=card?.querySelector('.program-event-actions');const cr=card?.getBoundingClientRect(),ir=info?.getBoundingClientRect(),tr=ticket?.getBoundingClientRect(),hr=time?.getBoundingClientRect(),ar=actions?.getBoundingClientRect(),pr=control?.getBoundingClientRect();return {card:cr&&{left:cr.left,right:cr.right,top:cr.top,bottom:cr.bottom},info:ir&&{left:ir.left,right:ir.right,top:ir.top,bottom:ir.bottom,width:ir.width,height:ir.height},ticket:tr&&{left:tr.left,right:tr.right,top:tr.top,bottom:tr.bottom,width:tr.width,height:tr.height},time:hr&&{left:hr.left,right:hr.right,top:hr.top,bottom:hr.bottom},actions:ar&&{left:ar.left,right:ar.right,top:ar.top,bottom:ar.bottom},control:pr&&{left:pr.left,right:pr.right,top:pr.top,bottom:pr.bottom},height:cr?.height};})()`);
-    for (const width of [1440, 900, 650, 390]) {
+    const counterColor = await evaluate(`getComputedStyle(document.querySelector('#wanted-unplanned-count')).color`);
+    assert.notEqual(counterColor, 'rgb(255, 255, 255)', `programme list counter should contrast with its pale background: ${counterColor}`);
+    const controlState = async (selector) => evaluate(`(() => {const card=document.querySelector(${JSON.stringify(selector)});const control=card?.querySelector('.program-event-control');const info=control?.querySelector('.program-access-help > summary');const ticket=control?.querySelector('.program-ticket-toggle');const time=card?.querySelector('.program-event-time');const body=card?.querySelector('.program-event-body');const actions=card?.querySelector('.program-event-actions');const cr=card?.getBoundingClientRect(),ir=info?.getBoundingClientRect(),tr=ticket?.getBoundingClientRect(),hr=time?.getBoundingClientRect(),br=body?.getBoundingClientRect(),ar=actions?.getBoundingClientRect(),pr=control?.getBoundingClientRect();return {card:cr&&{left:cr.left,right:cr.right,top:cr.top,bottom:cr.bottom},info:ir&&{left:ir.left,right:ir.right,top:ir.top,bottom:ir.bottom,width:ir.width,height:ir.height},ticket:tr&&{left:tr.left,right:tr.right,top:tr.top,bottom:tr.bottom,width:tr.width,height:tr.height},ticketRadius:ticket&&getComputedStyle(ticket).borderTopLeftRadius,time:hr&&{left:hr.left,right:hr.right,top:hr.top,bottom:hr.bottom},body:br&&{left:br.left,right:br.right,top:br.top,bottom:br.bottom},actions:ar&&{left:ar.left,right:ar.right,top:ar.top,bottom:ar.bottom},control:pr&&{left:pr.left,right:pr.right,top:pr.top,bottom:pr.bottom},height:cr?.height};})()`);
+    for (const width of [1440, 1100, 900, 801, 800, 700, 651, 650, 390]) {
       await send('Emulation.setDeviceMetricsOverride', { width, height: 1000, deviceScaleFactor: 1, mobile: width <= 650 });
       const state = await controlState('#program-agenda .program-event:has(.program-access-help)');
       assert.ok(state.info, `${width}px: access instructions should be present in their pass card`);
@@ -78,6 +80,25 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       const ticketCard = await controlState('#program-agenda .program-event:has(.program-ticket-toggle)');
       assert.ok(ticketCard.ticket && ticketCard.actions, `${width}px: ticket and action controls should both render`);
       if (width > 800) assert.ok(ticketCard.control.top >= ticketCard.actions.bottom, `desktop ticket control should sit below the actions: ${JSON.stringify(ticketCard)}`);
+      if (width >= 651 && width <= 1100) {
+        assert.ok(ticketCard.control.top >= ticketCard.actions.bottom, `${width}px: entry controls should follow the action row: ${JSON.stringify(ticketCard)}`);
+        assert.ok(ticketCard.body.right < ticketCard.control.left, `${width}px: body text must not enter the controls rail: ${JSON.stringify(ticketCard)}`);
+        assert.ok(ticketCard.ticket.width >= 116 && ticketCard.ticket.height === 36, `${width}px: ticket control should match the compact desktop action height: ${JSON.stringify(ticketCard)}`);
+        assert.equal(state.info.height, 36, `${width}px: information control should match the ticket control height`);
+        assert.notEqual(ticketCard.ticketRadius, '50%', `${width}px: wide ticket button must not inherit the old circular radius: ${JSON.stringify(ticketCard)}`);
+        assert.ok(ticketCard.ticket.right <= ticketCard.card.right && ticketCard.ticket.left >= ticketCard.body.right, `${width}px: ticket control should stay in its reserved rail: ${JSON.stringify(ticketCard)}`);
+      }
+      if (width > 1100) {
+        assert.equal(ticketCard.ticket.height, 36, `desktop ticket control should match the information control height: ${JSON.stringify(ticketCard)}`);
+        assert.equal((await controlState('#program-agenda .program-event:has(.program-access-help)')).info.height, 36);
+      }
+      if (width >= 651) {
+        const tagHeights = await evaluate(`(() => {const card=document.querySelector('#program-agenda .program-event:has(.program-ticket-toggle)'),flags=card?.querySelector('.program-event-flags');if(!card||!flags)return null;const saved=flags.innerHTML;flags.replaceChildren();const emptyHeight=card.getBoundingClientRect().height;flags.innerHTML='<span class="program-access-tag">Prensa/acreditados</span>';const taggedHeight=card.getBoundingClientRect().height;flags.innerHTML=saved;return {emptyHeight,taggedHeight,display:getComputedStyle(flags).display,visibility:getComputedStyle(flags).visibility,minHeight:parseFloat(getComputedStyle(flags).minHeight)};})()`);
+        assert.ok(tagHeights && Math.abs(tagHeights.emptyHeight - tagHeights.taggedHeight) <= 1, `${width}px: access tag presence must not change card height: ${JSON.stringify(tagHeights)}`);
+        assert.equal(tagHeights.display, 'flex');
+        assert.equal(tagHeights.visibility, 'hidden');
+        assert.ok(tagHeights.minHeight >= 20);
+      }
       if (width > 1100) {
         assert.equal(await evaluate(`document.querySelector('#program-agenda .program-access-help > summary span').textContent`), 'Entradas', 'desktop information control should use a generic label');
         const infoLayout = await evaluate(`(() => {const s=document.querySelector('#program-agenda .program-access-help > summary'),i=s.querySelector('svg').getBoundingClientRect(),t=s.querySelector('span').getBoundingClientRect();return {width:s.getBoundingClientRect().width,iconCenter:i.top+i.height/2,textCenter:t.top+t.height/2};})()`);
@@ -91,6 +112,13 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
         await evaluate(`document.querySelector('#program-agenda .program-event:has(.program-access-help) .program-access-help > summary').click()`);
       }
     }
+    const stableActions = await evaluate(`(() => {const card=document.querySelector('#program-agenda .program-event:has(.program-ticket-toggle)'),buttons=[...card.querySelectorAll('.program-event-actions button')];return {card:card.getBoundingClientRect().toJSON(),buttons:buttons.map(button=>button.getBoundingClientRect().toJSON())};})()`);
+    await evaluate(`document.querySelector('#program-agenda .program-event:has(.program-ticket-toggle) .program-remove-event').click()`);
+    const confirmingActions = await evaluate(`(() => {const card=document.querySelector('#program-agenda .program-event:has(.program-ticket-toggle)'),button=card.querySelector('.program-remove-event'),buttons=[...card.querySelectorAll('.program-event-actions button')];return {card:card.getBoundingClientRect().toJSON(),buttons:buttons.map(item=>item.getBoundingClientRect().toJSON()),label:button.getAttribute('aria-label'),text:button.textContent};})()`);
+    assert.deepEqual(confirmingActions.card, stableActions.card, 'mobile remove confirmation must not resize the pass card');
+    assert.deepEqual(confirmingActions.buttons, stableActions.buttons, 'mobile remove confirmation must not move the action column');
+    assert.match(confirmingActions.label, /Confirmar/);
+    assert.equal(confirmingActions.text, '?');
     await send('Page.addScriptToEvaluateOnNewDocument', { source: `localStorage.setItem('ficx64-remote-images-enabled-v1','false')` });
     await evaluate(`document.querySelector('#search-input').value='El debut';document.querySelector('#search-input').dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('#remote-images-toggle').checked=false;document.querySelector('#remote-images-toggle').dispatchEvent(new Event('change',{bubbles:true}));document.querySelector('[data-film-id="${withoutImage.id}"] .film-copy').click()`);
     await pause(150);
@@ -103,12 +131,14 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     await pause(300);
     await evaluate(`document.querySelector('#search-input').value='El debut';document.querySelector('#search-input').dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('#remote-images-toggle').checked=true;document.querySelector('#remote-images-toggle').dispatchEvent(new Event('change',{bubbles:true}));document.querySelector('[data-film-id="${withImage.id}"] .film-copy').click()`);
     await pause(150);
-    const withPoster = await evaluate(`(() => {const p=document.querySelector('dialog.film-expanded .film-detail-poster');if(!p)return null;return {hasImage:p.classList.contains('poster-has-image'),gradient:getComputedStyle(p,'::after').backgroundImage,metadataBackground:getComputedStyle(p.querySelector('.poster-mobile-metadata')).backgroundImage};})()`);
+    const withPoster = await evaluate(`(() => {const p=document.querySelector('dialog.film-expanded .film-detail-poster');if(!p)return null;const metadata=p.querySelector('.poster-mobile-metadata'),title=metadata.querySelector('h2').getBoundingClientRect(),director=metadata.querySelector(':scope > p').getBoundingClientRect();return {hasImage:p.classList.contains('poster-has-image'),gradient:getComputedStyle(p,'::after').backgroundImage,metadataBackground:getComputedStyle(metadata).backgroundImage,titleDirectorGap:director.top-title.bottom};})()`);
     assert.equal(withPoster.hasImage, true, `film poster should be enabled: ${JSON.stringify(withPoster)}`);
     assert.match(withPoster.gradient, /linear-gradient/);
-    assert.match(withPoster.gradient, /0\.72/);
+    assert.match(withPoster.gradient, /0\.58/);
+    assert.match(withPoster.gradient, /0\.78/);
+    assert.ok(withPoster.titleDirectorGap <= 1, `poster title should sit close to its director: ${JSON.stringify(withPoster)}`);
     assert.equal(withPoster.metadataBackground, 'none', `poster should receive a single overlay: ${JSON.stringify(withPoster)}`);
-    console.log('Chromium card/poster checks passed at 1440, 900, 650 and 390px.');
+    console.log('Chromium card/poster checks passed at 1440, 1100, 900, 801, 800, 700, 651, 650 and 390px.');
   } finally {
     clearTimeout(timeout);
     if (ws) ws.close();
