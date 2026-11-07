@@ -62,8 +62,12 @@ class UpdateBuildTest(unittest.TestCase):
             self.assertGreater(len(html), 100_000)
             self.assertLess(len(legacy), 1024)
             self.assertIn('location.search + location.hash', legacy)
-            self.assertIn('href="./index.html" download="ficx64.html"', html)
-            self.assertNotIn('src="pdf-itinerary.js"', html)
+            self.assertIn('href="./ficx64-portable.html" download="ficx64.html"', html)
+            self.assertIn('window.FICX_PDF_BUNDLE_URL', html)
+            self.assertNotIn('jspdf', html.lower())
+            portable_default = (root / 'dist/ficx64-portable.html').read_text()
+            self.assertIn('id="ficx-pdf-bundle"', portable_default)
+            self.assertIn('jspdf', portable_default.lower())
             self.assertNotIn('/* __PDF_FONTS__ */', html)
             self.assertNotIn('/* __PDF_LOGO__ */', html)
             self.assertNotIn('sourceMappingURL=jspdf', html)
@@ -71,7 +75,8 @@ class UpdateBuildTest(unittest.TestCase):
             output = root / 'portable' / 'ficx64.html'
             subprocess.run([sys.executable, str(root / 'build.py'), '--output', str(output)],
                            check=True, capture_output=True)
-            self.assertEqual(output.read_text(), html)
+            self.assertIn('id="ficx-pdf-bundle"', output.read_text())
+            self.assertIn('jspdf', output.read_text().lower())
             self.assertFalse((output.parent / 'index.html').exists())
             pages_output = root / 'pages' / 'index.html'
             subprocess.run([sys.executable, str(root / 'build.py'), '--output', str(pages_output),

@@ -69,10 +69,13 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       await pause(50);
     }
     assert.ok(await evaluate(`!!document.querySelector('#film-list .film-title-line')`), await evaluate(`JSON.stringify({url:location.href,title:document.title,body:document.body?.innerText.slice(0,700)})`));
+    assert.equal(await evaluate(`typeof window.FICXItineraryPDF`),'undefined','the PDF engine is not parsed on the initial PWA visit');
+    assert.equal(await evaluate(`document.querySelectorAll('script[src$=".js"]').length`),0,'the PDF bundle is not inserted before export');
     const openPdfDialog = async () => {
       await evaluate(`if(document.querySelector('#program-calendar-panel').hidden) document.querySelector('#program-calendar-toggle').click(); document.querySelector('#itinerary-pdf').click()`);
       for(let i=0;i<50 && !await evaluate(`document.querySelector('#alias-dialog').open`);i++) await pause(25);
-      assert.equal(await evaluate(`document.querySelector('#alias-dialog').open`),true);
+      assert.equal(await evaluate(`document.querySelector('#alias-dialog').open`),true,
+        await evaluate(`JSON.stringify({url:location.href,buttonDisabled:document.querySelector('#itinerary-pdf')?.disabled,feedback:document.querySelector('#settings-calendar-feedback')?.textContent,passCount:document.querySelector('#program-pass-count')?.textContent,portable:!!document.querySelector('#ficx-pdf-bundle'),pdf:typeof FICXItineraryPDF})`));
     };
     const confirmPdf = async name => {
       await openPdfDialog();
@@ -129,6 +132,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     assert.equal(await evaluate(`document.querySelector('#itinerary-pdf').disabled`),false);
     await confirmPdf('Lucía');
     for(let i=0;i<200 && !fs.readdirSync(downloadDirectory).some(name=>name.endsWith('.pdf'));i++) await pause(50);
+    assert.equal(await evaluate(`typeof window.FICXItineraryPDF`),'object','the PDF engine loads on demand');
     const filename=fs.readdirSync(downloadDirectory).find(name=>name.endsWith('.pdf'));
     assert.equal(filename,'ficx64-itinerario-lucia.pdf');
     const pdf=path.join(downloadDirectory,filename);
@@ -156,7 +160,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     assert.equal(await evaluate(`localStorage.getItem('ficx64-planned-screenings-v1')`),plansBefore);
     // The downloaded standalone HTML must not depend on sibling assets or a service worker.
     const portable=path.join(downloadDirectory,'portable.html');
-    fs.copyFileSync(path.join(root,'index.html'),portable);
+    fs.copyFileSync(path.join(root,'ficx64-portable.html'),portable);
     const seed = `localStorage.setItem('ficx64-planned-screenings-v1',${JSON.stringify(JSON.stringify(plan))});
       localStorage.setItem('ficx64-film-intentions-v2',${JSON.stringify(JSON.stringify(Object.fromEntries(Object.keys(plan).map(id=>[id,'want']))))});
       localStorage.setItem('ficx64-planned-standalone-v1',${JSON.stringify(JSON.stringify(standalone?[standalone.candidateId]:[]))});
@@ -165,8 +169,10 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     await send('Page.navigate',{url:pathToFileURL(portable).href});
     for(let i=0;i<100;i++) { if(await evaluate(`document.querySelector('#nav-plan-count')?.textContent===${JSON.stringify(String(expected.length))}`)) break; await pause(50); }
     await evaluate(`document.querySelectorAll('dialog[open]').forEach(d=>d.close());document.querySelector('#go-program').click();document.querySelector('#program-calendar-toggle').click()`);
+    assert.equal(await evaluate(`typeof window.FICXItineraryPDF`),'undefined','the portable PDF engine remains dormant until export');
     await confirmPdf('');
     for(let i=0;i<200 && !fs.existsSync(path.join(downloadDirectory,'ficx64-itinerario.pdf'));i++) await pause(50);
+    assert.equal(await evaluate(`typeof window.FICXItineraryPDF`),'object','the portable HTML activates its embedded PDF engine on demand');
     assert.equal(fs.existsSync(path.join(downloadDirectory,'ficx64-itinerario.pdf')),true,await evaluate(`JSON.stringify({url:location.href,button:document.querySelector('#itinerary-pdf')?.disabled,feedback:document.querySelector('#settings-calendar-feedback')?.textContent,count:document.querySelector('#program-pass-count')?.textContent,pdf:typeof FICXItineraryPDF,alias:localStorage.getItem('ficx64-alias-v1')})`));
     const anonymousText=require('node:child_process').execFileSync('pdftotext',['-layout',path.join(downloadDirectory,'ficx64-itinerario.pdf'),'-'],{encoding:'utf8'});
     assert.ok(anonymousText.includes('Tu itinerario'));

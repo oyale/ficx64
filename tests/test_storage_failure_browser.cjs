@@ -67,6 +67,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     assert.equal(await evaluate(`document.querySelector('#storage-warning').getAttribute('role')`), 'alert');
     for (const [width, height] of [[390,844],[844,390],[1280,800]]) {
       await send('Emulation.setDeviceMetricsOverride', {width,height,deviceScaleFactor:1,mobile:width<900});
+      await pause(100); // Let Chromium finish the modal/popover reflow at the new viewport.
       const layout = await evaluate(`(() => { const w=document.querySelector('#storage-warning'); const b=w.querySelector('button');
         const r=b.getBoundingClientRect();return {width:w.getBoundingClientRect().width, height:r.height, visible:w.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))}; })()`);
       assert.ok(layout.width <= width && layout.height >= 44 && layout.visible, JSON.stringify(layout));

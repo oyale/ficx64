@@ -22,7 +22,16 @@
       // Sin preferencia guardada se sigue al sistema.
       var savedTheme = localStorage.getItem("ficx64-theme-v1");
       if (savedTheme === "dark" || savedTheme === "light") document.documentElement.dataset.theme = savedTheme;
-    } catch (_) {}
+      var onboardingDone = localStorage.getItem("ficx64-onboarding-done-v1") === "true";
+      var hasSavedChoices = ["ficx64-film-intentions-v2", "ficx64-saved-film-ids-v1", "ficx64-planned-screenings-v1", "ficx64-discarded-v1", "ficx64-prioritized-v1", "ficx64-owned-tickets-v1"]
+        .some(function (key) {
+          try {
+            var value = JSON.parse(localStorage.getItem(key) || "null");
+            return Array.isArray(value) ? value.length > 0 : Boolean(value && Object.keys(value).length);
+          } catch (_) { return false; }
+        });
+      if (!onboardingDone && !hasSavedChoices) document.documentElement.dataset.onboardingPending = "";
+    } catch (_) { document.documentElement.dataset.onboardingPending = ""; }
   </script>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -99,8 +108,8 @@
               <p class="wizard-hint">Son los pases escolares y de prensa y acreditados. Con «Sí» también aparecen en el catálogo y se pueden elegir.</p>
             </fieldset>
             <fieldset class="wizard-field">
-              <legend>¿Cómo te llamas? <small>(opcional)</small></legend>
-              <input type="text" class="wizard-name-input" id="wizard-name" maxlength="40" autocomplete="nickname" placeholder="Tu nombre o apodo">
+              <legend id="wizard-name-legend">¿Cómo te llamas? <small>(opcional)</small></legend>
+              <input type="text" class="wizard-name-input" id="wizard-name" aria-labelledby="wizard-name-legend" maxlength="40" autocomplete="nickname" placeholder="Tu nombre o apodo">
               <p class="wizard-hint">Solo para nombrar lo que compartas o descargues. Si lo dejas vacío, no pasa nada.</p>
             </fieldset>
           </section>
@@ -192,7 +201,7 @@
       <span class="masthead-divider" aria-hidden="true"></span>
       <button class="masthead-settings theme-toggle" id="theme-toggle" type="button" aria-label="Cambiar de tema" title="Cambiar de tema"><span class="theme-toggle-icon" aria-hidden="true"></span></button>
       <button class="masthead-settings" id="help-toggle" type="button" data-screen="help" aria-label="Ayuda" title="Ayuda"><span class="settings-icon" aria-hidden="true">?</span><span class="settings-label">Ayuda</span></button>
-      <button class="masthead-settings" id="extras-toggle" type="button" aria-expanded="false" aria-controls="extras-panel"><span class="settings-icon" aria-hidden="true">⚙</span><span class="settings-label">Ajustes</span></button>
+      <button class="masthead-settings" id="extras-toggle" type="button" aria-label="Ajustes" aria-expanded="false" aria-controls="extras-panel"><span class="settings-icon" aria-hidden="true">⚙</span><span class="settings-label">Ajustes</span></button>
     </header>
 
     <main>
@@ -300,7 +309,9 @@
               <div class="filter-summary" id="filter-summary" hidden><span>Filtros activos</span><button class="clear-filters" id="clear-filters" type="button">Limpiar</button></div>
             </div>
             <section id="section-subfilters" class="section-subfilters" aria-label="Afinar resultados" hidden></section>
-            <ol class="film-list" id="film-list" aria-live="polite"></ol>
+            <ol class="film-list" id="film-list"></ol>
+            <p class="film-list-progress" id="film-list-progress" role="status" aria-live="polite"></p>
+            <button class="film-list-more" id="film-list-more" type="button" aria-controls="film-list" hidden>Ver más películas</button>
             <p class="empty-state" id="empty-state" hidden>No encontramos películas con esos filtros. Prueba otro título o sección.</p>
           </div>
 
@@ -415,7 +426,7 @@
             <p id="help-local-app" hidden><b>Estás usando la versión en archivo HTML.</b> Esta copia no se actualiza automáticamente. Puedes descargar otra cuando quieras renovar el catálogo.</p>
             <p>Tus listas y tu parrilla se guardan aquí, sin cuenta ni sincronización automática. Para conservar una copia o llevarlas a otro dispositivo, usa <b>Exportar tu programa</b> en Ajustes. Hazlo también antes de borrar los datos de la app.</p>
             <div id="help-download-app">
-              <a class="help-download-app" href="./index.html" download="ficx64.html">Descargar la app en un archivo HTML ↗</a>
+              <a class="help-download-app" href="./ficx64-portable.html" download="ficx64.html">Descargar la app en un archivo HTML ↗</a>
               <p id="help-download-description">Otra forma de usarla sin conexión, sin instalarla. El archivo incluye el catálogo, pero no tus listas ni tu parrilla, y no se actualiza automáticamente. Tus elecciones se exportan por separado desde Ajustes.</p>
             </div>
           </div>
