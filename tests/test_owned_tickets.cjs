@@ -57,7 +57,9 @@ test('personal import merges valid ticket marks without propagating them as shar
 });
 
 test('only the itinerary PDF snapshot receives the private ticket state', () => {
-  assert.match(source, /ownedTickets\.has\(screening\.candidateId\) \? "Tengo entrada"/);
+  const snapshot = source.slice(source.indexOf('function buildItineraryDocument'), source.indexOf('function buildCalendar'));
+  assert.match(snapshot, /ticketOwned: ownedTickets\.has\(screening\.candidateId\)/);
+  assert.match(fs.readFileSync('src/pdf-itinerary.js', 'utf8'), /event\.ticketDisplay === "owned" && event\.ticketOwned/);
   const sharedLink = source.slice(source.indexOf('async function sharePassLink'), source.indexOf('window.sharePassLink'));
   assert.doesNotMatch(sharedLink, /ownedTickets/);
 });

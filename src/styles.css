@@ -989,16 +989,18 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .program-day > header span { color: var(--gray); font-size: 8px; font-weight: 700; }
 .program-day-events { display: grid; gap: 7px; }
 .program-event { position: relative; min-width: 0; display: grid; grid-template-columns: 62px minmax(0, 1fr) repeat(3, 36px); align-items: start; gap: 8px; padding: 12px; border: 1px solid #d8e2ef; background: var(--surface-float); }
-.program-event:has(.program-access-help[open]) { z-index: 30; padding-bottom: 84px; }
+.program-event:has(.program-access-help[open]) { z-index: 30; }
 .program-event.has-conflict { border-color: #dc8a26; background: #fff7eb; }
 .program-event-time { padding-top: 2px; color: var(--blue-deep); font-size: 21px; font-weight: 900; font-variant-numeric: tabular-nums; }
 .program-event-body { min-width: 0; }
+.program-event-control { position: relative; z-index: 5; grid-column: 3 / 6; grid-row: 2; display: flex; justify-content: flex-end; min-width: 36px; min-height: 36px; }
 .program-event-venue { color: var(--text-body); font-size: 9px; font-weight: 700; }
 .program-event-end { margin-left: 5px; color: var(--text-muted); font-weight: 600; font-variant-numeric: tabular-nums; }
 .program-event-films { display: block; margin-top: 5px; line-height: 1.3; }
 .program-event-film { padding: 0; border: 0; background: transparent; color: var(--ink); cursor: pointer; font-size: 11px; font-weight: 800; text-align: left; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; transition: color .15s, text-decoration-color .15s; }
 .program-event-film:hover, .program-event-film:focus-visible { color: var(--blue); text-decoration-color: #9cb5d8; }
 .program-event-flags, .program-pass-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 7px; }
+.program-event-flags:empty { display: none; }
 .program-ticket-toggle { display: inline-flex; min-height: 32px; align-items: center; gap: 7px; padding: 5px 10px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface-float); color: var(--text-body); font-size: 10px; font-weight: 750; cursor: pointer; }
 .program-ticket-toggle::before { display: none; }
 .program-ticket-toggle svg { width: 15px; height: 15px; flex: 0 0 15px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
@@ -1048,12 +1050,10 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .program-film-fit.is-clear { background: var(--ok-pale); color: var(--ok); }
 .program-film-fit.is-selected { background: #ddf3e6; color: var(--ok); border: 1px solid #b9e2c8; }
 /* Calendar shortcut per pass: same footprint as the delete button, quieter. */
-.program-event-actions { grid-column: 3 / 6; display: flex; justify-content: flex-end; gap: 8px; }
+.program-event-actions { grid-column: 3 / 6; grid-row: 1; display: flex; justify-content: flex-end; gap: 8px; }
 .program-event-actions .program-remove-event { order: 0; }
 .program-event-actions .program-calendar-event { order: 1; }
 .program-event-actions .program-share-event { order: 2; }
-.program-event-controls { grid-column: 3 / 6; grid-row: 2; justify-self: end; min-width: 0; }
-.program-event > .program-event-controls:has(.program-access-help) { position: absolute; inset: 0; z-index: 4; width: auto; justify-self: stretch; grid-column: auto; grid-row: auto; pointer-events: none; }
 .program-calendar-event, .program-share-event { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; margin: 0; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-float); color: var(--icon-action); cursor: pointer; transition: background-color .15s, border-color .15s, color .15s; }
 .program-calendar-event:hover { border-color: var(--green); background: var(--green-pale); color: var(--green-deep); }
 .program-share-event:hover { border-color: var(--cyan); background: var(--cyan-pale); color: #00786b; }
@@ -1075,14 +1075,16 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .program-remove-event { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid #f2c6c0; border-radius: 8px; background: var(--danger-pale); color: var(--danger); cursor: pointer; transition: background-color .15s, border-color .15s; }
 .program-remove-event:hover { background: #f7d5d1; border-color: #ecb0a9; }
 .program-remove-event svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.program-access-help { display: contents; }
-.program-access-help > summary { position: absolute; top: 53px; left: 35px; display: grid; width: 36px; min-height: 36px; height: 36px; place-items: center; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface); color: var(--text-muted); cursor: pointer; list-style: none; pointer-events: auto; }
+.program-access-help { position: relative; display: block; }
+.program-access-help > summary { position: static; display: grid; width: 36px; min-height: 36px; height: 36px; place-items: center; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface); color: var(--text-muted); cursor: pointer; list-style: none; }
 .program-access-help > summary::-webkit-details-marker { display: none; }
 .program-access-help > summary svg { width: 15px; height: 15px; flex: 0 0 15px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
 .program-access-help > summary:hover, .program-access-help[open] > summary { border-color: var(--blue); background: var(--blue-pale); color: var(--blue-deep); }
 .program-access-help > summary svg { width: 18px; height: 18px; }
 .program-access-help > summary span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
-.program-access-help > div { position: absolute; right: 12px; bottom: 9px; left: 82px; display: none; width: auto; max-height: none; overflow: visible; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--text-body); font-size: 10px; line-height: 1.35; pointer-events: auto; }
+.program-event-control .program-access-help > summary { display: inline-flex; width: 116px; min-width: 116px; min-height: 44px; height: 44px; align-items: center; justify-content: center; gap: 9px; padding: 0 14px; border-radius: 999px; }
+.program-event-control .program-access-help > summary span { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: nowrap; font-size: 10px; font-weight: 750; }
+.program-access-help > div { position: absolute; top: calc(100% + 8px); right: 0; z-index: 10; display: none; width: min(340px, calc(100vw - 48px)); max-height: min(220px, 45vh); overflow: auto; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-float); box-shadow: 0 8px 24px var(--shadow); color: var(--text-body); font-size: 10px; line-height: 1.4; pointer-events: auto; }
 .program-access-help[open] > div { display: block; }
 .program-access-help > div p { margin: 0; }
 .program-access-help > div a { color: var(--blue-deep); font-weight: 750; text-decoration: underline; }
@@ -1383,15 +1385,16 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .film-expanded .screening-meeting { font-size: 11px; }
   .film-expanded .intent-button { min-height: 48px; font-size: 12px; }
   .film-expanded .intent-copy small { font-size: 9px; }
-  .film-detail-poster::after { background: linear-gradient(180deg, rgba(3, 15, 36, .04) 20%, rgba(3, 15, 36, .12) 43%, rgba(3, 15, 36, .94) 100%); }
+  .film-detail-poster.poster-has-image::after { background: linear-gradient(180deg, transparent 38%, rgba(3, 15, 36, .18) 64%, rgba(3, 15, 36, .72) 100%); }
   .poster-image { object-fit: contain; }
   .poster-topline, .poster-edition { opacity: .9; }
   .poster-bolt { top: 13px; right: -9px; width: 92px; height: 130px; opacity: .13; }
   .poster-format-badge { position: absolute; z-index: 2; top: 48px; left: 13px; margin: 0; }
-  .poster-mobile-metadata { position: absolute; z-index: 2; right: 0; bottom: 0; left: 0; display: block; padding: 48px 16px 15px; color: white; background: linear-gradient(180deg, transparent, rgba(3, 15, 36, .96) 45%); }
+  .poster-mobile-metadata { position: absolute; z-index: 2; right: 0; bottom: 0; left: 0; display: block; padding: 48px 16px 15px; color: white; background: transparent; }
+  .film-detail-poster:not(.poster-has-image) .poster-mobile-metadata { position: relative; right: auto; bottom: auto; left: auto; margin-top: auto; padding: 16px 2px 0; color: var(--poster-ink); }
   .poster-mobile-metadata h2 { margin: 0 0 3px; font-size: clamp(21px, 6vw, 29px); font-weight: 900; letter-spacing: -.035em; line-height: 1.02; overflow-wrap: anywhere; }
-  .poster-mobile-metadata > p { margin: 0; color: #edf4ff; font-size: 11px; line-height: 1.35; }
-  .poster-mobile-facts { display: block; margin-top: 4px; color: #d7e5f8; font-size: 10px; font-weight: 700; }
+  .poster-mobile-metadata > p { margin: 0; color: inherit; font-size: 11px; line-height: 1.35; }
+  .poster-mobile-facts { display: block; margin-top: 4px; color: inherit; font-size: 10px; font-weight: 700; }
   .poster-mobile-sections { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
   /* En móvil las etiquetas ya van sobre la carátula: repetirlas bajo la imagen sobra. */
   .film-detail-badges { display: none; }
@@ -1409,8 +1412,8 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .poster-mobile-metadata h2 { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
   /* La estrella va anclada: su aparición no puede mover el título ni una línea. */
   .poster-mobile-metadata h2 { position: relative; padding-right: 38px; min-height: 36px; align-items: flex-start; }
-  .poster-mobile-metadata .film-star-button { position: absolute; top: 0; right: 0; width: 32px; height: 32px; margin: 0; color: white; }
-  .poster-mobile-metadata .film-star-button:hover { background: rgba(255, 255, 255, .18); }
+  .poster-mobile-metadata .film-star-button { position: absolute; top: 0; right: 0; width: 32px; height: 32px; margin: 0; color: inherit; }
+  .poster-mobile-metadata .film-star-button:hover { background: rgba(127, 127, 127, .18); }
   .poster-mobile-metadata .film-star-button.is-on { color: #ffd964; }
   /* Barra de acciones fija dentro del diálogo (no de la página): siempre a la vista. */
   .film-expanded { padding-bottom: 88px; }
@@ -1809,6 +1812,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   /* El póster generado mantiene su color: solo se atenúa un poco.
      Las fotos reales no se tocan (el filtro va solo en el contenedor sin imagen). */
   :root:not([data-theme="light"]) .film-detail-poster:not(.poster-has-image) { filter: brightness(.92); }
+  :root:not([data-theme="light"]) .film-detail-poster:not(.poster-has-image) .poster-mobile-metadata { color: var(--poster-ink); }
   :root:not([data-theme="light"]) .share-toast { color: #ffffff; }
 }
 /* El atributo manda también con el sistema en claro. */
@@ -1851,6 +1855,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 :root[data-theme="dark"] .shared-pass.is-listed { background: var(--ok-pale); border-color: var(--ok); }
 :root[data-theme="dark"] .shared-pass.is-blocked { background: var(--surface-raised); }
 :root[data-theme="dark"] .film-detail-poster:not(.poster-has-image) { filter: brightness(.92); }
+:root[data-theme="dark"] .film-detail-poster:not(.poster-has-image) .poster-mobile-metadata { color: var(--poster-ink); }
 :root[data-theme="dark"] .share-toast { color: #ffffff; }
 
 /* Selector de tema. El botón activo va sobre --blue, cuyo relleno es claro en
@@ -2074,8 +2079,8 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .program-event-films { margin-top: 5px; line-height: 1.35; }
   .program-event-film { color: var(--ink); font-size: 18px; font-weight: 850; letter-spacing: -.02em; line-height: 1.18; text-decoration-color: #c3d3e8; text-underline-offset: 3px; }
   .program-event-flags, .program-pass-meta { gap: 5px; margin-top: 6px; }
-  .program-event > .program-event-controls { position: absolute; top: 39px; left: 0; z-index: 4; min-width: 0; grid-column: 1; grid-row: 1; justify-self: start; }
-  .program-ticket-toggle { display: grid; width: 36px; min-height: 36px; height: 36px; place-items: center; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface-float); color: var(--text-muted); }
+  .program-event-flags { position: static; display: flex; grid-column: 1; margin-top: 6px; }
+  .program-event-control { position: static; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; min-height: 44px; margin: 7px 0 0 calc((48px - 44px) / 2); }
   .program-ticket-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
   .program-ticket-toggle svg { width: 18px; height: 18px; flex: 0 0 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
   .program-ticket-toggle.is-owned { border-color: #9bd8c9; background: var(--green-pale); color: var(--green-deep); }
@@ -2084,20 +2089,18 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .program-remove-event { position: absolute; top: 7px; right: 7px; bottom: auto; width: 34px; height: 34px; margin: 0; }
   .program-remove-event.is-confirming { width: auto; min-width: 82px; padding: 0 8px; font-size: 11px; font-weight: 800; }
   .program-event-actions .program-remove-event { position: static; width: 36px; height: 36px; }
-  .program-event-controls .program-access-help > summary { width: 36px; min-height: 36px; height: 36px; }
-  .program-event > .program-event-controls:has(.program-access-help) { position: absolute; inset: 0; grid-column: auto; grid-row: auto; }
-  .program-access-help > summary { top: 52px; left: 28px; width: 36px; height: 36px; }
-  .program-access-help > div { right: 56px; bottom: 8px; left: 80px; font-size: 9px; line-height: 1.3; }
+  .program-event-control .program-ticket-toggle { display: grid; width: 44px; min-width: 44px; min-height: 44px; height: 44px; place-items: center; padding: 0; }
+  .program-event-control .program-ticket-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+  .program-event-control .program-access-help > summary { width: 44px; min-width: 44px; min-height: 44px; height: 44px; padding: 0; }
+  .program-event-control .program-access-help > summary span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+  .program-event-control .program-access-help > div { position: fixed; inset: auto 8px calc(76px + env(safe-area-inset-bottom)); width: auto; max-height: min(42dvh, 320px); font-size: 12px; }
 }
 @media (max-width: 374px) {
   .program-event { min-height: 124px; grid-template-columns: 42px minmax(0, 1fr); gap: 0 8px; padding-right: 46px; }
-  .program-event > .program-event-controls { left: 0; }
   .program-event-actions .program-calendar-event,
   .program-event-actions .program-share-event,
-  .program-event-actions .program-remove-event,
-  .program-ticket-toggle,
-  .program-event-controls .program-access-help > summary { width: 32px; min-height: 32px; height: 32px; }
-  .program-access-help > summary { left: 27px; }
+  .program-event-actions .program-remove-event { width: 32px; height: 32px; }
+  .program-event-control .program-access-help > summary { width: 40px; min-height: 40px; height: 40px; }
 }
 
 /* Overrides compactos de agenda: la entrada queda alineada bajo la hora. */
@@ -2105,19 +2108,14 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .program-event-actions .program-calendar-event,
   .program-event-actions .program-share-event,
   .program-event-actions .program-remove-event { width: 36px; height: 36px; }
-  .program-event > .program-event-controls { top: 39px; left: 0; }
-  .program-event-controls .program-ticket-toggle { display: grid; width: 44px; min-width: 44px; min-height: 44px; height: 44px; place-items: center; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface-float); color: var(--text-muted); }
-  .program-event-controls .program-ticket-toggle.is-owned { border-color: #9bd8c9; background: var(--green-pale); color: var(--green-deep); }
-  .program-event-controls .program-ticket-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
-  .program-event-controls .program-access-help > summary { width: 36px; min-height: 36px; height: 36px; }
-  .program-event > .program-event-controls:has(.program-access-help) { position: absolute; inset: 0; grid-column: auto; grid-row: auto; }
+  .program-event-control .program-ticket-toggle { display: grid; width: 44px; min-width: 44px; min-height: 44px; height: 44px; place-items: center; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface-float); color: var(--text-muted); }
+  .program-event-control .program-ticket-toggle.is-owned { border-color: #9bd8c9; background: var(--green-pale); color: var(--green-deep); }
 }
 @media (max-width: 374px) {
   .program-event-actions .program-calendar-event,
   .program-event-actions .program-share-event,
   .program-event-actions .program-remove-event { width: 32px; height: 32px; }
-  .program-event-controls .program-ticket-toggle { width: 44px; min-width: 44px; min-height: 44px; height: 44px; }
-  .program-event-controls .program-access-help > summary { width: 32px; min-height: 32px; height: 32px; }
+  .program-event-control .program-ticket-toggle { width: 44px; min-width: 44px; min-height: 44px; height: 44px; }
 }
 
 /* La agenda usa su distribución compacta también en tablets en vertical. */
@@ -2131,17 +2129,26 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .program-event-films { margin-top: 5px; line-height: 1.35; }
   .program-event-film { font-size: 18px; font-weight: 850; line-height: 1.18; }
   .program-event-flags, .program-pass-meta { gap: 5px; margin-top: 6px; }
-  .program-event > .program-event-controls { position: absolute; top: 39px; left: 0; z-index: 4; min-width: 0; grid-column: 1; grid-row: 1; justify-self: start; }
+  .program-event-control { grid-column: 1 / -1; grid-row: 2; margin: 7px 0 0 calc((42px - 44px) / 2); }
   .program-event-actions { position: absolute; top: 7px; right: 7px; z-index: 3; display: grid; grid-column: auto; gap: 6px; }
   .program-event-actions .program-calendar-event,
   .program-event-actions .program-share-event,
   .program-event-actions .program-remove-event { width: 36px; height: 36px; }
-  .program-event-controls .program-ticket-toggle { display: grid; width: 36px; min-width: 36px; min-height: 36px; height: 36px; place-items: center; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface-float); color: var(--text-muted); }
-  .program-event-controls .program-ticket-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
-  .program-event-controls .program-access-help > summary { width: 36px; min-height: 36px; height: 36px; }
-  .program-event > .program-event-controls:has(.program-access-help) { position: absolute; inset: 0; grid-column: auto; grid-row: auto; }
-  .program-access-help > summary { top: 52px; left: 28px; }
-  .program-access-help > div { right: 56px; bottom: 8px; left: 80px; }
+  .program-event-control .program-ticket-toggle { display: grid; width: 36px; min-width: 36px; min-height: 36px; height: 36px; place-items: center; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface-float); color: var(--text-muted); }
+  .program-event-control .program-ticket-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+  .program-event-control .program-access-help > summary { width: 36px; min-height: 36px; height: 36px; }
+}
+
+/* Agenda en columnas estrechas: acciones en el borde y control bajo la hora. */
+@media (min-width: 801px) and (max-width: 1100px) {
+  .program-event { min-height: 190px; grid-template-columns: 48px minmax(0, 1fr); gap: 0 10px; padding: 12px 52px 12px 22px; }
+  .program-event-time { grid-column: 1; grid-row: 1; font-size: 19px; }
+  .program-event-body { grid-column: 2; grid-row: 1; }
+  .program-event-control { position: absolute; top: 145px; right: 7px; left: auto; grid-column: auto; grid-row: auto; width: max-content; min-width: 36px; }
+  .program-event-actions { position: absolute; top: 7px; right: 7px; z-index: 3; display: grid; grid-column: auto; gap: 6px; }
+  .program-event-actions .program-calendar-event, .program-event-actions .program-share-event, .program-event-actions .program-remove-event { width: 36px; height: 36px; }
+  .program-event-control .program-ticket-toggle { display: grid; width: 36px; min-width: 36px; min-height: 36px; height: 36px; place-items: center; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface-float); color: var(--text-muted); }
+  .program-event-control .program-ticket-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 }
 
 /* Firefox: los pasos largos deben desbordar dentro del scroll, sin encogerse

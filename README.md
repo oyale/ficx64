@@ -300,8 +300,8 @@ grouped screenings. The shared Lucía Seles / POEX screening keeps its reviewed
 descriptive heading without assigning a principal. Otherwise the official block title is kept,
 or “Programa de N películas” is used. The app never guesses a principal film at runtime. Provisional offline
 approximations are recorded explicitly and remain reviewable. Editorial decisions and
-provenance are stored with the screening data, so the review report can be regenerated
-without losing them. The build rejects a `mainFilmId` outside the linked films.
+provenance are stored with the screening data. The build rejects a `mainFilmId`
+outside the linked films.
 
 The PDF is a dated snapshot for reading or printing, not an importable data backup.
 Download it again after changing the plan. The menu points to **Ajustes → Exportar
@@ -326,21 +326,3 @@ CHROMIUM_BIN=/usr/lib/chromium/chromium node tests/test_itinerary_pdf_browser.cj
 # Preserve the downloaded browser-test sample for inspection:
 FICX_PDF_SAMPLE=/tmp/ficx-itinerary.pdf node tests/test_itinerary_pdf_browser.cjs
 ```
-
-## Reviewing principal films
-
-`review/main-films.md` lists doubtful cases first, followed by applied provisional
-approximations and the full grouped-screening inventory. The accompanying JSON
-records all screening IDs, durations, provenance and input hashes.
-
-```sh
-python3 scripts/review_main_films.py              # report only; no data changes
-python3 scripts/review_main_films.py --apply-clear # annotate clear unconfigured pairs
-```
-
-The offline helper applies only unnamed pairs with a film of at least 60 minutes,
-an accompaniment of at most 20 minutes and a ratio of at least 4:1. It never
-overwrites an existing role or chooses a lead for a named programme. These are
-proposals, not official confirmation: they are marked `mainFilmSource:
-duration-proposal`. Remove that marker (or set it to `manual`) after approval;
-remove both fields to undo the proposal. The app/build does not run this helper.
