@@ -88,6 +88,17 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     await send('Emulation.setDeviceMetricsOverride', {width:320,height:740,deviceScaleFactor:1,mobile:true});
     const narrowTargetSize = await evaluate(`({height:document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect().height,width:document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect().width})`);
     assert.ok(narrowTargetSize.width >= 44 && narrowTargetSize.height >= 44, `narrow mobile touch target must remain at least 44px: ${JSON.stringify(narrowTargetSize)}`);
+    for (const width of [320, 374, 390, 650]) {
+      await send('Emulation.setDeviceMetricsOverride', {width,height:844,deviceScaleFactor:1,mobile:true});
+      const overflow = await evaluate(`Array.from(document.querySelectorAll('#program-agenda .program-event')).flatMap(card => {
+        const bounds = card.getBoundingClientRect();
+        return Array.from(card.querySelectorAll('.program-event-actions button')).filter(button => {
+          const rect = button.getBoundingClientRect();
+          return rect.bottom > bounds.bottom || rect.right > bounds.right || rect.top < bounds.top;
+        }).map(button => button.className);
+      })`);
+      assert.deepEqual(overflow, [], `actions must fit inside cards at ${width}px`);
+    }
   } finally {
     clearTimeout(timeout);
     if (ws) ws.close();

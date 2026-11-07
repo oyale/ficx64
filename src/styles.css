@@ -2368,3 +2368,13 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .program-toolbar-options #clear-planned-screenings { min-height: 44px; font-size: 11px; color: var(--text-muted); }
 
 .program-export-note { margin: 0; padding: 11px 16px; border-top: 1px solid var(--line); color: var(--text-body); font-size: 11px; line-height: 1.5; }
+
+/* Las acciones participan en la altura de la tarjeta también en móvil. */
+@media (max-width: 650px) {
+  .program-event { grid-template-columns: 48px minmax(0, 1fr) 36px; padding-right: 7px; }
+  .program-event-control { grid-column: 1 / 3; }
+  .program-event-actions { position: static; grid-column: 3; grid-row: 1 / 3; align-self: start; }
+}
+@media (max-width: 374px) {
+  .program-event { grid-template-columns: 42px minmax(0, 1fr) 32px; }
+}
