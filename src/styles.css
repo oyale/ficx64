@@ -2396,3 +2396,24 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   background: var(--green-pale);
   color: var(--green-deep);
 }
+
+.session-filter-help > summary { width: fit-content; cursor: pointer; padding: 8px 0; color: var(--text-body); text-underline-offset: 3px; }
+.session-filter-help > summary:hover { text-decoration: underline; }
+.session-filter-help > p { margin: 4px 0 12px; }
+@media (max-width: 650px) {
+  .session-exclusions { gap: 0; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface-float); }
+  .session-exclusions .include-special-access { box-sizing: border-box; width: 100%; min-height: 48px; padding: 10px 12px; gap: 12px; color: var(--text-body); cursor: pointer; }
+  .session-exclusions .include-special-access + .include-special-access { border-top: 1px solid var(--line); }
+  .session-exclusions .include-special-access span { flex: 1; font-size: 13px; font-weight: 600; line-height: 1.4; }
+  .session-exclusions input { order: 1; margin: 0; width: 20px; height: 20px; accent-color: var(--green-deep); }
+  .session-exclusions label:has(input:checked) { background: var(--green-pale); color: var(--green-deep); }
+  .session-exclusions label:focus-within { outline: 2px solid var(--blue); outline-offset: -3px; }
+  .session-filter-help { margin: 4px 0 14px; }
+  .session-filter-help > summary { min-height: 44px; box-sizing: border-box; padding: 13px 0; }
+}
+
+.session-filter-fold { margin: 10px 0 18px; border-block: 1px solid var(--line); }
+.session-filter-fold > summary { min-height: 48px; box-sizing: border-box; padding: 14px 0; font-size: 13px; font-weight: 700; cursor: pointer; color: var(--text-body); }
+.session-filter-fold > summary span { margin-left: 10px; color: var(--text-muted); font-size: 11px; font-weight: 500; }
+.session-filter-fold:has(input:checked) > summary span { color: var(--green-deep); font-weight: 700; }
+.session-filter-fold[open] > summary { margin-bottom: 6px; }
