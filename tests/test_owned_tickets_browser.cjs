@@ -99,6 +99,11 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       })`);
       assert.deepEqual(overflow, [], `actions must fit inside cards at ${width}px`);
     }
+    for (const width of [390,700,900,1100,1280]) {
+      await send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});
+      const colors = await evaluate(`(() => {const b=document.querySelector(${JSON.stringify(selector)});const before=getComputedStyle(b).backgroundColor; b.click(); return {before,after:getComputedStyle(b).backgroundColor,pressed:b.getAttribute('aria-pressed')};})()`);
+      assert.notEqual(colors.before, colors.after, `ticket state must change color at ${width}px: ${JSON.stringify(colors)}`);
+    }
   } finally {
     clearTimeout(timeout);
     if (ws) ws.close();

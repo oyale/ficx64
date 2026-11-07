@@ -2389,3 +2389,10 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 @media (max-width: 650px) {
   .session-exclusions { flex-direction: column; }
 }
+
+/* El estado de entrada prevalece sobre el aspecto de cada distribución. */
+.program-event-control .program-ticket-toggle.is-owned {
+  border-color: #9bd8c9;
+  background: var(--green-pale);
+  color: var(--green-deep);
+}
