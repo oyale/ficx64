@@ -20,6 +20,7 @@ const SHELL = [
   "./icons/favicon.svg",
   "./icons/favicon-32.png",
   "./icons/apple-touch-icon.png",
+  "./__PDF_BUNDLE__",
 ];
 
 self.addEventListener("install", (event) => {

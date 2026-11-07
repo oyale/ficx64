@@ -69,6 +69,12 @@
   const storageKey = "ficx64-film-intentions-v2";
   const legacyStorageKey = "ficx64-saved-film-ids-v1";
   const list = document.querySelector("#film-list");
+  const filmListProgress = document.querySelector("#film-list-progress");
+  const filmListMore = document.querySelector("#film-list-more");
+  const filmBatchSize = 36;
+  const mobileFilmViewport = window.matchMedia("(max-width: 650px)");
+  let filmRenderLimit = filmBatchSize;
+  let filmListObserver = null;
   const search = document.querySelector("#search-input");
   const moreSections = document.querySelector("#more-sections");
   const sort = document.querySelector("#sort-order");
@@ -474,7 +480,11 @@
     document.querySelector("#empty-state").hidden = visible.length > 0;
     document.querySelector("#empty-state").textContent = showDiscarded ? "No has descartado ninguna película." : "No encontramos películas con esos filtros. Prueba otro título o sección.";
     renderSubfilters();
-    list.innerHTML = visible.map((film) => {
+    const expandedIndex = expandedId ? visible.findIndex((film) => film.id === expandedId) : -1;
+    const renderCount = mobileFilmViewport.matches
+      ? Math.min(visible.length, Math.max(filmRenderLimit, expandedIndex + 1))
+      : visible.length;
+    list.innerHTML = visible.slice(0, renderCount).map((film) => {
       const status = intentions.get(film.id);
       const isExpanded = expandedId === film.id;
       const tags = (film.sections || []).filter((name) => !["otras secciones", "cortometrajes"].includes(name.toLocaleLowerCase("es"))).map((name) => `<span class="film-section">${escapeHtml(name)}</span>`).join("");
@@ -553,6 +563,15 @@
         ${details}
       </li>`;
     }).join("");
+    filmListProgress.textContent = mobileFilmViewport.matches && visible.length > filmBatchSize
+      ? `Mostrando ${renderCount} de ${visible.length} películas.`
+      : visible.length ? `${visible.length} ${visible.length === 1 ? "película" : "películas"}.` : "";
+    const remaining = visible.length - renderCount;
+    filmListMore.hidden = remaining <= 0 || !mobileFilmViewport.matches;
+    filmListMore.classList.toggle("sr-only", mobileFilmViewport.matches && remaining > 0 && Boolean(filmListObserver));
+    filmListMore.textContent = remaining > 0
+      ? `Ver ${Math.min(filmBatchSize, remaining)} ${remaining === 1 ? "película" : "películas"} más`
+      : "Ver más películas";
     const detailDialog = list.querySelector("dialog.film-expanded");
     if (detailDialog) {
       detailDialog.addEventListener("cancel", (event) => {
@@ -565,6 +584,25 @@
     }
     scheduleSynopsisFit();
   }
+  filmListMore.addEventListener("click", () => {
+    if (!mobileFilmViewport.matches) return;
+    filmRenderLimit += filmBatchSize;
+    renderFilms();
+  });
+  if ("IntersectionObserver" in window) {
+    filmListObserver = new IntersectionObserver((entries) => {
+      if (!mobileFilmViewport.matches || !entries.some((entry) => entry.isIntersecting) || filmListMore.hidden) return;
+      filmRenderLimit += filmBatchSize;
+      renderFilms();
+    }, { rootMargin: "300px 0px" });
+    filmListObserver.observe(filmListProgress);
+  }
+  const onFilmViewportChange = () => {
+    filmRenderLimit = filmBatchSize;
+    renderFilms();
+  };
+  if (typeof mobileFilmViewport.addEventListener === "function") mobileFilmViewport.addEventListener("change", onFilmViewportChange);
+  else mobileFilmViewport.addListener(onFilmViewportChange);
   function renderSaved() {
     const wanted = films.filter((film) => intentions.get(film.id) === "want");
     const maybes = films.filter((film) => intentions.get(film.id) === "maybe");
@@ -1895,7 +1933,7 @@
   document.querySelector("#show-all-sections").addEventListener("click", () => {
     activeSections.clear(); excludedSubfilters.clear(); search.value = ""; moreSections.value = ""; showDiscarded = false; syncFilterToggles(); renderSectionPicker(); renderFilms();
   });
-  search.addEventListener("input", renderFilms);
+  search.addEventListener("input", () => { filmRenderLimit = filmBatchSize; renderFilms(); });
   sort.addEventListener("change", renderFilms);
   document.querySelector("#clear-filters").addEventListener("click", () => { activeSections.clear(); excludedSubfilters.clear(); search.value = ""; moreSections.value = ""; onlyMyLists = false; showDiscarded = false; syncFilterToggles(); renderSectionPicker(); renderFilms(); search.focus(); });
   const onlyMyListsButton = document.querySelector("#only-my-lists");
@@ -3421,6 +3459,7 @@
       try { localStorage.removeItem(wizardStepKey); } catch (_) { /* Nothing to forget. */ }
     }
     if (wizard.open) wizard.close();
+    document.documentElement.removeAttribute("data-onboarding-pending");
     queueMicrotask(() => showTicketIntro());
   }
   document.querySelector("#wizard-next").addEventListener("click", () => {
@@ -3702,7 +3741,10 @@
     let done = false;
     try { done = localStorage.getItem(wizardDoneKey) === "true"; } catch (_) { /* Fall back to showing it. */ }
     if (!done && !hasUserData()) openOnboarding();
-    else showTicketIntro();
+    else {
+      document.documentElement.removeAttribute("data-onboarding-pending");
+      showTicketIntro();
+    }
   }
   function importProgram(payload) {
     if (!payload || typeof payload !== "object") throw new Error("invalid");
@@ -3799,6 +3841,27 @@
     });
   }
 
+  let itineraryPdfLoad;
+  function loadItineraryPdfGenerator() {
+    if (window.FICXItineraryPDF) return Promise.resolve();
+    if (itineraryPdfLoad) return itineraryPdfLoad;
+    const embedded = document.querySelector("#ficx-pdf-bundle");
+    if (embedded) {
+      const script = document.createElement("script");
+      script.textContent = embedded.textContent;
+      document.head.append(script);
+      return window.FICXItineraryPDF ? Promise.resolve() : Promise.reject(new Error("No se pudo iniciar el generador PDF portátil."));
+    }
+    itineraryPdfLoad = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = window.FICX_PDF_BUNDLE_URL || "pdf-itinerary.js";
+      script.onload = () => window.FICXItineraryPDF ? resolve() : reject(new Error("Falta el generador PDF."));
+      script.onerror = () => reject(new Error("No se pudo cargar el generador PDF."));
+      document.head.append(script);
+    });
+    return itineraryPdfLoad;
+  }
+
   document.querySelector("#itinerary-pdf").addEventListener("click", async () => {
     const button = document.querySelector("#itinerary-pdf");
     const feedback = document.querySelector("#settings-calendar-feedback");
@@ -3809,6 +3872,7 @@
       const answer = await askAlias("pdf");
       if (answer === null) return;
       button.querySelector("span").textContent = "Preparando PDF…";
+      await loadItineraryPdfGenerator();
       const model = buildItineraryDocument(selectedPlanEvents(), new Date(), answer.ticketDisplay);
       model.alias = answer.alias.trim().slice(0, 40);
       model.ticketDisplay = answer.ticketDisplay;

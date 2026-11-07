@@ -85,6 +85,9 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector)}).getAttribute('aria-pressed')`), 'true', 'mark persists after reload');
     const targetSize = await evaluate(`({height:document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect().height,width:innerWidth,media:matchMedia('(max-width: 650px)').matches})`);
     assert.ok(targetSize.media && targetSize.height >= 44, `mobile touch target must be at least 44px: ${JSON.stringify(targetSize)}`);
+    await send('Emulation.setDeviceMetricsOverride', {width:320,height:740,deviceScaleFactor:1,mobile:true});
+    const narrowTargetSize = await evaluate(`({height:document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect().height,width:document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect().width})`);
+    assert.ok(narrowTargetSize.width >= 44 && narrowTargetSize.height >= 44, `narrow mobile touch target must remain at least 44px: ${JSON.stringify(narrowTargetSize)}`);
   } finally {
     clearTimeout(timeout);
     if (ws) ws.close();

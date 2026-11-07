@@ -111,7 +111,15 @@ def main() -> None:
     pdf_bundle = "/*\n" + pdf_licenses + "\n*/\n" + pdf_library + "\n" + pdf_renderer
     # Protect the containing HTML script even when vendored dependency text changes.
     pdf_bundle = pdf_bundle.replace("</script", "<\\/script")
-    html = html.replace('  <script src="pdf-itinerary.js"></script>', f"  <script>\n{pdf_bundle}\n  </script>")
+    pdf_bundle_name = f"pdf-itinerary.{hashlib.sha256(pdf_bundle.encode('utf-8')).hexdigest()[:16]}.js"
+    pdf_marker = '  <script src="pdf-itinerary.js"></script>'
+    inline_pdf = f'  <script id="ficx-pdf-bundle" type="application/x-ficx-pdf">\n{pdf_bundle}\n  </script>'
+    is_pwa_output = args.output.resolve() == OUTPUT.resolve()
+    if is_pwa_output:
+        pdf_loader_config = f'  <script>window.FICX_PDF_BUNDLE_URL = "{pdf_bundle_name}";</script>'
+        html = html.replace(pdf_marker, pdf_loader_config)
+    else:
+        html = html.replace(pdf_marker, inline_pdf)
     # The fallback poster logo must also work in a downloaded offline HTML.
     mark = (ROOT / "icons" / "mark.svg").read_text(encoding="utf-8")
     html = html.replace('src="icons/mark.svg"', 'src="data:image/svg+xml,' + quote(mark, safe="") + '"')
@@ -127,10 +135,15 @@ def main() -> None:
     html = html.replace("window.FICX_BUS_TRANSFERS = {};", f"window.FICX_BUS_TRANSFERS = {compact(load('bus', False))};")
 
     html = version_icon_urls(html)
+    if is_pwa_output:
+        portable_html = html.replace(pdf_loader_config, inline_pdf)
 
     out = args.output
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
+    if is_pwa_output:
+        (out.parent / pdf_bundle_name).write_text(pdf_bundle, encoding="utf-8")
+        (out.parent / "ficx64-portable.html").write_text(portable_html, encoding="utf-8")
     # Compatibilidad con enlaces antiguos: solo una redirección, no otra copia de la app.
     if out.resolve() == OUTPUT.resolve():
         (out.parent / "ficx64.html").write_text(
@@ -153,11 +166,13 @@ def main() -> None:
         }]
     manifest_bytes = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
     (out.parent / "manifest.webmanifest").write_bytes(manifest_bytes)
-    worker = version_icon_urls((SOURCE / "sw.js").read_text(encoding="utf-8"))
+    worker_source = (SOURCE / "sw.js").read_text(encoding="utf-8").replace("__PDF_BUNDLE__", pdf_bundle_name)
+    worker = version_icon_urls(worker_source)
     digest = hashlib.sha256()
     for name, content in [("index.html", html.encode("utf-8")),
                           ("sw.js", worker.encode("utf-8")),
-                          ("manifest.webmanifest", manifest_bytes)] + [
+                          ("manifest.webmanifest", manifest_bytes),
+                          (pdf_bundle_name, pdf_bundle.encode("utf-8"))] + [
                               (f"icons/{icon.name}", icon.read_bytes())
                               for icon in sorted((ROOT / "icons").glob("*")) if icon.suffix in {".png", ".svg"}]:
         digest.update(name.encode("utf-8") + b"\0" + content + b"\0")
