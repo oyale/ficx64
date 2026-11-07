@@ -43,12 +43,13 @@ test('PDF snapshot includes every day, shared sessions once and standalone activ
   assert.equal(model.events[2].end,'');
   assert.match(model.events[2].warnings.join(' '),/Duración por confirmar/);
 });
-test('PDF snapshot labels only the screening marked as already ticketed',()=>{
+test('PDF snapshot carries ticket state only for the screening marked as owned',()=>{
   const sandbox=context();
   sandbox.ownedTickets.add('a');
-  const model=vm.runInContext('buildItineraryDocument()',sandbox);
-  assert.match(model.events[0].details.join(' '),/Tengo entrada/);
-  assert.doesNotMatch(model.events[1].details.join(' '),/Tengo entrada/);
+  const model=vm.runInContext('buildItineraryDocument(undefined, new Date(), "owned")',sandbox);
+  assert.equal(model.events[0].ticketOwned,true);
+  assert.equal(model.events[1].ticketOwned,false);
+  assert.equal(model.events[0].ticketDisplay,'owned');
 });
 test('unknown transfer and unknown end never become invented travel/finish times',()=>{
   const sandbox=context(); vm.runInContext('transferMinutes=()=>null',sandbox);
