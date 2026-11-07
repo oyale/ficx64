@@ -361,7 +361,14 @@
           </div></fieldset>
         </div>
         <div class="session-results"><div class="results-topline"><div><p class="eyebrow">TU BÚSQUEDA</p><h2 id="session-results-title">Todos los días <span>·</span> todas las horas</h2></div><button type="button" id="reset-session-filters">Borrar filtros</button></div>
+          <label class="session-search-label" for="session-search">Buscar pases</label><div class="session-search filters"><label class="search-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span class="sr-only">Buscar pases por título, cineasta o país</span><input id="session-search" type="search" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Título, cineasta o país…" autocomplete="off" aria-controls="session-results-list"></label></div>
+          <fieldset class="session-exclusions"><legend class="sr-only">Filtros de tu programa</legend>
           <label class="include-special-access"><input type="checkbox" id="only-saved"><span>Solo las de mi lista o quizás</span></label>
+          <label class="include-special-access"><input type="checkbox" id="hide-session-conflicts" aria-describedby="session-filter-help"><span>Ocultar conflictos con mi parrilla</span></label>
+          <label class="include-special-access"><input type="checkbox" id="hide-session-planned"><span>Ocultar pases ya en mi parrilla</span></label>
+          <label class="include-special-access"><input type="checkbox" id="hide-session-discarded"><span>Ocultar películas descartadas</span></label>
+          </fieldset>
+          <p class="session-filter-help" id="session-filter-help">Los conflictos incluyen solapes y traslados imposibles según tu transporte. Si faltan datos, el pase sigue visible. Los programas compartidos solo se ocultan si todos sus títulos están descartados.</p>
           <ol class="screening-results" id="session-results-list" aria-live="polite"></ol>
         </div>
       </section>

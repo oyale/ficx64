@@ -822,7 +822,21 @@
     const venueText = venueCount ? ` · ${venueCount} ${venueCount === 1 ? "sede" : "sedes"}` : " · todas las sedes";
     const includeSpecial = includeSpecialInProgram;
     const onlySaved = document.querySelector("#only-saved").checked;
+    const normalizeQuery = (value) => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("es");
+    const query = normalizeQuery(document.querySelector("#session-search").value.trim());
+    const hideConflicts = document.querySelector("#hide-session-conflicts").checked;
+    const hidePlanned = document.querySelector("#hide-session-planned").checked;
+    const hideDiscarded = document.querySelector("#hide-session-discarded").checked;
+    const plannedEvents = selectedPlanEvents();
     const filtered = screeningRecords.filter((screening) => {
+      const linkedFilms = (screening.filmIds || []).map((id) => filmById.get(id)).filter(Boolean);
+      const searchable = normalizeQuery([screening.title, ...(screening.films || []).map((film) => film.title),
+        ...linkedFilms.map((film) => `${film.title} ${directorText(film)} ${(film.countries || []).join(" ")}`)].join(" "));
+      if (query && !searchable.includes(query)) return false;
+      if (hidePlanned && plannedEvents.some((planned) => planned.candidateId === screening.candidateId)) return false;
+      if (hideConflicts && plannedEvents.some((planned) => planned.candidateId !== screening.candidateId
+        && compareScreenings(planned, screening).status === "conflict")) return false;
+      if (hideDiscarded && screening.filmIds?.length && screening.filmIds.every((id) => discarded.has(id))) return false;
       const hour = Number(String(screening.time || "0").split(":")[0]);
       const period = hour < 13 ? "morning" : hour < 19 ? "afternoon" : "evening";
       return (!activeDates.size || activeDates.has(screening.date))
@@ -2096,6 +2110,10 @@
     updateSessionSummary();
   });
   document.querySelector("#only-saved").addEventListener("change", updateSessionSummary);
+  document.querySelector("#session-search").addEventListener("input", updateSessionSummary);
+  for (const id of ["hide-session-conflicts", "hide-session-planned", "hide-session-discarded"]) {
+    document.getElementById(id).addEventListener("change", updateSessionSummary);
+  }
   document.querySelector("#session-results-list").addEventListener("click", (event) => {
     const button = event.target.closest("button[data-open-film]");
     if (!button) return;
@@ -2282,6 +2300,10 @@
   });
   document.querySelector("#reset-session-filters").addEventListener("click", () => {
     activeDates.clear(); activeTimes.clear(); activeVenues.clear();
+    document.querySelector("#session-search").value = "";
+    for (const id of ["only-saved", "hide-session-conflicts", "hide-session-planned", "hide-session-discarded"]) {
+      document.getElementById(id).checked = false;
+    }
     document.querySelectorAll("#venue-options input").forEach((input) => { input.checked = false; });
     document.querySelectorAll("#time-options [data-time]").forEach((button) => { button.classList.remove("is-selected"); button.setAttribute("aria-pressed", "false"); });
     document.querySelector("#time-options [data-time-all]").classList.add("is-selected");

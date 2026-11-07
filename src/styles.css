@@ -2378,3 +2378,14 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 @media (max-width: 374px) {
   .program-event { grid-template-columns: 42px minmax(0, 1fr) 32px; }
 }
+
+/* Pases: búsqueda y exclusiones junto al resultado que modifican. */
+.session-search-label { display: block; margin-top: 16px; font-size: 13px; font-weight: 700; }
+.session-search.filters { padding: 0; border: 0; margin: 6px 0 10px; background: transparent; }
+.session-exclusions { min-width: 0; border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0 24px; }
+.session-exclusions .include-special-access { min-height: 48px; margin: 0; }
+.session-exclusions input { width: 18px; height: 18px; flex-shrink: 0; accent-color: var(--blue); }
+.session-filter-help { margin: 8px 0 18px; max-width: 75ch; color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+@media (max-width: 650px) {
+  .session-exclusions { flex-direction: column; }
+}
