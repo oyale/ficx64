@@ -122,6 +122,7 @@
   let sharedScrollY = 0;
   let sessionSearchScrollY = 0;
   let activeProgramDate = "";
+  let programTicketFilter = "all";
   const specialAccessStorageKey = "ficx64-include-special-v1";
   let includeSpecialInProgram = readIncludeSpecial();
 
@@ -1277,7 +1278,12 @@
         ? "En Escuela de Comercio, prensa: entrada online o en taquilla desde las 07:00 del día anterior; otras acreditaciones o bonos, desde las 19:00. Es obligatorio retirar o canjear entrada."
         : "Hay que retirar o canjear una entrada para el pase; consulta con taquilla las condiciones de acceso de tu acreditación.";
       const freeRule = free ? " La ficha también indica entrada libre, pero esa modalidad exige retirar entrada en taquilla el mismo día (máximo 4 por persona); confirma con el festival qué condición prevalece." : "";
-      return { label: "Prensa y acreditados", text: `${pressRule}${freeRule}`, officialUrl };
+      const sections = screening.venue === "Escuela de Comercio" ? [
+        { label: "Prensa", text: "Entrada online o en taquilla desde las 07:00 del día anterior." },
+        { label: "Otras acreditaciones o bonos", text: "Desde las 19:00 del día anterior." },
+      ] : null;
+      return { label: "Prensa y acreditados", text: `${pressRule}${freeRule}`, sections,
+        note: sections ? `Es obligatorio retirar o canjear entrada.${freeRule}` : "", officialUrl };
     }
     if (free) {
       return { label: labels.includes("ENTRADA LIBRE") ? "Entrada libre" : "Acceso libre", text: "Aunque sea gratuita, es imprescindible retirar la entrada en taquilla el mismo día de la sesión: máximo 4 por persona.", officialUrl };
@@ -1287,7 +1293,10 @@
   function programEntryControl(screening) {
     const guidance = accessGuidance(screening);
     if (guidance) {
-      return `<details class="program-access-help"><summary aria-label="Cómo acceder: ${escapeHtml(guidance.label)}" title="Cómo acceder"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v5m0-8h.01"/></svg><span>Entradas</span></summary><div><p>${escapeHtml(guidance.text)} <a href="${guidance.officialUrl}" target="_blank" rel="noopener">Normas oficiales del FICX</a></p></div></details>`;
+      const instructions = guidance.sections
+        ? `<dl class="access-instructions">${guidance.sections.map((section) => `<div><dt>${escapeHtml(section.label)}</dt><dd>${escapeHtml(section.text)}</dd></div>`).join("")}</dl><p class="access-instructions-note">${escapeHtml(guidance.note)}</p>`
+        : `<p>${escapeHtml(guidance.text)}</p>`;
+      return `<details class="program-access-help" name="program-access-instructions"><summary aria-label="Cómo acceder: ${escapeHtml(guidance.label)}" title="Cómo acceder"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v5m0-8h.01"/></svg><span>Entradas</span></summary><div>${guidance.label === "Prensa y acreditados" ? "" : `<strong class="access-instructions-title">${escapeHtml(guidance.label)}</strong>`}${instructions}<a class="access-instructions-link" href="${guidance.officialUrl}" target="_blank" rel="noopener">Normas oficiales del FICX</a></div></details>`;
     }
     const owned = ownedTickets.has(screening.candidateId);
     const name = (screening.films || []).map((film) => film.title).join(", ") || screening.title || "este pase";
@@ -1307,6 +1316,8 @@
       conflictList.length ? `<span class="program-conflict-tag">${conflictList.some((item) => item.reason === "transfer") ? "No da tiempo al traslado" : "Solapa con " + conflictList.map((item) => escapeHtml(item.screening.time)).join(", ")}</span>` : "",
       uncertain.has(screening.candidateId) || !screening.durationMinutes ? `<span class="program-duration-unknown">Duración por confirmar</span>` : "",
       screening.accessType !== "public" ? `<span class="program-access-tag">${screening.accessType === "restricted" ? "Prensa/acreditados" : "Escolares"}</span>` : "",
+      (screening.eventLabels || []).some((label) => ["ENTRADA LIBRE", "ACCESO LIBRE"].includes(String(label).trim().toLocaleUpperCase("es")))
+        ? `<span class="program-access-tag">Entrada libre</span>` : "",
     ].filter(Boolean).join("");
     const actionName = (screening.films || []).map((film) => film.title).join(", ") || screening.title || "este pase";
     return `<article class="cinema-card program-event${conflictList.length ? " has-conflict" : ""}${screening.candidateId === chosenId ? " is-demo-chosen" : ""}"><time class="program-event-time" datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}">${escapeHtml(screening.time)}</time><div class="program-event-body"><div class="program-event-venue">${escapeHtml(screening.venue)}${screening.room ? ` · ${screening.room}` : ""}${endMeta}</div>${blockTitle}<div class="program-event-films">${demoChosenTag(screening, chosenId)}${eventTitles(screening)}</div>${sectionChips((screening.filmIds || []).map((id) => filmById.get(id)).filter(Boolean), "screening-section-line program-section-line")}<div class="program-event-flags">${flags}</div></div><div class="program-event-control">${programEntryControl(screening)}</div><div class="program-event-actions"><button class="program-calendar-event" type="button" data-program-action="calendar-event" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-haspopup="menu" aria-expanded="false" aria-label="Añadir ${escapeHtml(actionName)} al calendario" title="Añadir al calendario"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg></button><button class="program-share-event" type="button" data-program-action="share-screening" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-label="Compartir este pase" title="Compartir este pase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.6 6.8-4M8.6 13.4l6.8 4"/></svg></button><button class="program-remove-event" type="button" data-program-action="remove-program-screening" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-label="Quitar pase de ${escapeHtml(actionName)}" title="Quitar pase"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div></article>`;
@@ -1439,9 +1450,17 @@
     const unplannedWanted = wanted.filter((film) => !coverage.has(film.id));
     const maybes = films.filter((film) => intentions.get(film.id) === "maybe");
     const { conflicts, uncertain, conflictPairs } = analyzeProgram(allEvents);
-    const visibleEvents = activeProgramDate ? allEvents.filter((item) => item.date === activeProgramDate) : allEvents;
+
     const dateOptions = [...new Set(allEvents.map((item) => item.date))].sort();
     if (activeProgramDate && !dateOptions.includes(activeProgramDate)) activeProgramDate = "";
+    const visibleEvents = allEvents.filter((item) => (!activeProgramDate || item.date === activeProgramDate)
+      && (programTicketFilter === "all" || ownedTickets.has(item.candidateId) === (programTicketFilter === "owned")));
+    const ticketFilterButton = document.querySelector("#program-ticket-filter");
+    const ticketFilterLabels = { all: "todas", owned: "con entrada", missing: "sin entrada" };
+    const nextTicketFilter = { all: "owned", owned: "missing", missing: "all" }[programTicketFilter];
+    ticketFilterButton.textContent = `Entradas: ${ticketFilterLabels[programTicketFilter]}`;
+    ticketFilterButton.setAttribute("aria-label", `Mostrando ${ticketFilterLabels[programTicketFilter]}. Mostrar ${ticketFilterLabels[nextTicketFilter]}`);
+    ticketFilterButton.classList.toggle("is-filtered", programTicketFilter !== "all");
     document.querySelector("#program-day-options").innerHTML = dateOptions.length > 1 || activeProgramDate
       ? `<button type="button" class="program-day-chip${activeProgramDate ? "" : " is-selected"}" data-program-date="">Todos los días</button>${dateOptions.map((date) => `<button type="button" class="program-day-chip${activeProgramDate === date ? " is-selected" : ""}" data-program-date="${date}">${escapeHtml(formatProgramDate(date, { weekday: "short", day: "numeric" }))}</button>`).join("")}`
       : "";
@@ -1484,7 +1503,7 @@
     });
     document.querySelector("#program-agenda").innerHTML = grouped.size      ? [...grouped].map(([date, dayEvents]) => `<section class="program-day"><header><h3>${escapeHtml(formatProgramDate(date))}</h3><span>${dayEvents.length} ${dayEvents.length === 1 ? "pase" : "pases"}</span></header><div class="program-day-events">${renderDayEvents(dayEvents, conflicts, uncertain)}</div></section>`).join("")
       : allEvents.length
-        ? `<div class="cinema-card program-empty"><h3>No hay pases ese día</h3><p>Prueba otro día para ver tu selección.</p></div>`
+        ? `<div class="cinema-card program-empty"><h3>No hay pases con estos filtros</h3><p>Prueba otro día o cambia el filtro de entradas para ver tu selección.</p></div>`
         : `<div class="cinema-card program-empty"><h3>Tu parrilla empieza con un pase</h3><p>Elige sesiones de las películas que has añadido. Si todavía no has guardado ninguna, vuelve a explorar.</p><button type="button" data-program-action="explore-films">Explorar películas</button></div>`;
     const sortedWanted = sortPlanFilms(wanted, allEvents);
     const pendingWanted = sortedWanted.filter((film) => !coverage.has(film.id));
@@ -2136,6 +2155,26 @@
     switchScreen("explore");
     requestAnimationFrame(() => list.querySelector("dialog.film-expanded .film-detail-sticky .film-title")?.focus({ preventScroll: true }));
   });
+  document.querySelector("#program-ticket-filter").addEventListener("click", () => {
+    programTicketFilter = { all: "owned", owned: "missing", missing: "all" }[programTicketFilter];
+    renderProgram();
+  });
+  document.addEventListener("toggle", (event) => {
+    const help = event.target;
+    if (!help.matches?.(".program-access-help") || !help.open) return;
+    requestAnimationFrame(() => {
+      if (!help.open) return;
+      const panel = help.querySelector("div");
+      const bounds = panel.getBoundingClientRect();
+      const bar = document.querySelector(".mobile-tabbar");
+      const bottom = bar && getComputedStyle(bar).display !== "none" ? bar.getBoundingClientRect().top : innerHeight;
+      const top = document.querySelector(".masthead").getBoundingClientRect().bottom + 12;
+      const delta = bounds.height > bottom - top - 12 ? bounds.top - top
+        : bounds.bottom > bottom - 12 ? bounds.bottom - bottom + 12
+        : bounds.top < top ? bounds.top - top : 0;
+      if (delta) window.scrollBy({ top: delta, behavior: "instant" });
+    });
+  }, true);
   const programScreen = document.querySelector("#screen-program");
   programScreen.addEventListener("click", (event) => {
     const dateButton = event.target.closest("button[data-program-date]");
@@ -2197,6 +2236,7 @@
       button.setAttribute("aria-label", `${owned ? "Quitar la marca Tengo entrada de" : "Marcar que tienes entrada para"} ${passName}`);
       renderFilms();
       updateSessionSummary();
+      if (programTicketFilter !== "all") renderProgram();
       return;
     }
     if (programAction === "remove-program-screening") {
@@ -4156,8 +4196,9 @@
   window.addEventListener("resize", () => { if (!calendarPanel.hidden) positionCalendarPanel(); }, { passive: true });
   window.addEventListener("scroll", () => { if (!calendarPanel.hidden) positionCalendarPanel(); }, { passive: true });
   document.addEventListener("click", (event) => {
-    const openAccessHelp = document.querySelector(".program-access-help[open]");
-    if (openAccessHelp && !event.target.closest(".program-access-help")) openAccessHelp.open = false;
+    if (!event.target.closest(".program-access-help")) {
+      document.querySelectorAll(".program-access-help[open]").forEach((help) => { help.open = false; });
+    }
     if (calendarPanel.hidden) return;
     if (event.target.closest("#program-calendar-panel, #program-calendar-toggle")) return;
     calendarPanel.hidden = true;
