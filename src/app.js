@@ -4134,8 +4134,27 @@
     document.querySelector("#shared-feedback").textContent = "";
     switchScreen("explore");
   });
+  // Manifest shortcuts use a fragment so cached navigation keeps the same document URL.
+  function handleSectionShortcut() {
+    const params = new URLSearchParams(window.location.hash.slice(1));
+    const section = params.get("seccion");
+    if (!["peliculas", "mis-listas", "pases", "mi-parrilla"].includes(section)) return false;
+    if (params.has("listas") || params.has("pases")) return false;
+    if (expandedId) closeFilmDetails();
+    openSelectionSheet(false);
+    if (section === "mis-listas") {
+      switchScreen("explore", { scrollTop: false });
+      openSelectionSheet(true);
+      if (!mobileFilmViewport.matches) document.querySelector("#mi-programa").scrollIntoView({ block: "start", behavior: "instant" });
+    } else {
+      activeMobileTab = section === "mi-parrilla" ? "program" : section === "pases" ? "sessions" : "explore";
+      switchScreen(section === "mi-parrilla" ? "program" : section === "pases" ? "sessions" : "explore");
+    }
+    return true;
+  }
   // Un mismo enlace puede pegarse con la pestaña ya abierta: solo cambia el hash.
   function handleSharedLink() {
+    if (handleSectionShortcut()) return;
     readSharedList().then((lists) => {
       if (lists === null) return false;
       if (!lists.lists.length) {

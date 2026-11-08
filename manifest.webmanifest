@@ -41,5 +41,55 @@
       "id": "https://ficx.situacion.es/"
     }
   ],
-  "id": "/"
+  "id": "/",
+  "shortcuts": [
+    {
+      "name": "Películas",
+      "url": "./#seccion=peliculas",
+      "description": "Explorar las películas del festival",
+      "icons": [
+        {
+          "src": "icons/shortcut-films.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Mis listas",
+      "url": "./#seccion=mis-listas",
+      "description": "Ver tus películas guardadas",
+      "icons": [
+        {
+          "src": "icons/shortcut-lists.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Pases",
+      "url": "./#seccion=pases",
+      "description": "Consultar los pases del festival",
+      "icons": [
+        {
+          "src": "icons/shortcut-sessions.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Mi parrilla",
+      "url": "./#seccion=mi-parrilla",
+      "description": "Abrir tu parrilla personal",
+      "icons": [
+        {
+          "src": "icons/shortcut-program.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
 }

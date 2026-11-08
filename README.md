@@ -328,3 +328,9 @@ CHROMIUM_BIN=/usr/lib/chromium/chromium node tests/test_itinerary_pdf_browser.cj
 # Preserve the downloaded browser-test sample for inspection:
 FICX_PDF_SAMPLE=/tmp/ficx-itinerary.pdf node tests/test_itinerary_pdf_browser.cjs
 ```
+
+### Installed-app shortcuts
+
+The manifest exposes **Películas**, **Mis listas**, **Pases**, and **Mi parrilla** with individual 96×96 icons. Their URLs use `#seccion=peliculas`, `#seccion=mis-listas`, `#seccion=pases`, and `#seccion=mi-parrilla`, respectively. These fragment destinations also work when the app is already open and keep the document URL available to the offline cache. Existing shared-list and shared-itinerary links retain their own handling.
+
+Supported launchers expose shortcuts through the installed app icon's context menu (for example, long-press on Android). Availability, the number shown, and refresh timing for existing installations depend on the browser and operating system.

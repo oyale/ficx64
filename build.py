@@ -159,6 +159,9 @@ def main() -> None:
     manifest = json.loads(manifest_bytes)
     for icon in manifest.get("icons", []):
         icon["src"] = icon_urls.get(icon["src"], icon["src"])
+    for shortcut in manifest.get("shortcuts", []):
+        for icon in shortcut.get("icons", []):
+            icon["src"] = icon_urls.get(icon["src"], icon["src"])
     if site_url:
         manifest["id"] = site_url
         manifest["related_applications"] = [{
