@@ -66,8 +66,10 @@ things together.
 | `id` | string | Unique film identifier |
 | `title` | string | Display title |
 | `directors`, `actors`, `countries` | string arrays | May be empty |
+| `actorsSource` | string, optional | `"tmdb"` for cast imported from the accepted `tmdbId`, in TMDB credit order; attributed beside the cast in the film detail. |
 | `year` | number | Production year |
 | `durationMinutes` | number or `null` | Film runtime |
+| `tmdbId` | positive integer, optional | Accepted TMDB movie identity; adds an external link to the film detail. Rejected/unresolved matches have no ID. |
 | `sections`, `ciclo` | string arrays | Festival section and retrospective, if any. The first section drives the home screen |
 | `format` | `"short"`, `"medium"` or `null` | Short or medium-length film; draws the format badge |
 | `synopsis`, `synopsisSource` | string or `null` | Full text, with blank lines (`\n\n`) between paragraphs, and where it came from (`"web"`, `"catalogo-pdf"`) |

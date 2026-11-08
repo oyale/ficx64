@@ -491,9 +491,11 @@
       const tags = (film.sections || []).filter((name) => !["otras secciones", "cortometrajes"].includes(name.toLocaleLowerCase("es"))).map((name) => `<span class="film-section">${escapeHtml(name)}</span>`).join("");
       const cicloTags = (film.ciclo || []).map((name) => `<span class="film-ciclo">${escapeHtml(name)}</span>`).join("");
       const credits = directorText(film);
+      const actorNames = Array.isArray(film.actors) ? film.actors.filter(name => typeof name === "string" && name.trim()) : [];
       const countries = Array.isArray(film.countries) ? film.countries.filter(Boolean) : [];
       const facts = [film.year, film.durationMinutes ? `${film.durationMinutes} min` : ""].filter(Boolean).map(escapeHtml).join(" · ");
       const detailUrl = /^https:\/\/(?:www\.)?ficx\.tv\//.test(film.pageUrl || "") ? film.pageUrl : "";
+      const tmdbUrl = Number.isSafeInteger(film.tmdbId) && film.tmdbId > 0 ? `https://www.themoviedb.org/movie/${film.tmdbId}` : "";
       const posterSection = (film.sections || [])[0] || "Festival Internacional de Cine de Xixón";
       const toneIndex = [...String(posterSection)].reduce((sum, char) => sum + char.codePointAt(0), 0) % 4;
       const formatLabel = film.format === "medium" ? "Mediometraje" : "Cortometraje";
@@ -544,9 +546,17 @@
         <div class="film-detail-copy">
           ${countries.length ? `<p class="detail-kicker detail-countryline">${escapeHtml(countries.join(" · "))}</p>` : ""}
           <div class="film-synopsis-heading"><h4>Sinopsis</h4>
+            <span class="film-source-links">
             ${detailUrl ? `<a class="film-web-link" href="${escapeHtml(detailUrl)}" target="_blank" rel="noopener noreferrer" title="${film.synopsisSource === "catalogo-pdf" ? "Sinopsis del catálogo impreso. Abrir ficha oficial" : "Sinopsis de la ficha web. Abrir ficha oficial"}">Ficha oficial <span aria-hidden="true">↗</span></a>` : ""}
+            ${tmdbUrl ? `<span class="film-tmdb-source"><a class="film-web-link" href="${tmdbUrl}" target="_blank" rel="noopener noreferrer" aria-label="Ver ${escapeHtml(film.title)} en TMDB">TMDB <span aria-hidden="true">↗</span></a></span>` : ""}
+            </span>
           </div>
           ${film.synopsis ? film.synopsis.split(/\n\s*\n/).map(paragraph => `<p class="detail-synopsis">${escapeHtml(paragraph)}</p>`).join("") : `<p class="detail-synopsis detail-missing">La sinopsis no está disponible en la ficha capturada.</p>`}
+          ${actorNames.length ? `<section class="film-cast" aria-label="Reparto">
+            <div class="film-cast-heading"><h4>Reparto</h4>${film.actorsSource === "tmdb" && tmdbUrl ? `<a class="film-web-link film-cast-source" href="${tmdbUrl}/cast" target="_blank" rel="noopener noreferrer" aria-label="Reparto de ${escapeHtml(film.title)} en TMDB">Fuente: TMDB <span aria-hidden="true">↗</span></a>` : ""}</div>
+            <p class="film-cast-names">${actorNames.slice(0, 8).map(escapeHtml).join(", ")}</p>
+            ${actorNames.length > 8 ? `<details class="film-cast-more"><summary>Ver ${actorNames.length - 8} nombres más</summary><p class="film-cast-names">${actorNames.slice(8).map(escapeHtml).join(", ")}</p></details>` : ""}
+          </section>` : ""}
         </div>
         </div>
         <div class="film-expanded-screenings">${renderFilmScreenings(film)}</div>
