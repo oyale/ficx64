@@ -3686,7 +3686,7 @@
     const heading = `<header>${date}<span>${demo.length} ${demo.length === 1 ? "pase" : "pases"}</span></header>`;
     // El análisis va sobre los pases que se ven, como `analyzeProgram(dayEvents)` en «Mi programa»
     // (si no, el traslado hasta el siguiente se mide contra un pase que no está en la demo).
-    const { conflicts, uncertain } = analyzeProgram([...selectedPlanEvents(), ...demo]);
+    const { conflicts, uncertain } = analyzeProgram(demo);
     cards.innerHTML = `<section class="program-day">${heading}<div class="program-day-events">${renderDayEvents(demo, conflicts, uncertain, null)}</div></section>`
       + wizardDemoChain(demo);
     // Los botones de la tarjeta (calendario, compartir, quitar) son de la parrilla del usuario y
