@@ -257,6 +257,13 @@
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
   }
+  const languageNames = typeof Intl.DisplayNames === "function" ? new Intl.DisplayNames(["es"], { type: "language" }) : null;
+  function originalLanguageText(film) {
+    const code = film.originalLanguage;
+    if (code === "xx") return "Sin idioma";
+    if (typeof code !== "string" || !/^[a-z]{2}$/.test(code)) return "";
+    return languageNames ? languageNames.of(code) : code.toUpperCase();
+  }
   function directorText(film) {
     return Array.isArray(film.directors) ? film.directors.join(", ") : (film.directors || "Dirección no disponible");
   }
@@ -491,6 +498,7 @@
       const tags = (film.sections || []).filter((name) => !["otras secciones", "cortometrajes"].includes(name.toLocaleLowerCase("es"))).map((name) => `<span class="film-section">${escapeHtml(name)}</span>`).join("");
       const cicloTags = (film.ciclo || []).map((name) => `<span class="film-ciclo">${escapeHtml(name)}</span>`).join("");
       const credits = directorText(film);
+      const originalLanguage = originalLanguageText(film);
       const actorNames = Array.isArray(film.actors) ? film.actors.filter(name => typeof name === "string" && name.trim()) : [];
       const countries = Array.isArray(film.countries) ? film.countries.filter(Boolean) : [];
       const facts = [film.year, film.durationMinutes ? `${film.durationMinutes} min` : ""].filter(Boolean).map(escapeHtml).join(" · ");
@@ -552,12 +560,17 @@
             </span>
           </div>
           ${film.synopsis ? film.synopsis.split(/\n\s*\n/).map(paragraph => `<p class="detail-synopsis">${escapeHtml(paragraph)}</p>`).join("") : `<p class="detail-synopsis detail-missing">La sinopsis no está disponible en la ficha capturada.</p>`}
+
+        </div>
+          ${originalLanguage || actorNames.length ? `<div class="film-detail-metadata">
+            ${tmdbUrl && ((originalLanguage && film.originalLanguageSource === "tmdb") || (actorNames.length && film.actorsSource === "tmdb")) ? `<p class="film-metadata-source"><a class="film-web-link film-cast-source" href="${tmdbUrl}" target="_blank" rel="noopener noreferrer" aria-label="Fuente de los datos de ${escapeHtml(film.title)}: TMDB"><span class="metadata-source-label">${originalLanguage && actorNames.length ? "Idioma y reparto:" : originalLanguage ? "Idioma original:" : "Reparto:"}</span> TMDB <span aria-hidden="true">↗</span></a></p>` : ""}
+            ${originalLanguage ? `<p class="film-original-language"><b>Idioma original:</b> ${escapeHtml(originalLanguage)}</p>` : ""}
           ${actorNames.length ? `<section class="film-cast" aria-label="Reparto">
-            <div class="film-cast-heading"><h4>Reparto</h4>${film.actorsSource === "tmdb" && tmdbUrl ? `<a class="film-web-link film-cast-source" href="${tmdbUrl}/cast" target="_blank" rel="noopener noreferrer" aria-label="Reparto de ${escapeHtml(film.title)} en TMDB">Fuente: TMDB <span aria-hidden="true">↗</span></a>` : ""}</div>
+            <div class="film-cast-heading"><h4>Reparto</h4></div>
             <p class="film-cast-names">${actorNames.slice(0, 8).map(escapeHtml).join(", ")}</p>
             ${actorNames.length > 8 ? `<details class="film-cast-more"><summary>Ver ${actorNames.length - 8} nombres más</summary><p class="film-cast-names">${actorNames.slice(8).map(escapeHtml).join(", ")}</p></details>` : ""}
           </section>` : ""}
-        </div>
+          </div>` : ""}
         </div>
         <div class="film-expanded-screenings">${renderFilmScreenings(film)}</div>
            <div class="detail-actions film-expanded-actions" role="group" aria-label="Decidir sobre ${escapeHtml(film.title)}">${intentButtons}</div>
@@ -1295,6 +1308,9 @@
       ] : null;
       return { label: "Prensa y acreditados", text: `${pressRule}${freeRule}`, sections,
         note: sections ? `Es obligatorio retirar o canjear entrada.${freeRule}` : "", officialUrl };
+    }
+    if (free && screening.venueGroup === "antiguo-instituto") {
+      return { label: "Acceso libre", text: "Acceso libre sin necesidad de retirar entrada y hasta completar aforo.", officialUrl };
     }
     if (free) {
       return { label: labels.includes("ENTRADA LIBRE") ? "Entrada libre" : "Acceso libre", text: "Aunque sea gratuita, es imprescindible retirar la entrada en taquilla el mismo día de la sesión: máximo 4 por persona.", officialUrl };

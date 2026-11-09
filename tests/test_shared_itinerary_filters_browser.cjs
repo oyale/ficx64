@@ -53,8 +53,12 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     const singles=records.filter(s=>s.accessType==='public'&&s.filmIds?.length===1);
     const other=singles.find(s=>singles.some(t=>t.candidateId!==s.candidateId&&t.filmIds[0]===s.filmIds[0]&&t.date!==s.date));
     const otherOwn=singles.find(t=>t.candidateId!==other.candidateId&&t.filmIds[0]===other.filmIds[0]&&t.date!==other.date);
-    const chosen=[other];
-    for(const s of singles){if(chosen.length===5)break;if(chosen.every(t=>t.filmIds[0]!==s.filmIds[0]))chosen.push(s);}
+    const coinciding=singles.find(s=>s.filmIds[0]!==other.filmIds[0]&&s.date!==otherOwn.date);
+    const chosen=[other,coinciding];
+    for(const s of singles){
+      if(chosen.length===5)break;
+      if(s.date!==coinciding.date && s.date!==otherOwn.date && chosen.every(t=>t.filmIds[0]!==s.filmIds[0]))chosen.push(s);
+    }
     assert.equal(chosen.length,5);
     const [otherPass,coincide,want,maybe,fresh]=chosen;
     const planned={[other.filmIds[0]]:otherOwn.candidateId,[coincide.filmIds[0]]:coincide.candidateId};

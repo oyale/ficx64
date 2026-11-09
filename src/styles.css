@@ -2509,10 +2509,13 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .tmdb-credit-logo img { display: block; width: 100px; height: auto; }
 .tmdb-credit p { margin: 8px 0; }
 
-/* Cast belongs to its own source, below the festival synopsis. */
-.film-cast { width: 100%; max-width: 58ch; margin: 2px 0 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+/* The cast has its own source and follows the synopsis on mobile. */
+.film-detail-metadata { width: 100%; max-width: 58ch; margin: 2px 0 18px; }
+.film-original-language { margin: 0 0 16px; color: var(--text-body); font-size: 13px; line-height: 1.6; }
+.film-original-language b { font-weight: 700; }
+.film-cast { width: 100%; padding-top: 14px; border-top: 1px solid var(--line); }
 .film-cast-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 8px; }
-.film-detail-copy .film-cast-heading h4 { margin: 0; }
+.film-cast-heading h4 { margin: 0; color: var(--text-muted); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .film-cast-source { min-height: 24px; color: var(--text-muted); font-size: 11px; }
 .film-cast-names { margin: 0; color: var(--text-body); font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
 .film-cast-more { margin-top: 8px; }
@@ -2527,3 +2530,32 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .shared-pass-filter-summary { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.5; }
 #shared-pass-filters { gap: 4px 16px; }
 #shared-pass-filters .text-button { padding: 8px 0; font-size: 12px; }
+
+@media (min-width: 651px) {
+  .film-expanded-main { grid-template-rows: min-content 1fr; }
+  .film-detail-poster { grid-column: 1; grid-row: 1; }
+  .film-detail-copy { grid-column: 2; grid-row: 1 / span 2; }
+  .film-detail-metadata { grid-column: 1; grid-row: 2; width: auto; max-width: none; margin: 0; padding: clamp(18px, 3vw, 32px); }
+  .film-cast:first-child { padding-top: 0; border-top: 0; }
+}
+@media (max-width: 650px) {
+  .film-detail-metadata { width: auto; max-width: none; margin: 2px 18px 18px; }
+  .film-original-language { font-size: 14px; }
+  .film-cast-heading h4 { font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--text); }
+}
+
+/* One explicit source for language and cast: compact desktop row, mobile footer. */
+.film-metadata-source { display: flex; margin: 0; }
+.film-web-link .metadata-source-label { color: inherit; font-size: inherit; }
+@media (min-width: 651px) {
+  .film-detail-metadata { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-content: start; align-items: baseline; column-gap: 12px; }
+  .film-original-language { grid-column: 1; grid-row: 1; }
+  .film-metadata-source { grid-column: 2; grid-row: 1; justify-content: flex-end; }
+  .film-metadata-source .film-web-link { font-size: 10px; }
+  .film-cast { grid-column: 1 / -1; grid-row: 2; }
+  .film-detail-metadata:not(:has(.film-original-language)) .film-metadata-source { grid-column: 1 / -1; margin-bottom: 8px; }
+}
+@media (max-width: 650px) {
+  .film-detail-metadata { display: flex; flex-direction: column; padding-top: 16px; border-top: 1px solid var(--line); }
+  .film-metadata-source { order: 1; justify-content: flex-start; margin: 12px 0 0; }
+}

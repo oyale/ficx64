@@ -118,7 +118,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1391239,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "paper-tiger",
@@ -255,7 +257,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1381273,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "yo-soy-rocky",
@@ -327,10 +331,10 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
-            "ACCESO LIBRE",
+            "PRENSA Y ACREDITADOS",
             "CLAUSURA"
           ],
-          "accessType": "public",
+          "accessType": "restricted",
           "reviewStatus": "needs-review",
           "durationMinutes": 127,
           "durationSource": "calendar-block",
@@ -382,7 +386,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1286656,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "heil-jupiter",
@@ -478,7 +484,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1153093,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "du-soleil-et-du-plomb",
@@ -567,7 +575,9 @@
       "synopsis": "Esta es la tercera vez que los parajes, desiertos y pobladores de Marruecos fijan la atención de este cineasta belga. Las otras dos fueron Le thé ou l’électricité y Où est l’ amour dans la palmeraie?, y en esta suerte de trilogía aborda la contradicción entre el avance del progreso y sus devastadores efectos sobre las comunidades tradicionales que habitan los territorios donde estas transformaciones ocurren.\n\nEn este nuevo trabajo, estrenado en Visions du Réel y Premio Especial del Jurado en FIDADOC, acompaña a una comunidad de pastores bereberes en el desierto del Oeste, cuyo modo de vida está siendo amenazado por los planes de construcción de la mayor planta de energía renovable del mundo. Una realidad que les empuja a resistir o a cambiar.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1658241
+      "tmdbId": 1658241,
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "el-maletin",
@@ -749,8 +759,7 @@
           "room": "Sala 3",
           "venueGroup": "ocine",
           "eventLabels": [
-            "ENCUENTRO",
-            "PRESENTACIÓN"
+            "ENCUENTRO"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -1022,7 +1031,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1437696,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "pl",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "cobarde",
@@ -1125,7 +1136,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1437981,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "the-chilean",
@@ -1222,7 +1235,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1715722,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "it",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "rocas-rojas",
@@ -1290,15 +1305,13 @@
           "venue": "C.M.I. Pumarín Gijón Sur",
           "room": null,
           "venueGroup": "pumarin",
-          "eventLabels": [
-            "ENCUENTRO"
-          ],
+          "eventLabels": [],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 91,
           "durationSource": "calendar-block",
-          "hasMeeting": true,
-          "meetingMinutes": 15,
+          "hasMeeting": false,
+          "meetingMinutes": null,
           "sourcePage": 4,
           "filmIds": [
             "rocas-rojas"
@@ -1317,7 +1330,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1265831,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "mujer-desconocida",
@@ -1381,7 +1396,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1511780,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "da",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "laffaire-marie-claire",
@@ -1449,7 +1466,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1003494,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "ink",
@@ -1559,7 +1578,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1532610,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "elegy-for-the-forgotten-on-an-endless-war",
@@ -1592,7 +1613,7 @@
           "venueGroup": "pumarin",
           "eventLabels": [
             "ENCUENTRO",
-            "PRESENTACIÓN"
+            "CODOPA"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -1653,7 +1674,9 @@
       "synopsis": "Elegy for the Forgotten… tuvo su estreno en Locarno. La directora de Luciérnagas y The Vanishing Point (FICX 2025) firma un cortometraje tan urgente como reflexivo, donde va contraponiendo dos tipos de imágenes. Por un lado, diferentes secuencias de películas de ficción a través de las cuales la filmografía iraní representó la guerra entre Irán e Irak. En el otro lado, imágenes reales capturadas con teléfonos móviles que muestran los bombardeos israelís y estadounidenses actuales. Sobre este juego de paralelismo y contraste, la voz en off reflexiona sobre el momento que vive el país y la naturaleza de las propias imágenes a la hora de transmitir la Historia.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1735606
+      "tmdbId": 1735606,
+      "originalLanguage": "fa",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "forever-forever",
@@ -1687,6 +1710,7 @@
           "eventLabels": [
             "ENCUENTRO",
             "ENCUENTRO VIRTUAL",
+            "ENTRADA LIBRE",
             "THE JOHANN LURF EXPERIENCE"
           ],
           "accessType": "public",
@@ -1717,7 +1741,8 @@
           "eventLabels": [
             "ENCUENTRO",
             "ENCUENTRO VIRTUAL",
-            "AMNISTÍA INTERNACIONAL"
+            "ENTRADA LIBRE",
+            "THE JOHANN LURF EXPERIENCE"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -1742,7 +1767,9 @@
       "synopsis": "El FICX presenta esta Johann Lurf Experience como un acontecimiento extraordinario que se vertebra en torno a la premiere en España de su última obra, Forever…Forever, proyectada en Berlinale Forum, así como en Wavelengths (Toronto), 25 FPS, New York FF, Nouveaux Cinémas o IDFA, y que inauguró la Viennale. Lurf reincide en la indagación acerca de las conexiones entre paisaje, luz, imagen, cosmos y eternidad, común a otras piezas de su obra. El reflejo del cielo en el embalse de Ottenstein se convierte en un espejo en el que nuestra mirada adquiere dimensiones siderales y nuestro pensamiento alcanza nuevas perspectivas de la vida, el espacio y el tiempo y su relación armónica, convirtiendo esta proyección en una genuina vivencia sensorial para el público.\n\nRodada a lo largo de casi 2 años con una cámara de 65 mm. especialmente ideada para este proyecto, el lago, el cielo, el sol, las estrellas o la luna van cobrando nuevo sentido ante nuestros ojos a medida que pasan los días, las estaciones y se perciben los distintos ritmos cosmológicos. La proyección irá acompañada por un encuentro virtual con el cineasta, quien fue objeto de una asombrosa retrospectiva en el FICX 2018 y regresó en 2019 y 2024 con Cavalcade y Revolving Rounds.\n\nLa película, en parte de su metraje, contiene efectos estroboscópicos y flickering.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1616842
+      "tmdbId": 1616842,
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "las-acogidas",
@@ -2308,7 +2335,9 @@
       "synopsis": "Nueva selección de cortometrajes de estudiantes de cine de Catalyst, Institute for Creative Arts and Technology de Berlín. Entre el documental autobiográfico, la ficción y el cine de vanguardia, estas piezas hablan en primera persona y comparten una pregunta: dónde está el hogar cuando ya no se puede regresar a él y qué significa el hogar cuando uno no puede abandonarlo.",
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
-      "tmdbId": 1694067
+      "tmdbId": 1694067,
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "yovodevi",
@@ -2487,7 +2516,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1555801,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "why-do-i-see-you-in-everything",
@@ -2522,7 +2553,7 @@
           "venueGroup": "pumarin",
           "eventLabels": [
             "ENCUENTRO",
-            "PRESENTACIÓN"
+            "CODOPA"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -2584,7 +2615,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1580164,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "nl",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "eight-bridges",
@@ -2669,7 +2702,9 @@
       "synopsis": "James Benning (Landscape Suicide, i) es toda una institución dentro del cine de vanguardia, así como uno de los más hábiles observadores de la realidad política e histórica de su país, imponiendo un estilo propio de narración desde sus inicios en 1971, que ha ido evolucionando en estas cinco décadas.\n\nEIGHT BRIDGES conecta inevitablemente con sus trabajos 13 Lakes o Ten Skies, y se ofrece como un ensayo audiovisual que parte de la contemplación de ocho emblemáticos puentes estadounidenses. Ocho planos, de diez minutos cada uno, cuya elección puede contener un significado autobiográfico distinto, y de los que surgen lecturas íntimas, personales y que, al avanzar el metraje, se convierten en colectivas. Estrenada en la sección Forum de Berlinale, la película será presentada por el propio Benning, que acude al FICX una década después de su última visita a España para encontrarse con el público del festival.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1521017
+      "tmdbId": 1521017,
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "que-es-el-cine",
@@ -2727,7 +2762,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1794571,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "the-megalomaniacs",
@@ -2817,7 +2854,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1567508,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "el",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "adolescencia-sexo-y-muerte-en-campamento-miasma",
@@ -2942,7 +2981,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1240889,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "vade-retro",
@@ -3051,7 +3092,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1001288,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "full-phil",
@@ -3151,7 +3194,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1554364,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "staubwelt",
@@ -3254,7 +3299,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1696146,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "sv",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "misophonia",
@@ -3344,7 +3391,9 @@
       "synopsis": "“La misofonía es un trastorno neuroconductual asociado con la intolerancia, el odio o incluso el disgusto hacia ciertos sonidos”. Tomando este concepto como punto de partida, Michelle Gruppetta logra con su primer y muy conciso cortometraje, comprimir una severa crítica al ruido y la contaminación acústica (e informativa) en que vivimos inmersos, buscando trastocar al espectador a partir de este trastorno aural. Una experiencia impactante que ha viajado por festivales como Annecy, Animafest, Odense o Manchester Animation.\n\nAdvertencia para personas con sensibilidad a los estímulos agudos visuales y auditivos.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1701560
+      "tmdbId": 1701560,
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "awaken-thee-romanian",
@@ -3545,7 +3594,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1302994,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "freddy-got-fingered",
@@ -3652,7 +3703,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 13166,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "el-anorak-rojo",
@@ -3728,7 +3781,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1642890,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "where-to-land",
@@ -3830,7 +3885,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1187431,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "robert-richardson-the-white-devil",
@@ -3898,7 +3955,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1706746,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "ruta-norte",
@@ -3929,8 +3988,7 @@
           "room": null,
           "venueGroup": "pumarin",
           "eventLabels": [
-            "ENCUENTRO",
-            "TERTULIA LES COMADRES"
+            "ENCUENTRO"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -4090,7 +4148,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1471672,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "felpeyu-faciendo-historia-a-traves-de-la-musica",
@@ -4121,7 +4181,8 @@
           "room": null,
           "venueGroup": "pumarin",
           "eventLabels": [
-            "ENCUENTRO"
+            "ENCUENTRO",
+            "TALLER DE MÚSICOS"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -4300,7 +4361,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1387981,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "amanecer",
@@ -4331,7 +4394,8 @@
           "room": null,
           "venueGroup": "laboral",
           "eventLabels": [
-            "CONCIERTO"
+            "CONCIERTO",
+            "SOCIEDAD FILARMÓNICA DE GIJÓN"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -4443,7 +4507,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1670733,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "the-blessing",
@@ -4532,7 +4598,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1728733,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "melk",
@@ -4613,7 +4681,9 @@
       "synopsis": "Por primera vez, una animación ganó el Premio al Mejor Cortometraje en Locarno: el sobresaliente debut de Filip Anthonissen, elegido además por el festival suizo como candidato a los Premios de la Academia del Cine Europeo (EFA).\n\nDesconcertante y arrebatador, bello y grotesco a un tiempo, Melk nos enfrenta a sentimientos tan incómodos como familiares. Sus imágenes construyen un espacio irreal y vitriólico, donde los vínculos personales responden a códigos perversos y una presencia diabólica parece manejar los destinos de los habitantes del pueblo.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1667690
+      "tmdbId": 1667690,
+      "originalLanguage": "nl",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "procrastination-yoga",
@@ -4700,7 +4770,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1696897,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "peloton-trueno",
@@ -4782,7 +4854,9 @@
       "synopsis": "Theo Montoya regresa a la Sección Oficial de Cannes con Pelotón trueno, tras Hijo de Sodoma (2020) y después de ganar el Premio FIPRESCI del FICX 2022 y el de Mejor Primera Película en Zinebi con Anhell69.\n\nA principios de los 2000, unos jóvenes militares colombianos celebran el ascenso de su comandante por su actuación contra las FARC. La música, el alcohol y la euforia se ven amenazados por una tormenta. Montoya revisita el pasado reciente de su país y cuestiona el heroísmo, la masculinidad y los relatos oficiales.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1678770
+      "tmdbId": 1678770,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "oh-boys",
@@ -4875,7 +4949,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1549565,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "it",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "hold-it-together",
@@ -4958,7 +5034,9 @@
       "synopsis": "A lo largo de tres estaciones, en unas piscinas al aire libre de Islandia, Hold It Together explora la soledad, el duelo y el aislamiento, pero también la solidaridad que experimenta una persona migrante en su país de acogida. Entre cuerpos desnudos, vapores y contrastes térmicos y culturales, Fan Sissoko (Mención Especial del Jurado de Clermont-Ferrand por On the Surface) vuelve a abordar las transformaciones y adaptaciones. La obra ganó el Premio André Martin al Mejor Corto Francés en Annecy y el de Mejor Cortometraje Islandés en Reykjavik.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1660254
+      "tmdbId": 1660254,
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "les-pelures-d-estomac",
@@ -5039,7 +5117,9 @@
       "synopsis": "El dibujo sobre papel, bien sea con tinta o acuarela, es la base de la técnica de Bonnet quien no por casualidad también se dedica a la ilustración. Con su último trabajo, galardonado con el Alexeïeff-Parker Prize en Annecy por su originalidad artística, conjuga una estética muy de cómic underground, el documental y el humor para relatar un episodio autobiográfico, un suceso aparentemente insignificante como es una simple erupción cutánea, para elevarlo a niveles de hilaridad e incertidumbre de lo más explosivo.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1660515
+      "tmdbId": 1660515,
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "penguin",
@@ -5126,7 +5206,9 @@
       "synopsis": "Kaspar Jancis, autor de Kosmonaut, Krokodill, Piano y Captain Morten and the Spider Queen (FICX 2018), es una figura destacada de la animación europea. En Penguin, seleccionado en Annecy e Imaginaria, retoma el humor absurdo y su inconfundible estética 2D, esta vez inspirada en la pintura de Edward Hopper.\n\nLa película despliega una fantasía moderna y surrealista sobre una mujer que recibe un pingüino como regalo de su novio: una metáfora de la transformación de su relación y del deseo de aferrarse a lo que ya se ha desvanecido.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1661910
+      "tmdbId": 1661910,
+      "originalLanguage": "et",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "another-earth",
@@ -5212,7 +5294,9 @@
       "synopsis": "Ganador del Premio FIPRESCI Rellumes en el FICX 2017 por Good Luck y presente en Xixón junto a Ben Rivers con The Rare Event (2018), Ben Russell es uno de los creadores fundamentales del audiovisual contemporáneo, con trabajos premiados en Rotterdam, la Berlinale, Cinéma du Réel y CPH.\n\nEn Another Earth plantea un ejercicio de metaficción introspectiva, basado en textos de la novelista Rachel Kushner, que cuestiona nuestra vivencia y percepción del tiempo y retrata una época teñida de pesimismo ante la idea de un capitalismo invencible.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1633432
+      "tmdbId": 1633432,
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "dentro-de-lo-azul",
@@ -5294,7 +5378,9 @@
       "synopsis": "MACDO (FICX 2025) permitió descubrir a esta cineasta de origen mexicano, interesada en las dinámicas de los vínculos familiares y emocionales. Dentro de lo azul aborda el recuerdo de una relación tras su colapso como un territorio físico y mental, donde el pasado convive con mentiras, deseos, deformaciones, esperanzas y rencores. Un espacio claustrofóbico de sanación y perversión; un páramo que atravesar y habitar a la vez, retratado con brillante lucidez en esta obra que tuvo su estreno mundial en FIDMarseille.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1711426
+      "tmdbId": 1711426,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "recipes-for-phantoms",
@@ -5384,7 +5470,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1557065,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "a-shot-at-art",
@@ -5469,7 +5557,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1626645,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "nl",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "cau-la-nit",
@@ -5562,7 +5652,9 @@
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
       "tmdbId": 1648378,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "ca",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "mouse",
@@ -5662,7 +5754,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1241052,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "moulin",
@@ -5761,7 +5855,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1437925,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "princesa-burro",
@@ -5850,7 +5946,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1536431,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "the-only-living-pickpocket-in-new-york",
@@ -5910,8 +6008,7 @@
           "room": null,
           "venueGroup": "teatro-jovellanos",
           "eventLabels": [
-            "PRENSA Y PÚBLICO",
-            "PRESENTACIÓN"
+            "PRENSA Y PÚBLICO"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -5963,7 +6060,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1458099,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "flesh-and-fuel",
@@ -6017,6 +6116,7 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
+            "PRENSA Y ACREDITADOS",
             "INAUGURACIÓN"
           ],
           "accessType": "restricted",
@@ -6098,7 +6198,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1084814,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "women-as-lovers",
@@ -6206,7 +6308,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1452018,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "meanwhile-in-namibia",
@@ -6238,7 +6342,8 @@
           "venueGroup": "escuela-comercio",
           "eventLabels": [
             "PRENSA Y PÚBLICO",
-            "ENCUENTRO"
+            "ENCUENTRO",
+            "SOCIEDAD CULTURAL GIJONESA"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -6265,15 +6370,13 @@
           "venue": "OCINE",
           "room": "Sala 3",
           "venueGroup": "ocine",
-          "eventLabels": [
-            "ENCUENTRO"
-          ],
+          "eventLabels": [],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 111,
           "durationSource": "calendar-block",
-          "hasMeeting": true,
-          "meetingMinutes": 15,
+          "hasMeeting": false,
+          "meetingMinutes": null,
           "sourcePage": 5,
           "filmIds": [
             "meanwhile-in-namibia"
@@ -6291,7 +6394,9 @@
       "synopsis": "Estreno en España en colaboración con ZINEBI\n\nLa mirada de Spriestersbach, heredera de las mejores obras de Ulrich Seidl o Michael Glawogger, resulta implacable. Aparenta ser testigo mudo, pero amplifica lo que recoge y lo proyecta de forma atronadora y sin efectismos.\n\nEn este caso, una Namibia por la que han pasado más de cien años desde el genocidio perpetrado por Alemania, cuando el territorio era su colonia. Más de tres décadas después de su independencia de Suráfrica, el país no ve resarcimiento ni identidad en los millones de dólares que le llegan en fondos al desarrollo, ni en los “museos (safaris) humanos” que fascinan a los miles de turistas alemanes que la visitan. Sólo percibe el mismo colonialismo y el mismo racismo de siempre, pero con otras vestiduras. Estrenada en Visions du Réel y premiada en Múnich.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1658210
+      "tmdbId": 1658210,
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "dua",
@@ -6387,7 +6492,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1472825,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "sq",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "i-plant-my-hand-in-the-garden",
@@ -6427,8 +6534,7 @@
           "venueGroup": "escuela-comercio",
           "eventLabels": [
             "PRENSA Y ACREDITADOS",
-            "ENCUENTRO",
-            "ENTRADA LIBRE"
+            "ENCUENTRO"
           ],
           "accessType": "restricted",
           "reviewStatus": "needs-review",
@@ -6508,7 +6614,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1735952,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "brave-new-love",
@@ -6603,7 +6711,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1605116,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "da",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "un-detour-par-diane",
@@ -6643,9 +6753,10 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
+            "PRENSA Y ACREDITADOS",
             "ENCUENTRO"
           ],
-          "accessType": "public",
+          "accessType": "restricted",
           "reviewStatus": "needs-review",
           "durationMinutes": 92,
           "durationSource": "calendar-block",
@@ -6723,7 +6834,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1404588,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "objet-a",
@@ -6830,7 +6943,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1228841,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "garance",
@@ -6876,15 +6991,14 @@
           "room": null,
           "venueGroup": "teatro-jovellanos",
           "eventLabels": [
-            "PRENSA Y PÚBLICO",
-            "ENCUENTRO"
+            "PRENSA Y PÚBLICO"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 115,
           "durationSource": "calendar-block",
-          "hasMeeting": true,
-          "meetingMinutes": 15,
+          "hasMeeting": false,
+          "meetingMinutes": null,
           "sourcePage": 2,
           "filmIds": [
             "garance"
@@ -6929,7 +7043,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1507877,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "my-wife-cries",
@@ -6971,9 +7087,7 @@
           "venue": "OCINE",
           "room": "Sala 5",
           "venueGroup": "ocine",
-          "eventLabels": [
-            "PREMIO DE HONOR"
-          ],
+          "eventLabels": [],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 93,
@@ -7024,7 +7138,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1152312,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "todo-el-mundo-quiere-a-bill-evans",
@@ -7064,8 +7180,7 @@
           "room": null,
           "venueGroup": "teatro-jovellanos",
           "eventLabels": [
-            "ENCUENTRO",
-            "PRESENTACIÓN"
+            "ENCUENTRO"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -7121,15 +7236,13 @@
           "venue": "C.M.I. Pumarín Gijón Sur",
           "room": null,
           "venueGroup": "pumarin",
-          "eventLabels": [
-            "ENCUENTRO"
-          ],
+          "eventLabels": [],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 102,
           "durationSource": "calendar-block",
-          "hasMeeting": true,
-          "meetingMinutes": 15,
+          "hasMeeting": false,
+          "meetingMinutes": null,
           "sourcePage": 4,
           "filmIds": [
             "todo-el-mundo-quiere-a-bill-evans"
@@ -7148,7 +7261,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1378791,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "un-peu-avant-minuit",
@@ -7245,7 +7360,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1480672,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "fujiko",
@@ -7283,8 +7400,10 @@
           "venue": "Escuela de Comercio",
           "room": null,
           "venueGroup": "escuela-comercio",
-          "eventLabels": [],
-          "accessType": "public",
+          "eventLabels": [
+            "PRENSA Y ACREDITADOS"
+          ],
+          "accessType": "restricted",
           "reviewStatus": "needs-review",
           "durationMinutes": 95,
           "durationSource": "calendar-block",
@@ -7360,7 +7479,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1454699,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "ja",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "la-invitada",
@@ -7398,8 +7519,7 @@
           "room": null,
           "venueGroup": "teatro-jovellanos",
           "eventLabels": [
-            "PRENSA Y PÚBLICO",
-            "PRESENTACIÓN"
+            "PRENSA Y PÚBLICO"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -7451,7 +7571,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1706729,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "da",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "the-blood-countess",
@@ -7559,7 +7681,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1251608,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "conrad-crab-idiotic-gems",
@@ -7646,7 +7770,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1273296,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "virages-summer-drift",
@@ -7706,7 +7832,8 @@
           "room": "Sala 1",
           "venueGroup": "ocine",
           "eventLabels": [
-            "ENCUENTRO"
+            "ENCUENTRO",
+            "XEGA"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -7732,7 +7859,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1670436,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "journal-du-futur",
@@ -7768,7 +7897,8 @@
           "room": "Sala 5",
           "venueGroup": "ocine",
           "eventLabels": [
-            "PRESENTACIÓN"
+            "PRESENTACIÓN",
+            "MUESTRA DE CINE LÉSBICO DE GIJÓN"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -7839,7 +7969,9 @@
       "synopsis": "Ganador del Premio Georges de Beauregard de la Competición Francesa de FID Marseille, Journal du Futur supone el debut como directora de la actriz Agathe Bonitzer (AffectionAffection, El Último Suspiro, Belle Dormant), quien recupera aquí las entrañables imágenes capturadas con su primera videocámara que recibió como regalo en su 15 cumpleaños. Imágenes repletas de juegos y confidencias adolescentes, viajes, juegos, ilusiones y esperanzas, que contrapone contrapone a los textos de su diario de entonces, poblado por sentimientos más inciertos y frágiles. Del contraste surge una explosión de realidad y confesión, un diálogo entre su yo del pasado y el actual, que refleja el proceso de maduración de la cineasta.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1708600
+      "tmdbId": 1708600,
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "tutti-frutti",
@@ -7878,7 +8010,8 @@
           "room": "Sala 5",
           "venueGroup": "ocine",
           "eventLabels": [
-            "PRESENTACIÓN"
+            "PRESENTACIÓN",
+            "MUESTRA DE CINE LÉSBICO DE GIJÓN"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -7950,7 +8083,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1707480,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "the-day-she-returns",
@@ -7980,15 +8115,13 @@
           "venue": "Escuela de Comercio",
           "room": null,
           "venueGroup": "escuela-comercio",
-          "eventLabels": [
-            "ENCUENTRO"
-          ],
+          "eventLabels": [],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 120,
           "durationSource": "programme-duration-overrides (suma de fichas)",
-          "hasMeeting": true,
-          "meetingMinutes": 15,
+          "hasMeeting": false,
+          "meetingMinutes": null,
           "sourcePage": 3,
           "filmIds": [
             "torino-shadow",
@@ -8102,10 +8235,7 @@
           "venue": "Escuela de Comercio",
           "room": null,
           "venueGroup": "escuela-comercio",
-          "eventLabels": [
-            "ENTRADA LIBRE",
-            "AGENDA 2030"
-          ],
+          "eventLabels": [],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 107,
@@ -8182,7 +8312,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1597196,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "it",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "i-want-your-sex",
@@ -8233,9 +8365,7 @@
           "venue": "Teatro Jovellanos",
           "room": null,
           "venueGroup": "teatro-jovellanos",
-          "eventLabels": [
-            "TERTULIA LES COMADRES"
-          ],
+          "eventLabels": [],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 90,
@@ -8286,7 +8416,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1288059,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "a-pena",
@@ -8347,7 +8479,9 @@
       "synopsis": "Cámara en mano, salgo a la búsqueda de a Pena, palabra gallega que nombra tanto una roca grande y prominente como un sentimiento de dolor o angustia. Desde la mirada de quien intenta nombrar el mundo por primera vez, se articula este cuaderno de notas audiovisual que explora algunas de las formaciones rocosas más singulares del paisaje en el que crecí, en la comarca de A Terra Chá (Galicia).",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1711524
+      "tmdbId": 1711524,
+      "originalLanguage": "gl",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "los-divulgators",
@@ -8446,7 +8580,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1627151,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "the-getaway",
@@ -8533,7 +8669,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1770853,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "trella",
@@ -8702,7 +8840,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1561326,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "a-los-traidores",
@@ -8789,7 +8929,9 @@
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
       "tmdbId": 1783607,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "la-fabula-de-la-punki-adolescente",
@@ -8877,7 +9019,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1730304,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "la-prona",
@@ -8963,7 +9107,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1637691,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "ca",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "era-domingo",
@@ -9127,7 +9273,9 @@
       "synopsis": "Con Café (Cuentos con la C) es un poema en forma de Animación experimental. Un viaje al subconsciente íntimo durante el momento de hacer una pausa para tomar un café.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1716868
+      "tmdbId": 1716868,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "tina",
@@ -9209,7 +9357,9 @@
       "synopsis": "Una joven deprimida adopta a una perra con la esperanza de que sea su salvación, pero la perra está peor que ella y la relación no funciona.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1720008
+      "tmdbId": 1720008,
+      "originalLanguage": "xx",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "la-inutil",
@@ -9281,7 +9431,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 634179,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "los-tortuga",
@@ -9397,7 +9549,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 800090,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "la-hija-de-un-ladron",
@@ -9473,7 +9627,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 620639,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "sara-a-la-fuga",
@@ -9545,7 +9701,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 392793,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "titanic-ocean",
@@ -9720,7 +9878,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1728686,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "animas-benditas",
@@ -9802,7 +9962,9 @@
       "synopsis": "Gabriel Velázquez vuelve al FICX, donde Iceberg obtuvo una Mención Especial del Jurado en 2011, para estrenar mundialmente una película ascética al tiempo que profundamente arraigada en la Sierra de Salamanca. Siete historias cotidianas se cruzan en una aldea de La Alberca alrededor de la muerte, la memoria y una tradición centenaria: cada atardecer, las mozas de ánimas recorren sus calles con candelas y esquila para rezar por quienes aún buscan descanso. Un forestal, una joven viuda, dos hermanos que se reencuentran, ancianos, niños y recién casados componen este retrato coral de un territorio suspendido entre lo terrenal y lo espiritual.\n\nCon un equipo mayoritariamente salmantino y serrano, Ánimas benditas reúne paisajes, ritos y vidas en una memoria cinematográfica de extraordinaria belleza.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1815944
+      "tmdbId": 1815944,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "bajani",
@@ -9868,7 +10030,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1736720,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "bonus-track-desesperada",
@@ -9931,7 +10095,9 @@
       "synopsis": "Como prolongación de asturias es jazz, Lucía Seles presenta un auténtico bonus track: una pieza que retoma sus espacios, ritmos y materiales para desviarlos hacia otro itinerario.\n\nUn autobús urbano más allá de los límites de Xixón conduce la película hasta una periferia brumosa donde lo cotidiano empieza a adquirir una extraña cualidad de misterio y soledad. El trayecto se entrecorta con un concierto de jazz en una de esas cafeterías que ocupan un lugar reconocible en el universo de Seles, mientras el montaje adopta la lógica de una feliz improvisación visual y sonora.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1815558
+      "tmdbId": 1815558,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "asturias-es-jazz",
@@ -9994,7 +10160,9 @@
       "synopsis": "Lucía Seles recorre Asturias en transporte público mientras aplica al territorio y al paisanaje la poesía de su mirada, sus fetiches artísticos y una capacidad única para encontrar belleza en los detalles más aparentemente nimios. Cafeterías, bares, tiendas en traspaso, administraciones de lotería, calles lluviosas y conversaciones ajenas van dibujando una Asturias urbana y popular, muy lejos de cualquier postal turística. Imágenes capturadas casi al vuelo, textos sobreimpresos, fragmentos de radio, entrevistas y materiales sonoros se suceden con la libertad característica de su cine. Una mirada personalísima sobre un lugar, sus ritmos y sus habitantes que celebra su estreno mundial en el FICX",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1815552
+      "tmdbId": 1815552,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "cuantica-rave",
@@ -10057,7 +10225,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1624955,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "hombres-semilla",
@@ -10088,8 +10258,7 @@
           "room": "Sala 3",
           "venueGroup": "ocine",
           "eventLabels": [
-            "ENCUENTRO",
-            "PRESENTACIÓN"
+            "ENCUENTRO"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -10176,7 +10345,9 @@
       "synopsis": "En Portugal a los videoclips musicales le decian telediscos y este es mi teledisco de Astorga centrada en la family Panero.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1661467
+      "tmdbId": 1661467,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "anxo",
@@ -10233,7 +10404,8 @@
           "room": "Sala 3",
           "venueGroup": "ocine",
           "eventLabels": [
-            "ENCUENTRO"
+            "ENCUENTRO",
+            "ATENEO OBRERO DE GIJÓN"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -10318,7 +10490,9 @@
       "synopsis": "La contaminación lumínica aumenta de manera paralela al avance del capitalismo. El mundo se ilumina en pos de la seguridad y del desarrollismo. Sin embargo, la oscuridad es el lugar seguro para quienes se ven obligados a huir del lugar donde viven.\n\nEste es un trabajo [lan], en la noche [gau]; gaulana: una película sobre las personas que, a lo largo de la historia de la muga, de la frontera, han buscado abrigo en la oscuridad. Lo fueron los presos fugados de Ezkaba, quienes intentaron guiarse por las estrellas para llegar a Francia; también los portugueses a mediados del siglo pasado; hoy, los migrantes que intentan cruzar el Bidasoa. En esa línea que divide el territorio existen pequeños huecos sin luz, espacios donde la presión política y policial se queda a oscuras.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1678188
+      "tmdbId": 1678188,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "hoxe-e-o-resto-do-mundo",
@@ -10349,7 +10523,8 @@
           "room": "Sala 1",
           "venueGroup": "ocine",
           "eventLabels": [
-            "ENCUENTRO"
+            "ENCUENTRO",
+            "SOCIEDAD CULTURAL GESTO"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -10400,7 +10575,9 @@
       "synopsis": "Una película que nos sumerge en el periplo vital y artístico de Isaac Díaz Pardo y Mimina Arias de Castro, fundadores del Laboratorio de Formas (Sargadelos). A través de infinidad de archivos, viajamos entre Galicia y el exilio por el arte, la memoria histórica, el diseño, la arquitectura y el pensamiento de vanguardia y, por encima de todo, el humanismo.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1812741
+      "tmdbId": 1812741,
+      "originalLanguage": "gl",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "on-gods-island",
@@ -10679,7 +10856,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1453909,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "kotodama-el-camino-del-espejo",
@@ -10757,7 +10936,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1752136,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "el-color-y-el-paisaxe",
@@ -11168,7 +11349,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1697206,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "los-andares",
@@ -11259,7 +11442,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1725429,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "ca",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "ur",
@@ -11425,7 +11610,9 @@
       "synopsis": "Tres años después de La estafa del amor, Virginia García del Pino está de vuelta en el FICX para presentar su nuevo trabajo. Un corto breve y directo, cimentado sobre imágenes de películas españolas producidas en los primeros años 70, en las que aparecen temas y elementos tabú de la época, como el desnudo, el sexo o la homosexualidad, que sirven a la cineasta para analizar las normas de la censura franquista y el propio término “normal” a lo largo de las últimas décadas, a modo de recordatorio o de advertencia.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1686857
+      "tmdbId": 1686857,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "chica-y-lobo",
@@ -11542,7 +11729,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 676648,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "las-mantis",
@@ -11576,9 +11765,10 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
+            "PRENSA Y ACREDITADOS",
             "ENCUENTRO"
           ],
-          "accessType": "public",
+          "accessType": "restricted",
           "reviewStatus": "needs-review",
           "durationMinutes": 102,
           "durationSource": "calendar-block",
@@ -11656,7 +11846,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1532455,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "las-convulsiones",
@@ -11688,9 +11880,10 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
+            "PRENSA Y ACREDITADOS",
             "ENCUENTRO"
           ],
-          "accessType": "public",
+          "accessType": "restricted",
           "reviewStatus": "needs-review",
           "durationMinutes": 93,
           "durationSource": "calendar-block",
@@ -11742,8 +11935,7 @@
           "room": "Sala 1",
           "venueGroup": "ocine",
           "eventLabels": [
-            "ENCUENTRO",
-            "TERTULIA LES COMADRES"
+            "ENCUENTRO"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -11803,7 +11995,8 @@
           "room": null,
           "venueGroup": "teatro-jovellanos",
           "eventLabels": [
-            "ENCUENTRO"
+            "ENCUENTRO",
+            "SOCIEDAD CULTURAL GIJONESA"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -11831,9 +12024,10 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
+            "PRENSA Y ACREDITADOS",
             "ENCUENTRO"
           ],
-          "accessType": "public",
+          "accessType": "restricted",
           "reviewStatus": "needs-review",
           "durationMinutes": 80,
           "durationSource": "calendar-block",
@@ -11883,7 +12077,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1708742,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "la-noche-de-la-infancia",
@@ -11917,10 +12113,10 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
-            "ENCUENTRO",
-            "ACCESO LIBRE"
+            "PRENSA Y ACREDITADOS",
+            "ENCUENTRO"
           ],
-          "accessType": "public",
+          "accessType": "restricted",
           "reviewStatus": "needs-review",
           "durationMinutes": 93,
           "durationSource": "calendar-block",
@@ -11946,8 +12142,7 @@
           "room": "Sala 5",
           "venueGroup": "ocine",
           "eventLabels": [
-            "ENCUENTRO",
-            "ENTRADA LIBRE"
+            "ENCUENTRO"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -11999,7 +12194,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1464311,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "the-talented-mr-f",
@@ -12040,8 +12237,6 @@
           "venueGroup": "pumarin",
           "eventLabels": [
             "ENCUENTRO",
-            "ENTRADA LIBRE",
-            "AGENDA 2030",
             "ESCOLARES"
           ],
           "accessType": "conditional",
@@ -12101,7 +12296,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1550673,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "22-lengths-22-bahnen",
@@ -12201,7 +12398,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1380070,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "the-gymnast",
@@ -12327,7 +12526,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1220686,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "sunny-dancer",
@@ -12466,7 +12667,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1280015,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "take-me-home",
@@ -12593,7 +12796,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1569461,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "expedicion-a-la-jungla-born-in-the-jungle",
@@ -12633,7 +12838,9 @@
           "venue": "C.M.I. Pumarín Gijón Sur",
           "room": null,
           "venueGroup": "pumarin",
-          "eventLabels": [],
+          "eventLabels": [
+            "DOBLADA AL ESPAÑOL"
+          ],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 73,
@@ -12688,7 +12895,8 @@
           "room": "Sala 13",
           "venueGroup": "yelmo",
           "eventLabels": [
-            "ESCOLARES"
+            "ESCOLARES",
+            "DOBLAJE EN DIRECTO AL ASTURIANO"
           ],
           "accessType": "conditional",
           "reviewStatus": "needs-review",
@@ -12742,7 +12950,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 947474,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "lv",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "barca-zou-rewind-barcelona",
@@ -12861,7 +13071,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1670376,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "iron-boy",
@@ -12966,7 +13178,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 947493,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "adieu-monde-cruel-goodbye-cruel-world",
@@ -13062,9 +13276,10 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
+            "PRENSA Y ACREDITADOS",
             "ENCUENTRO"
           ],
-          "accessType": "public",
+          "accessType": "restricted",
           "reviewStatus": "needs-review",
           "durationMinutes": 93,
           "durationSource": "calendar-block",
@@ -13143,7 +13358,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1352304,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "mi-vida-en-versalles-my-life-in-versailles",
@@ -13248,7 +13465,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1489456,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "chicas-tristes",
@@ -13296,7 +13515,8 @@
           "room": "Sala 13",
           "venueGroup": "yelmo",
           "eventLabels": [
-            "PRESENTACIÓN"
+            "PRESENTACIÓN",
+            "ABIERTO HASTA EL AMANECER"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -13322,7 +13542,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1536433,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "15-18-a-place-to-heal",
@@ -13499,7 +13721,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1429602,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "lenfant-du-desert-the-desert-child",
@@ -13727,7 +13951,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1175842,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "belleville-kitchen",
@@ -13811,7 +14037,9 @@
       "synopsis": "Marion pasa lista: Jissel, Hamza, Mouloud, Rita, María, Milo… Vienen de Perú, del Congo, de Túnez, de las Ardenas o del distrito 11, y forman la clase de 5.º de primaria de la escuela del número 104 de la calle de Belleville, en París. Mientras que las tensiones entre comunidades se agravan día a día, y la escuela pública parece verse cada vez más puesta a prueba, Marion se esfuerza por crear en su clase, gracias a la cocina, un espacio para compartir.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1648038
+      "tmdbId": 1648038,
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "le-journal-dune-femme-de-chambre-the-diary-of-a-chambermaid",
@@ -13868,8 +14096,7 @@
           "room": null,
           "venueGroup": "teatro-jovellanos",
           "eventLabels": [
-            "PRESENTACIÓN",
-            "PREMIO DE HONOR"
+            "PRESENTACIÓN"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -13897,11 +14124,10 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
-            "ENCUENTRO",
-            "ENTRADA LIBRE",
-            "THE JOHANN LURF EXPERIENCE"
+            "PRENSA Y ACREDITADOS",
+            "ENCUENTRO"
           ],
-          "accessType": "public",
+          "accessType": "restricted",
           "reviewStatus": "needs-review",
           "durationMinutes": 94,
           "durationSource": "calendar-block",
@@ -13951,7 +14177,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1472813,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "versus",
@@ -13983,8 +14211,6 @@
           "venueGroup": "pumarin",
           "eventLabels": [
             "ENCUENTRO",
-            "ENTRADA LIBRE",
-            "AGENDA 2030",
             "ESCOLARES"
           ],
           "accessType": "conditional",
@@ -14106,7 +14332,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1422441,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "les-miserables",
@@ -14210,7 +14438,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1241803,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "a-veces-me-entra-tristeza-otra-veces-rebelion",
@@ -14243,9 +14473,7 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
-            "ENCUENTRO",
-            "ENTRADA LIBRE",
-            "PELÍCULA DE SENSACINE"
+            "ENCUENTRO"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -14297,7 +14525,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1735947,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "el-hombre-mas-solitario-de-la-ciudad",
@@ -14387,7 +14617,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1426957,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "la-detention-detention",
@@ -14469,7 +14701,9 @@
       "synopsis": "Abrir una puerta. Gestionar una crisis. Redactar el informe de un incidente. En la Escuela Nacional de Administración Penitenciaria de Francia, cientos de mujeres y hombres aprenden el oficio de vigilante. Sus palabras se convierten en reflejo de la institución. Lo que antes era incierto se convierte en rutina, sus movimientos se vuelven más precisos y la duda se desvanece poco a poco de sus rostros.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1670409
+      "tmdbId": 1670409,
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "orange-flavoured-wedding",
@@ -14581,7 +14815,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1563891,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "saudades-eternas",
@@ -14665,7 +14901,9 @@
       "synopsis": "En una casa de ladrillo situada en el corazón de una favela de Río, Sueli grita, regaña y consuela. Matriarca de una ruidosa familia, cuida de sus hijos y nietos, sin dejarse intimidar por las ráfagas de disparos que marcan el ritmo de la vida cotidiana. A su alrededor, se multiplican las muertes repentinas, los niños crecen y la casa no deja de cambiar, marcada por un sinfín de reparaciones. Aun así, Sueli se mantiene firme.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 1658225
+      "tmdbId": 1658225,
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "sense-of-water",
@@ -14705,7 +14943,8 @@
           "room": "Sala 5",
           "venueGroup": "ocine",
           "eventLabels": [
-            "PRESENTACIÓN"
+            "PRESENTACIÓN",
+            "MUESTRA DE CINE LÉSBICO DE GIJÓN"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -14777,7 +15016,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1604270,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fa",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "torino-shadow",
@@ -14812,15 +15053,13 @@
           "venue": "Escuela de Comercio",
           "room": null,
           "venueGroup": "escuela-comercio",
-          "eventLabels": [
-            "ENCUENTRO"
-          ],
+          "eventLabels": [],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 120,
           "durationSource": "programme-duration-overrides (suma de fichas)",
-          "hasMeeting": true,
-          "meetingMinutes": 15,
+          "hasMeeting": false,
+          "meetingMinutes": null,
           "sourcePage": 3,
           "filmIds": [
             "torino-shadow",
@@ -14875,7 +15114,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1689248,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "zh",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "silvia",
@@ -14939,7 +15180,9 @@
       "synopsis": "Una poética crónica familiar, donde la hija de un diplomático y sus dos hermanas intentan reconstruir la trágica vida de su madre. A través de viejas lmaciones familiares y sus propios recuerdos, buscan dilucidar cómo el matrimonio de sus padres se terminó convirtiendo en un espiral de enfrentamientos violentos, problemas psicológicos y drogas prescriptas.\n\nLos fragmentos del pasado son acentuados, congelados, rebobinados, para convertir esta íntima historia en un drama universal, suscitando preguntas sobre la memoria, la verdad, las ilusiones y las apariencias, así como la naturaleza del vínculo madre-hija.",
       "synopsisSource": "web",
       "hasWebPage": true,
-      "tmdbId": 587726
+      "tmdbId": 587726,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "the-spiral",
@@ -15007,7 +15250,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 968288,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "mailin",
@@ -15078,7 +15323,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1567783,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "criatura",
@@ -15147,7 +15394,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 846848,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "to-hold-a-mountain",
@@ -15185,7 +15434,8 @@
           "room": null,
           "venueGroup": "pumarin",
           "eventLabels": [
-            "PRESENTACIÓN"
+            "PRESENTACIÓN",
+            "CODOPA"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -15237,7 +15487,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1596276,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "sr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "heysel-85",
@@ -15310,15 +15562,13 @@
           "venue": "C.M.I. Pumarín Gijón Sur",
           "room": null,
           "venueGroup": "pumarin",
-          "eventLabels": [
-            "ENCUENTRO"
-          ],
+          "eventLabels": [],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 91,
           "durationSource": "calendar-block",
-          "hasMeeting": true,
-          "meetingMinutes": 15,
+          "hasMeeting": false,
+          "meetingMinutes": null,
           "sourcePage": 4,
           "filmIds": [
             "heysel-85"
@@ -15365,7 +15615,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1447885,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "nl",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "ill-be-gone-in-june",
@@ -15554,7 +15806,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1441105,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "honey-bunny",
@@ -15657,7 +15911,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1550540,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "hr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "the-dreamed-adventure",
@@ -15697,8 +15953,10 @@
           "venue": "Escuela de Comercio",
           "room": null,
           "venueGroup": "escuela-comercio",
-          "eventLabels": [],
-          "accessType": "public",
+          "eventLabels": [
+            "PRENSA Y ACREDITADOS"
+          ],
+          "accessType": "restricted",
           "reviewStatus": "reviewed",
           "durationMinutes": 164,
           "durationSource": "calendar-block",
@@ -15774,7 +16032,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1013822,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "shame-and-money",
@@ -15872,7 +16132,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1553591,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "sq",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "full-nest",
@@ -16160,7 +16422,9 @@
       "synopsis": "Capítulo de la serie animada «Lena's Farm» de Elena Walf, once cortometrajes de 5'13'' sin diálogo —nominados en conjunto al Emmy Internacional a Mejor Serie de Animación Infantil— en los que texturas artesanales, humor visual, música y movimiento dialogan con la diferencia, la amistad y la convivencia.",
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
-      "tmdbId": 1493680
+      "tmdbId": 1493680,
+      "originalLanguage": "xx",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "providence-and-the-guitar",
@@ -16267,7 +16531,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1440397,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "pt",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "margen-de-maniobra",
@@ -16298,9 +16564,10 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
+            "PRENSA Y ACREDITADOS",
             "ENCUENTRO"
           ],
-          "accessType": "public",
+          "accessType": "restricted",
           "reviewStatus": "needs-review",
           "durationMinutes": 71,
           "durationSource": "calendar-block",
@@ -16469,7 +16736,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1728687,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "fr",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "agua-mole",
@@ -16502,9 +16771,7 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
-            "ENCUENTRO",
-            "ENTRADA LIBRE",
-            "POEX"
+            "ENCUENTRO"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -16597,7 +16864,9 @@
       "synopsis": "Programa del foco dedicado a Alexandra Ramires y Laura Gonçalves, que hacen de la animación un espacio para explorar memoria, territorio, vínculos familiares y comunidad desde testimonios y experiencias reales, con una poderosa sensibilidad plástica.",
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
-      "tmdbId": 464110
+      "tmdbId": 464110,
+      "originalLanguage": "pt",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "elo",
@@ -16631,9 +16900,7 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
-            "ENCUENTRO",
-            "ENTRADA LIBRE",
-            "POEX"
+            "ENCUENTRO"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -16726,7 +16993,9 @@
       "synopsis": "Programa del foco dedicado a Alexandra Ramires y Laura Gonçalves, que hacen de la animación un espacio para explorar memoria, territorio, vínculos familiares y comunidad desde testimonios y experiencias reales, con una poderosa sensibilidad plástica.",
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
-      "tmdbId": 736832
+      "tmdbId": 736832,
+      "originalLanguage": "pt",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "o-homem-do-lix",
@@ -16759,9 +17028,7 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
-            "ENCUENTRO",
-            "ENTRADA LIBRE",
-            "POEX"
+            "ENCUENTRO"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -16854,7 +17121,9 @@
       "synopsis": "Programa del foco dedicado a Alexandra Ramires y Laura Gonçalves, que hacen de la animación un espacio para explorar memoria, territorio, vínculos familiares y comunidad desde testimonios y experiencias reales, con una poderosa sensibilidad plástica.",
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
-      "tmdbId": 950817
+      "tmdbId": 950817,
+      "originalLanguage": "pt",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "percebes",
@@ -16888,9 +17157,7 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
-            "ENCUENTRO",
-            "ENTRADA LIBRE",
-            "POEX"
+            "ENCUENTRO"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -16983,7 +17250,9 @@
       "synopsis": "Con el mar y el Algarve urbano como telón de fondo, seguimos el ciclo completo de la vida de los «percebes». Desde su formación hasta el plato, atravesamos diferentes entornos que nos permiten comprender mejor esta región y a quienes la habitan. Ganador en Annecy, premiado en Sophia y Guadalajara, y con selecciones en Toronto, Raindance, Tampere y Clermont.",
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
-      "tmdbId": 1280699
+      "tmdbId": 1280699,
+      "originalLanguage": "pt",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "tres-semanas",
@@ -17017,9 +17286,7 @@
           "room": null,
           "venueGroup": "escuela-comercio",
           "eventLabels": [
-            "ENCUENTRO",
-            "ENTRADA LIBRE",
-            "POEX"
+            "ENCUENTRO"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -17112,7 +17379,9 @@
       "synopsis": "Programa del foco dedicado a Alexandra Ramires y Laura Gonçalves, que hacen de la animación un espacio para explorar memoria, territorio, vínculos familiares y comunidad desde testimonios y experiencias reales, con una poderosa sensibilidad plástica.",
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
-      "tmdbId": 476717
+      "tmdbId": 476717,
+      "originalLanguage": "pt",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "well-hidden",
@@ -17817,7 +18086,9 @@
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
       "tmdbId": 520726,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "reizwasche",
@@ -17949,7 +18220,9 @@
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
       "tmdbId": 785236,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "jam-and-wood",
@@ -19225,7 +19498,9 @@
       "synopsis": "Capítulo de la serie animada «Lena's Farm» de Elena Walf, once cortometrajes de 5'13'' sin diálogo —nominados en conjunto al Emmy Internacional a Mejor Serie de Animación Infantil— en los que texturas artesanales, humor visual, música y movimiento dialogan con la diferencia, la amistad y la convivencia.",
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
-      "tmdbId": 881255
+      "tmdbId": 881255,
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "beloved-cowbell",
@@ -19927,7 +20202,9 @@
       "synopsis": "Capítulo de la serie animada «Lena's Farm» de Elena Walf, once cortometrajes de 5'13'' sin diálogo —nominados en conjunto al Emmy Internacional a Mejor Serie de Animación Infantil— en los que texturas artesanales, humor visual, música y movimiento dialogan con la diferencia, la amistad y la convivencia.",
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
-      "tmdbId": 451234
+      "tmdbId": 451234,
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "a-very-special-meal",
@@ -20502,7 +20779,9 @@
       "synopsis": "Capítulo de la serie animada «Lena's Farm» de Elena Walf, once cortometrajes de 5'13'' sin diálogo —nominados en conjunto al Emmy Internacional a Mejor Serie de Animación Infantil— en los que texturas artesanales, humor visual, música y movimiento dialogan con la diferencia, la amistad y la convivencia.",
       "synopsisSource": "catalogo-pdf",
       "hasWebPage": true,
-      "tmdbId": 1493683
+      "tmdbId": 1493683,
+      "originalLanguage": "xx",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "a-family",
@@ -20597,7 +20876,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1359694,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "nl",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "memorizu",
@@ -20690,7 +20971,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1637456,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "ja",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "supporting-role",
@@ -20800,7 +21083,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1306247,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "ka",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "veo-caer-edificios-como-rayos",
@@ -20842,7 +21127,8 @@
           "room": null,
           "venueGroup": "teatro-jovellanos",
           "eventLabels": [
-            "PRESENTACIÓN"
+            "PRESENTACIÓN",
+            "ATENEO OBRERO DE GIJÓN"
           ],
           "accessType": "public",
           "reviewStatus": "needs-review",
@@ -20922,7 +21208,9 @@
       "synopsisSource": "web",
       "hasWebPage": true,
       "tmdbId": 1455247,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "no-hay-donde-posar-la-mirada",
@@ -20978,8 +21266,10 @@
           "venue": "Escuela de Comercio",
           "room": null,
           "venueGroup": "escuela-comercio",
-          "eventLabels": [],
-          "accessType": "public",
+          "eventLabels": [
+            "PRENSA Y ACREDITADOS"
+          ],
+          "accessType": "restricted",
           "reviewStatus": "needs-review",
           "durationMinutes": 72,
           "durationSource": "calendar-block",
@@ -21186,7 +21476,9 @@
       "synopsis": "En un hospital de Buenos Aires, Horacio Quiroga se enfrenta a sus recuerdos, obsesiones y personajes en una última noche que resquebraja la realidad, por la que se cuelan el amor, la locura y la muerte.",
       "synopsisSource": "web",
       "hasWebPage": false,
-      "tmdbId": 1720065
+      "tmdbId": 1720065,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "lo-que-fuiste",
@@ -21269,7 +21561,9 @@
       "synopsisSource": "web",
       "hasWebPage": false,
       "tmdbId": 1787854,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "intolerant",
@@ -21355,7 +21649,9 @@
       "synopsisSource": "web",
       "hasWebPage": false,
       "tmdbId": 1800864,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "en",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "nosotras",
@@ -21536,7 +21832,9 @@
       "synopsisSource": "web",
       "hasWebPage": false,
       "tmdbId": 1812714,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "jaime",
@@ -21854,7 +22152,9 @@
       "synopsisSource": "web",
       "hasWebPage": false,
       "tmdbId": 1588311,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "lo-que-dura-la-noche",
@@ -21944,7 +22244,9 @@
       "synopsisSource": "web",
       "hasWebPage": false,
       "tmdbId": 1661424,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "family-tape-work-in-progress",
@@ -22194,7 +22496,9 @@
       "synopsis": "Cortometraje experimental animado sobre la dualidad entre la vigilia y el sueño, que explora la impotencia de observar sin poder intervenir y la fragilidad del recuerdo.",
       "synopsisSource": "web",
       "hasWebPage": false,
-      "tmdbId": 1645600
+      "tmdbId": 1645600,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "el-libro-del-maestro",
@@ -22414,7 +22718,9 @@
       "synopsis": "Susana de Sousa Dias revisita el archivo de la dictadura portuguesa, contraponiendo fotografías de presos políticos con imágenes propagandísticas del régimen. Al prolongar la duración de los planos y detenerse en los rostros, la película cuestiona la aparente transparencia documental de las imágenes: aquello que servía para identificar, vigilar o legitimar el régimen se convierte en objeto de una mirada sostenida que revela significados más allá de su función original.",
       "synopsisSource": "web",
       "hasWebPage": false,
-      "tmdbId": 279999
+      "tmdbId": 279999,
+      "originalLanguage": "pt",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "a-fidai-film",
@@ -22445,7 +22751,9 @@
           "venue": "C.C. Antiguo Instituto",
           "room": null,
           "venueGroup": "antiguo-instituto",
-          "eventLabels": [],
+          "eventLabels": [
+            "ACCESO LIBRE"
+          ],
           "accessType": "public",
           "reviewStatus": "reviewed",
           "durationMinutes": 78,
@@ -22469,7 +22777,9 @@
       "synopsis": "En A Fidai Film, Kamal Aljafari se apropia, entre otras, de imágenes del Centro de Investigación Palestino saqueadas por el ejército israelí durante la invasión de Beirut en 1982. La película confronta el despojo de la memoria visual palestina y reivindica la presencia de una historia frente a los intentos de borrarla, convirtiendo el cine en una forma de restitución simbólica.",
       "synopsisSource": "web",
       "hasWebPage": false,
-      "tmdbId": 1274777
+      "tmdbId": 1274777,
+      "originalLanguage": "de",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "het-verzet-in-spanje",
@@ -22496,7 +22806,9 @@
           "venue": "C.C. Antiguo Instituto",
           "room": null,
           "venueGroup": "antiguo-instituto",
-          "eventLabels": [],
+          "eventLabels": [
+            "ACCESO LIBRE"
+          ],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 56,
@@ -22550,7 +22862,9 @@
           "venue": "C.C. Antiguo Instituto",
           "room": null,
           "venueGroup": "antiguo-instituto",
-          "eventLabels": [],
+          "eventLabels": [
+            "ACCESO LIBRE"
+          ],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 44,
@@ -22575,7 +22889,9 @@
       "synopsisSource": "web",
       "hasWebPage": false,
       "tmdbId": 1125281,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "ca",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "tierras-de-malaga",
@@ -22602,7 +22918,9 @@
           "venue": "C.C. Antiguo Instituto",
           "room": null,
           "venueGroup": "antiguo-instituto",
-          "eventLabels": [],
+          "eventLabels": [
+            "ACCESO LIBRE"
+          ],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 34,
@@ -22626,7 +22944,9 @@
       "synopsis": "Recoge en el Valle del Guadalhorce los testimonios de campesinos y ganaderos sobre las condiciones económicas y sociales de los poblados de colonización agraria. Es el único título conservado de la producción documental del colectivo, surgido en 1972 alrededor del Cineclub Tiempos Modernos.",
       "synopsisSource": "web",
       "hasWebPage": false,
-      "tmdbId": 1672959
+      "tmdbId": 1672959,
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "salut-de-lluita",
@@ -22658,7 +22978,7 @@
           "room": null,
           "venueGroup": "antiguo-instituto",
           "eventLabels": [
-            "MESA REDONDA"
+            "ACCESO LIBRE"
           ],
           "accessType": "public",
           "reviewStatus": "reviewed",
@@ -22684,7 +23004,9 @@
       "synopsisSource": "web",
       "hasWebPage": false,
       "tmdbId": 1573597,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "larga-noche",
@@ -22717,7 +23039,9 @@
           "venue": "C.C. Antiguo Instituto",
           "room": null,
           "venueGroup": "antiguo-instituto",
-          "eventLabels": [],
+          "eventLabels": [
+            "ACCESO LIBRE"
+          ],
           "accessType": "public",
           "reviewStatus": "needs-review",
           "durationMinutes": 43,
@@ -22742,7 +23066,9 @@
       "synopsisSource": "web",
       "hasWebPage": false,
       "tmdbId": 957817,
-      "actorsSource": "tmdb"
+      "actorsSource": "tmdb",
+      "originalLanguage": "es",
+      "originalLanguageSource": "tmdb"
     },
     {
       "id": "mujeres-arqueologas-en-gipuzkoa",
@@ -22851,7 +23177,9 @@
       "synopsis": "Documental sobre la revolución que supuso el vidrio en la Roma antigua, proyectado dentro de las actividades complementarias del festival.",
       "synopsisSource": "web",
       "hasWebPage": false,
-      "tmdbId": 1813370
+      "tmdbId": 1813370,
+      "originalLanguage": "it",
+      "originalLanguageSource": "tmdb"
     }
   ]
 }

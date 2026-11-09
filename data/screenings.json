@@ -15,8 +15,10 @@
       "venue": "Escuela de Comercio",
       "room": null,
       "venueGroup": "escuela-comercio",
-      "eventLabels": [],
-      "accessType": "public",
+      "eventLabels": [
+        "PRENSA Y ACREDITADOS"
+      ],
+      "accessType": "restricted",
       "reviewStatus": "reviewed",
       "durationMinutes": 164,
       "durationSource": "calendar-block",
@@ -210,6 +212,7 @@
       "room": null,
       "venueGroup": "escuela-comercio",
       "eventLabels": [
+        "PRENSA Y ACREDITADOS",
         "INAUGURACIÓN"
       ],
       "accessType": "restricted",
@@ -319,7 +322,8 @@
       "room": "Sala 5",
       "venueGroup": "ocine",
       "eventLabels": [
-        "PRESENTACIÓN"
+        "PRESENTACIÓN",
+        "MUESTRA DE CINE LÉSBICO DE GIJÓN"
       ],
       "accessType": "public",
       "reviewStatus": "reviewed",
@@ -575,7 +579,9 @@
       "venue": "C.M.I. Pumarín Gijón Sur",
       "room": null,
       "venueGroup": "pumarin",
-      "eventLabels": [],
+      "eventLabels": [
+        "DOBLADA AL ESPAÑOL"
+      ],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 73,
@@ -771,8 +777,7 @@
       "room": null,
       "venueGroup": "teatro-jovellanos",
       "eventLabels": [
-        "PRENSA Y PÚBLICO",
-        "PRESENTACIÓN"
+        "PRENSA Y PÚBLICO"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -879,7 +884,9 @@
       "venue": "C.C. Antiguo Instituto",
       "room": null,
       "venueGroup": "antiguo-instituto",
-      "eventLabels": [],
+      "eventLabels": [
+        "ACCESO LIBRE"
+      ],
       "accessType": "public",
       "reviewStatus": "reviewed",
       "durationMinutes": 78,
@@ -935,7 +942,8 @@
       "room": null,
       "venueGroup": "teatro-jovellanos",
       "eventLabels": [
-        "PRESENTACIÓN"
+        "PRESENTACIÓN",
+        "ATENEO OBRERO DE GIJÓN"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -963,9 +971,7 @@
       "room": null,
       "venueGroup": "escuela-comercio",
       "eventLabels": [
-        "ENCUENTRO",
-        "ENTRADA LIBRE",
-        "PELÍCULA DE SENSACINE"
+        "ENCUENTRO"
       ],
       "accessType": "public",
       "reviewStatus": "reviewed",
@@ -1129,7 +1135,8 @@
       "room": "Sala 13",
       "venueGroup": "yelmo",
       "eventLabels": [
-        "PRESENTACIÓN"
+        "PRESENTACIÓN",
+        "ABIERTO HASTA EL AMANECER"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -1157,8 +1164,7 @@
       "room": null,
       "venueGroup": "teatro-jovellanos",
       "eventLabels": [
-        "PRENSA Y PÚBLICO",
-        "PRESENTACIÓN"
+        "PRENSA Y PÚBLICO"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -1382,9 +1388,10 @@
       "room": null,
       "venueGroup": "escuela-comercio",
       "eventLabels": [
+        "PRENSA Y ACREDITADOS",
         "ENCUENTRO"
       ],
-      "accessType": "public",
+      "accessType": "restricted",
       "reviewStatus": "needs-review",
       "durationMinutes": 102,
       "durationSource": "calendar-block",
@@ -1409,8 +1416,10 @@
       "venue": "Escuela de Comercio",
       "room": null,
       "venueGroup": "escuela-comercio",
-      "eventLabels": [],
-      "accessType": "public",
+      "eventLabels": [
+        "PRENSA Y ACREDITADOS"
+      ],
+      "accessType": "restricted",
       "reviewStatus": "needs-review",
       "durationMinutes": 95,
       "durationSource": "calendar-block",
@@ -1617,15 +1626,13 @@
       "venue": "C.M.I. Pumarín Gijón Sur",
       "room": null,
       "venueGroup": "pumarin",
-      "eventLabels": [
-        "ENCUENTRO"
-      ],
+      "eventLabels": [],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 91,
       "durationSource": "calendar-block",
-      "hasMeeting": true,
-      "meetingMinutes": 15,
+      "hasMeeting": false,
+      "meetingMinutes": null,
       "sourcePage": 4,
       "filmIds": [
         "heysel-85"
@@ -1856,7 +1863,8 @@
       "room": null,
       "venueGroup": "laboral",
       "eventLabels": [
-        "CONCIERTO"
+        "CONCIERTO",
+        "SOCIEDAD FILARMÓNICA DE GIJÓN"
       ],
       "accessType": "public",
       "reviewStatus": "reviewed",
@@ -1966,7 +1974,8 @@
       "room": "Sala 1",
       "venueGroup": "ocine",
       "eventLabels": [
-        "ENCUENTRO"
+        "ENCUENTRO",
+        "SOCIEDAD CULTURAL GESTO"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -1994,15 +2003,14 @@
       "room": null,
       "venueGroup": "teatro-jovellanos",
       "eventLabels": [
-        "PRENSA Y PÚBLICO",
-        "ENCUENTRO"
+        "PRENSA Y PÚBLICO"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 115,
       "durationSource": "calendar-block",
-      "hasMeeting": true,
-      "meetingMinutes": 15,
+      "hasMeeting": false,
+      "meetingMinutes": null,
       "sourcePage": 2,
       "filmIds": [
         "garance"
@@ -2329,8 +2337,10 @@
       "venue": "Escuela de Comercio",
       "room": null,
       "venueGroup": "escuela-comercio",
-      "eventLabels": [],
-      "accessType": "public",
+      "eventLabels": [
+        "PRENSA Y ACREDITADOS"
+      ],
+      "accessType": "restricted",
       "reviewStatus": "needs-review",
       "durationMinutes": 72,
       "durationSource": "calendar-block",
@@ -2555,8 +2565,7 @@
       "venueGroup": "escuela-comercio",
       "eventLabels": [
         "PRENSA Y ACREDITADOS",
-        "ENCUENTRO",
-        "ENTRADA LIBRE"
+        "ENCUENTRO"
       ],
       "accessType": "restricted",
       "reviewStatus": "needs-review",
@@ -2895,7 +2904,8 @@
       "venueGroup": "antiguo-instituto",
       "eventLabels": [
         "FICCIÓN SONORA",
-        "ACCESO LIBRE"
+        "ACCESO LIBRE",
+        "PUERTAS FILM FEST"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -3243,7 +3253,8 @@
       "venueGroup": "escuela-comercio",
       "eventLabels": [
         "PRENSA Y PÚBLICO",
-        "ENCUENTRO"
+        "ENCUENTRO",
+        "SOCIEDAD CULTURAL GIJONESA"
       ],
       "accessType": "public",
       "reviewStatus": "reviewed",
@@ -3323,7 +3334,8 @@
       "room": "Sala 1",
       "venueGroup": "ocine",
       "eventLabels": [
-        "ENCUENTRO"
+        "ENCUENTRO",
+        "XEGA"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -3351,7 +3363,8 @@
       "room": "Sala 3",
       "venueGroup": "ocine",
       "eventLabels": [
-        "ENCUENTRO"
+        "ENCUENTRO",
+        "ATENEO OBRERO DE GIJÓN"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -3515,7 +3528,9 @@
       "venue": "C.C. Antiguo Instituto",
       "room": null,
       "venueGroup": "antiguo-instituto",
-      "eventLabels": [],
+      "eventLabels": [
+        "ACCESO LIBRE"
+      ],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 56,
@@ -3648,7 +3663,9 @@
       "venue": "C.C. Antiguo Instituto",
       "room": null,
       "venueGroup": "antiguo-instituto",
-      "eventLabels": [],
+      "eventLabels": [
+        "ACCESO LIBRE"
+      ],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 44,
@@ -3703,9 +3720,10 @@
       "room": null,
       "venueGroup": "escuela-comercio",
       "eventLabels": [
+        "PRENSA Y ACREDITADOS",
         "ENCUENTRO"
       ],
-      "accessType": "public",
+      "accessType": "restricted",
       "reviewStatus": "needs-review",
       "durationMinutes": 92,
       "durationSource": "calendar-block",
@@ -3730,7 +3748,9 @@
       "venue": "C.C. Antiguo Instituto",
       "room": null,
       "venueGroup": "antiguo-instituto",
-      "eventLabels": [],
+      "eventLabels": [
+        "ACCESO LIBRE"
+      ],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 34,
@@ -3756,15 +3776,13 @@
       "venue": "C.M.I. Pumarín Gijón Sur",
       "room": null,
       "venueGroup": "pumarin",
-      "eventLabels": [
-        "ENCUENTRO"
-      ],
+      "eventLabels": [],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 91,
       "durationSource": "calendar-block",
-      "hasMeeting": true,
-      "meetingMinutes": 15,
+      "hasMeeting": false,
+      "meetingMinutes": null,
       "sourcePage": 4,
       "filmIds": [
         "rocas-rojas"
@@ -3785,7 +3803,7 @@
       "room": null,
       "venueGroup": "antiguo-instituto",
       "eventLabels": [
-        "MESA REDONDA"
+        "ACCESO LIBRE"
       ],
       "accessType": "public",
       "reviewStatus": "reviewed",
@@ -3839,9 +3857,7 @@
       "room": null,
       "venueGroup": "escuela-comercio",
       "eventLabels": [
-        "ENCUENTRO",
-        "ENTRADA LIBRE",
-        "POEX"
+        "ENCUENTRO"
       ],
       "accessType": "public",
       "reviewStatus": "reviewed",
@@ -4050,7 +4066,9 @@
       "venue": "C.C. Antiguo Instituto",
       "room": null,
       "venueGroup": "antiguo-instituto",
-      "eventLabels": [],
+      "eventLabels": [
+        "ACCESO LIBRE"
+      ],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 43,
@@ -4317,8 +4335,7 @@
       "room": null,
       "venueGroup": "teatro-jovellanos",
       "eventLabels": [
-        "ENCUENTRO",
-        "PRESENTACIÓN"
+        "ENCUENTRO"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -4451,15 +4468,13 @@
       "venue": "Escuela de Comercio",
       "room": null,
       "venueGroup": "escuela-comercio",
-      "eventLabels": [
-        "ENCUENTRO"
-      ],
+      "eventLabels": [],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 120,
       "durationSource": "programme-duration-overrides (suma de fichas)",
-      "hasMeeting": true,
-      "meetingMinutes": 15,
+      "hasMeeting": false,
+      "meetingMinutes": null,
       "sourcePage": 3,
       "filmIds": [
         "torino-shadow",
@@ -4533,15 +4548,13 @@
       "venue": "OCINE",
       "room": "Sala 3",
       "venueGroup": "ocine",
-      "eventLabels": [
-        "ENCUENTRO"
-      ],
+      "eventLabels": [],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 111,
       "durationSource": "calendar-block",
-      "hasMeeting": true,
-      "meetingMinutes": 15,
+      "hasMeeting": false,
+      "meetingMinutes": null,
       "sourcePage": 5,
       "filmIds": [
         "meanwhile-in-namibia"
@@ -4588,9 +4601,10 @@
       "room": null,
       "venueGroup": "escuela-comercio",
       "eventLabels": [
+        "PRENSA Y ACREDITADOS",
         "ENCUENTRO"
       ],
-      "accessType": "public",
+      "accessType": "restricted",
       "reviewStatus": "needs-review",
       "durationMinutes": 71,
       "durationSource": "calendar-block",
@@ -4735,7 +4749,8 @@
       "room": "Sala 13",
       "venueGroup": "yelmo",
       "eventLabels": [
-        "ESCOLARES"
+        "ESCOLARES",
+        "DOBLAJE EN DIRECTO AL ASTURIANO"
       ],
       "accessType": "conditional",
       "reviewStatus": "needs-review",
@@ -4763,9 +4778,10 @@
       "room": null,
       "venueGroup": "escuela-comercio",
       "eventLabels": [
+        "PRENSA Y ACREDITADOS",
         "ENCUENTRO"
       ],
-      "accessType": "public",
+      "accessType": "restricted",
       "reviewStatus": "needs-review",
       "durationMinutes": 93,
       "durationSource": "calendar-block",
@@ -4845,7 +4861,8 @@
       "room": null,
       "venueGroup": "pumarin",
       "eventLabels": [
-        "PRESENTACIÓN"
+        "PRESENTACIÓN",
+        "CODOPA"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -5103,7 +5120,7 @@
       "venueGroup": "pumarin",
       "eventLabels": [
         "ENCUENTRO",
-        "PRESENTACIÓN"
+        "CODOPA"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -5378,15 +5395,13 @@
       "venue": "C.M.I. Pumarín Gijón Sur",
       "room": null,
       "venueGroup": "pumarin",
-      "eventLabels": [
-        "ENCUENTRO"
-      ],
+      "eventLabels": [],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 102,
       "durationSource": "calendar-block",
-      "hasMeeting": true,
-      "meetingMinutes": 15,
+      "hasMeeting": false,
+      "meetingMinutes": null,
       "sourcePage": 4,
       "filmIds": [
         "todo-el-mundo-quiere-a-bill-evans"
@@ -5570,9 +5585,10 @@
       "room": null,
       "venueGroup": "escuela-comercio",
       "eventLabels": [
+        "PRENSA Y ACREDITADOS",
         "ENCUENTRO"
       ],
-      "accessType": "public",
+      "accessType": "restricted",
       "reviewStatus": "needs-review",
       "durationMinutes": 80,
       "durationSource": "calendar-block",
@@ -5747,9 +5763,10 @@
       "room": null,
       "venueGroup": "escuela-comercio",
       "eventLabels": [
+        "PRENSA Y ACREDITADOS",
         "ENCUENTRO"
       ],
-      "accessType": "public",
+      "accessType": "restricted",
       "reviewStatus": "needs-review",
       "durationMinutes": 93,
       "durationSource": "calendar-block",
@@ -5944,9 +5961,7 @@
       "venue": "OCINE",
       "room": "Sala 5",
       "venueGroup": "ocine",
-      "eventLabels": [
-        "PREMIO DE HONOR"
-      ],
+      "eventLabels": [],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 93,
@@ -5972,9 +5987,7 @@
       "venue": "Teatro Jovellanos",
       "room": null,
       "venueGroup": "teatro-jovellanos",
-      "eventLabels": [
-        "TERTULIA LES COMADRES"
-      ],
+      "eventLabels": [],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 90,
@@ -6084,7 +6097,8 @@
       "room": null,
       "venueGroup": "pumarin",
       "eventLabels": [
-        "ENCUENTRO"
+        "ENCUENTRO",
+        "TALLER DE MÚSICOS"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -6196,10 +6210,7 @@
       "venue": "Escuela de Comercio",
       "room": null,
       "venueGroup": "escuela-comercio",
-      "eventLabels": [
-        "ENTRADA LIBRE",
-        "AGENDA 2030"
-      ],
+      "eventLabels": [],
       "accessType": "public",
       "reviewStatus": "needs-review",
       "durationMinutes": 107,
@@ -6226,8 +6237,7 @@
       "room": "Sala 3",
       "venueGroup": "ocine",
       "eventLabels": [
-        "ENCUENTRO",
-        "PRESENTACIÓN"
+        "ENCUENTRO"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -6339,8 +6349,7 @@
       "room": "Sala 1",
       "venueGroup": "ocine",
       "eventLabels": [
-        "ENCUENTRO",
-        "TERTULIA LES COMADRES"
+        "ENCUENTRO"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -6549,7 +6558,8 @@
       "room": null,
       "venueGroup": "teatro-jovellanos",
       "eventLabels": [
-        "ENCUENTRO"
+        "ENCUENTRO",
+        "SOCIEDAD CULTURAL GIJONESA"
       ],
       "accessType": "public",
       "reviewStatus": "reviewed",
@@ -6613,10 +6623,10 @@
       "room": null,
       "venueGroup": "escuela-comercio",
       "eventLabels": [
-        "ENCUENTRO",
-        "ACCESO LIBRE"
+        "PRENSA Y ACREDITADOS",
+        "ENCUENTRO"
       ],
-      "accessType": "public",
+      "accessType": "restricted",
       "reviewStatus": "needs-review",
       "durationMinutes": 93,
       "durationSource": "calendar-block",
@@ -6699,8 +6709,6 @@
       "venueGroup": "pumarin",
       "eventLabels": [
         "ENCUENTRO",
-        "ENTRADA LIBRE",
-        "AGENDA 2030",
         "ESCOLARES"
       ],
       "accessType": "conditional",
@@ -6792,11 +6800,10 @@
       "room": null,
       "venueGroup": "escuela-comercio",
       "eventLabels": [
-        "ENCUENTRO",
-        "ENTRADA LIBRE",
-        "THE JOHANN LURF EXPERIENCE"
+        "PRENSA Y ACREDITADOS",
+        "ENCUENTRO"
       ],
-      "accessType": "public",
+      "accessType": "restricted",
       "reviewStatus": "needs-review",
       "durationMinutes": 94,
       "durationSource": "calendar-block",
@@ -6907,6 +6914,7 @@
       "eventLabels": [
         "ENCUENTRO",
         "ENCUENTRO VIRTUAL",
+        "ENTRADA LIBRE",
         "THE JOHANN LURF EXPERIENCE"
       ],
       "accessType": "public",
@@ -6990,8 +6998,7 @@
       "room": null,
       "venueGroup": "teatro-jovellanos",
       "eventLabels": [
-        "PRESENTACIÓN",
-        "PREMIO DE HONOR"
+        "PRESENTACIÓN"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -7073,7 +7080,8 @@
       "eventLabels": [
         "ENCUENTRO",
         "ENCUENTRO VIRTUAL",
-        "AMNISTÍA INTERNACIONAL"
+        "ENTRADA LIBRE",
+        "THE JOHANN LURF EXPERIENCE"
       ],
       "accessType": "public",
       "reviewStatus": "reviewed",
@@ -7101,8 +7109,7 @@
       "room": null,
       "venueGroup": "pumarin",
       "eventLabels": [
-        "ENCUENTRO",
-        "TERTULIA LES COMADRES"
+        "ENCUENTRO"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -7184,8 +7191,7 @@
       "room": "Sala 5",
       "venueGroup": "ocine",
       "eventLabels": [
-        "ENCUENTRO",
-        "ENTRADA LIBRE"
+        "ENCUENTRO"
       ],
       "accessType": "public",
       "reviewStatus": "needs-review",
@@ -7619,10 +7625,10 @@
       "room": null,
       "venueGroup": "escuela-comercio",
       "eventLabels": [
-        "ACCESO LIBRE",
+        "PRENSA Y ACREDITADOS",
         "CLAUSURA"
       ],
-      "accessType": "public",
+      "accessType": "restricted",
       "reviewStatus": "needs-review",
       "durationMinutes": 127,
       "durationSource": "calendar-block",

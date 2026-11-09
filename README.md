@@ -66,7 +66,8 @@ things together.
 | `id` | string | Unique film identifier |
 | `title` | string | Display title |
 | `directors`, `actors`, `countries` | string arrays | May be empty |
-| `actorsSource` | string, optional | `"tmdb"` for cast imported from the accepted `tmdbId`, in TMDB credit order; attributed beside the cast in the film detail. |
+| `actorsSource` | string, optional | `"tmdb"` for cast imported from the accepted `tmdbId`, in TMDB credit order; attributed in the shared language/cast metadata block in the film detail. |
+| `originalLanguage`, `originalLanguageSource` | strings, optional | TMDB `original_language` code and `"tmdb"` provenance, imported only for accepted IDs. Codes follow TMDB ISO 639-1 conventions; `"xx"` is its No Language marker. This does not describe screening audio, dubbing or subtitles. |
 | `year` | number | Production year |
 | `durationMinutes` | number or `null` | Film runtime |
 | `tmdbId` | positive integer, optional | Accepted TMDB movie identity; adds an external link to the film detail. Rejected/unresolved matches have no ID. |
