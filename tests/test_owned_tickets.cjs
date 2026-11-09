@@ -63,3 +63,26 @@ test('only the itinerary PDF snapshot receives the private ticket state', () => 
   const sharedLink = source.slice(source.indexOf('async function sharePassLink'), source.indexOf('window.sharePassLink'));
   assert.doesNotMatch(sharedLink, /ownedTickets/);
 });
+
+
+test('plan buttons distinguish planned passes with and without an owned ticket', () => {
+  const sandbox = vm.createContext({
+    plannedScreenings: new Map(), plannedStandalone: new Set(), ownedTickets: new Set(),
+    discarded: new Set(), escapeHtml: String, passConflictWarning: () => '',
+  });
+  vm.runInContext(extract('screeningIsPlanned') + '\n' + extract('renderPassQuickActions'), sandbox);
+  const render = () => vm.runInContext("renderPassQuickActions({candidateId:'pass-a',filmIds:['film-a']},{planOnly:true})",sandbox);
+  assert.match(render(), /＋ A la parrilla/);
+  sandbox.ownedTickets.add('pass-a');
+  assert.match(render(), /＋ A la parrilla/, 'Owning a ticket does not silently add a pass');
+  sandbox.plannedScreenings.set('film-a','pass-a');
+  assert.match(render(), /✓ Con entrada/);
+  assert.match(render(), /disabled aria-label="Con entrada; quita este pase desde Mi parrilla"/);
+  sandbox.ownedTickets.delete('pass-a');
+  assert.match(render(), /✓ En la parrilla/);
+  sandbox.plannedStandalone.add('talk');
+  sandbox.ownedTickets.add('talk');
+  const standalone = vm.runInContext("renderPassQuickActions({candidateId:'talk',filmIds:[]})",sandbox);
+  assert.match(standalone, /✓ Con entrada/);
+  assert.match(standalone, /disabled/);
+});

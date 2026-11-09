@@ -49,7 +49,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       if (result.exceptionDetails) throw new Error(JSON.stringify(result.exceptionDetails));
       return result.result.value;
     };
-    const screening = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/screenings.json'), 'utf8')).screenings.find(item => item.filmIds?.length);
+    const screening = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/screenings.json'), 'utf8')).screenings.find(item => item.filmIds?.length && item.accessType === "public" && !(item.eventLabels || []).some(label => ["ENTRADA LIBRE", "ACCESO LIBRE", "ACTO DE INAUGURACIÓN", "ACTO DE CLAUSURA"].includes(label)));
     assert.ok(screening, 'fixture must include a film screening');
     await send('Page.enable');
     await send('Page.addScriptToEvaluateOnNewDocument', { source: `localStorage.setItem('ficx64-planned-screenings-v1', ${JSON.stringify(JSON.stringify(Object.fromEntries(screening.filmIds.map(id => [id, screening.candidateId]))))})` });
@@ -78,6 +78,22 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector)}).getAttribute('aria-pressed')`), 'true');
     assert.match(await evaluate(`document.querySelector(${JSON.stringify(selector)}).textContent`), /Tengo entrada/);
     assert.deepEqual(await evaluate(`JSON.parse(localStorage.getItem('ficx64-owned-tickets-v1'))`), [screening.candidateId]);
+    // The shared plan button in film details must reflect ticket ownership.
+    const quickSelector = `dialog[open] [data-quick-action="plan"][data-candidate="${screening.candidateId}"]`;
+    const checkQuickLabel = async expected => {
+      await evaluate(`document.querySelector('#program-agenda [data-open-film]').click()`);
+      await evaluate(`document.querySelector('dialog[open] .film-screenings-foldout').open=true`);
+      assert.equal(await evaluate(`document.querySelector(${JSON.stringify(quickSelector)}).textContent`), expected);
+      assert.equal(await evaluate(`document.querySelector(${JSON.stringify(quickSelector)}).getAttribute('aria-pressed')`), 'true');
+      assert.equal(await evaluate(`document.querySelector(${JSON.stringify(quickSelector)}).disabled`), expected === '✓ Con entrada');
+      if (expected === '✓ Con entrada') {
+        await evaluate(`document.querySelector(${JSON.stringify(quickSelector)}).click()`);
+        assert.equal(await evaluate(`Object.values(JSON.parse(localStorage.getItem('ficx64-planned-screenings-v1'))).includes(${JSON.stringify(screening.candidateId)})`), true, 'disabled Con entrada action must preserve the planned pass');
+      }
+      await evaluate(`document.querySelector('dialog[open] .film-detail-close').click()`);
+    };
+    await checkQuickLabel('✓ Con entrada');
+
     await send('Page.reload');
     await pause(300);
     assert.equal(await evaluate(`document.querySelector('#ticket-intro').open`), false, 'intro should stay dismissed on later visits');
@@ -128,11 +144,18 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       const shot=await send('Page.captureScreenshot',{format:'png'});
       fs.writeFileSync(`/tmp/ficx-toolbar-${width}.png`,Buffer.from(shot.data,'base64'));
     }
+    // The separate remove action in Mi parrilla remains available, with its existing confirmation.
+    const removeSelector = `#program-agenda [data-program-action="remove-program-screening"][data-candidate-id="${screening.candidateId}"]`;
+    await evaluate(`document.querySelector(${JSON.stringify(removeSelector)}).click()`);
+    assert.match(await evaluate(`document.querySelector(${JSON.stringify(removeSelector)}).getAttribute('aria-label')`), /Confirmar/);
+    await evaluate(`document.querySelector(${JSON.stringify(removeSelector)}).click()`);
+    assert.equal(await evaluate(`document.querySelectorAll(${JSON.stringify(removeSelector)}).length`), 0, 'Mi parrilla remove action must still remove a ticket-owned pass');
+    assert.deepEqual(await evaluate(`JSON.parse(localStorage.getItem('ficx64-owned-tickets-v1'))`), [screening.candidateId], 'removing a pass from Mi parrilla must preserve ticket ownership');
   } finally {
     clearTimeout(timeout);
     if (ws) ws.close();
     browser.kill();
     if (browser.exitCode === null && browser.signalCode === null) await new Promise(resolve => browser.once('exit', resolve));
-    fs.rmSync(profile, { recursive: true, force: true });
+    fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });

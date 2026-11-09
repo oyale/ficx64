@@ -1599,8 +1599,9 @@
     // Talks and activities without a linked film can still be added to the agenda
     // by their candidate id alone.
     const planned = screeningIsPlanned(screening);
-    const label = planned ? "✓ En la parrilla" : "＋ A la parrilla";
-    const planButton = `<button type="button" class="pass-quick is-plan${planned ? " is-done" : ""}" data-quick-action="plan" data-ids="${escapeHtml(liveIds.join(","))}" data-candidate="${escapeHtml(screening.candidateId)}" aria-pressed="${planned}">${label}</button>`;
+    const hasTicket = planned && ownedTickets.has(screening.candidateId);
+    const label = hasTicket ? "✓ Con entrada" : planned ? "✓ En la parrilla" : "＋ A la parrilla";
+    const planButton = `<button type="button" class="pass-quick is-plan${planned ? " is-done" : ""}" data-quick-action="plan" data-ids="${escapeHtml(liveIds.join(","))}" data-candidate="${escapeHtml(screening.candidateId)}" aria-pressed="${planned}"${hasTicket ? ' disabled aria-label="Con entrada; quita este pase desde Mi parrilla" title="Quita este pase desde Mi parrilla"' : ""}>${label}</button>`;
     const conflictWarning = passConflictWarning(screening);
     if (!ids.length) return `<span class="pass-quick-actions">${planButton}${conflictWarning}</span>`;
     if (planOnly) return `<span class="pass-quick-actions">${planButton}${conflictWarning}</span>`;
@@ -1619,6 +1620,7 @@
     const ids = (idList || "").split(",").filter((id) => id && !discarded.has(id));
     if (quickAction === "plan" && !ids.length) {
       if (!candidate || !findScreening(candidate)) return true;
+      if (plannedStandalone.has(candidate) && ownedTickets.has(candidate)) return true;
       if (plannedStandalone.has(candidate)) plannedStandalone.delete(candidate);
       else plannedStandalone.add(candidate);
       persistStandalone(); renderSaved();
@@ -1628,6 +1630,7 @@
     if (quickAction === "plan") {
       if (!candidate || !findScreening(candidate)) return true;
       const alreadyPlanned = ids.every((id) => plannedScreenings.get(id) === candidate);
+      if (alreadyPlanned && ownedTickets.has(candidate)) return true;
       for (const id of ids) {
         if (alreadyPlanned) plannedScreenings.delete(id);
         else {
