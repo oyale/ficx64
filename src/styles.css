@@ -2523,3 +2523,7 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .film-cast-names { font-size: 14px; line-height: 1.6; }
   .film-cast-more summary { min-height: 44px; padding: 12px 0; }
 }
+
+.shared-pass-filter-summary { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+#shared-pass-filters { gap: 4px 16px; }
+#shared-pass-filters .text-button { padding: 8px 0; font-size: 12px; }

@@ -761,6 +761,7 @@
     } else if (backToShared) {
       returnToShared = false;
       switchScreen("shared", { scrollTop: false });
+      refreshSharedScreen();
       requestAnimationFrame(() => window.scrollTo({ top: sharedScrollY, behavior: "auto" }));
     } else {
       list.querySelector(`button[data-action="expand"][data-id="${CSS.escape(filmId)}"]`)?.focus({ preventScroll: true });
@@ -2591,6 +2592,7 @@
   // El enlace abierto: pases (por defecto) o listas de películas.
   let sharedListsOnly = false;
   const sharedSelection = new Set();
+  let sharedPassFilter = "all";
   // reason y kind solo para bloqueos; note es el aviso que no impide marcarlo.
   // Etiqueta corta del pase propio: "L21 · 19:30" se lee de un vistazo en el aviso.
   function shortOwnPass(screening) {
@@ -2657,8 +2659,47 @@
         : `${separator}<span>${escapeHtml(film.title)}</span>`;
     }).join("");
   }
-  function renderSharedScreen(candidateIds, alias = "") {
+  function sharedPassMatchesFilter(candidateId, filter = sharedPassFilter) {
+    if (filter === "all") return true;
+    const screening = findScreening(candidateId);
+    if (!screening) return false;
+    const filmIds = screening.filmIds || [];
+    if (filter === "coincide") return selectedPlanEvents().some(item => item.candidateId === candidateId);
+    if (filter === "want" || filter === "maybe") return filmIds.some(id => intentions.get(id) === filter);
+    if (filter === "other") return filmIds.some(id => plannedScreenings.has(id) && plannedScreenings.get(id) !== candidateId);
+    if (filter === "fitting") return !sharedPassState(candidateId).disabled;
+    return false;
+  }
+  function renderSharedPassFilters() {
+    if (sharedListsOnly) return;
+    const filters = [["all", "Todos"], ["coincide", "Mismo pase"], ["want", "En mi lista"],
+      ["maybe", "Quizás"], ["other", "Otro horario"], ["fitting", "Me encajan"]];
+    const controls = document.querySelector("#shared-pass-filters");
+    controls.hidden = false;
+    controls.innerHTML = filters.map(([id, label]) => `<button type="button" class="text-button" data-shared-pass-filter="${id}" aria-pressed="${sharedPassFilter === id}">${label} · ${sharedPasses.filter(candidateId => sharedPassMatchesFilter(candidateId, id)).length}</button>`).join("");
+    const visible = sharedPasses.filter(id => sharedPassMatchesFilter(id));
+    const visibleIds = new Set(visible);
+    document.querySelectorAll("#shared-list [data-shared-candidate]").forEach(row => {
+      row.hidden = !visibleIds.has(row.dataset.sharedCandidate);
+    });
+    const empty = document.querySelector("#shared-filter-empty");
+    empty.textContent = "No hay pases en este filtro. Prueba otro o vuelve a Todos.";
+    empty.hidden = visible.length > 0;
+    syncSharedPassFilterSummary();
+    document.querySelector("#shared-mark-fitting").textContent = sharedPassFilter === "all" ? "Marcar todos los que encajan" : "Marcar los visibles que encajan";
+  }
+  function syncSharedPassFilterSummary() {
+    if (sharedListsOnly) return;
+    const visible = sharedPasses.filter(id => sharedPassMatchesFilter(id));
+    const hiddenSelected = [...sharedSelection].filter(id => !visible.includes(id)).length;
+    const summary = document.querySelector("#shared-pass-filter-summary");
+    summary.hidden = false;
+    summary.textContent = `${visible.length} de ${sharedPasses.length} pases` + (hiddenSelected
+      ? ` · ${hiddenSelected} ${hiddenSelected === 1 ? "seleccionado fuera del filtro" : "seleccionados fuera del filtro"}` : "");
+  }
+  function renderSharedScreen(candidateIds, alias = "", { preserveFilter = false } = {}) {
     sharedListsOnly = false;
+    if (!preserveFilter) sharedPassFilter = "all";
     document.querySelector("#screen-shared").classList.remove("is-list-reception");
     for (const id of ["shared-list-filters", "shared-filter-empty", "shared-pending-summary", "shared-view-lists", "shared-keep-looking"]) document.getElementById(id).hidden = true;
     document.querySelector("#shared-eyebrow").textContent = "ITINERARIO COMPARTIDO";
@@ -2735,7 +2776,7 @@
       const day = Number(screening.date.slice(8, 10));
       const month = formatProgramDate(screening.date, { month: "short" }).replace(/\.$/, "");
       const weekday = formatProgramDate(screening.date, { weekday: "short" }).replace(/\.$/, "");
-      return `<li class="shared-pass${state.disabled ? " is-blocked" : ""}${state.listed ? " is-listed" : ""}">
+      return `<li class="shared-pass${state.disabled ? " is-blocked" : ""}${state.listed ? " is-listed" : ""}" data-shared-candidate="${escapeHtml(candidateId)}">
         <label>
           <input type="checkbox" data-shared-pass="${escapeHtml(candidateId)}"${state.disabled ? " disabled" : state.listed ? " checked" : ""}>
           <span class="shared-pass-date" aria-hidden="true"><small>${escapeHtml(weekday)}</small><b>${day}</b><small>${escapeHtml(month)}</small></span>
@@ -2747,6 +2788,7 @@
         </label>
       </li>`;
     }).join("");
+    renderSharedPassFilters();
     syncSharedCount();
     switchScreen("shared");
   }
@@ -2769,6 +2811,9 @@
     sharedListFilms = lists.filter((item) => filmById.has(item.filmId));
     sharedListChoices.clear();
     sharedListsOnly = true;
+    document.querySelector("#shared-pass-filters").hidden = true;
+    document.querySelector("#shared-pass-filter-summary").hidden = true;
+    document.querySelector("#shared-filter-empty").textContent = "No hay películas en este filtro.";
     sharedAlias = alias;
     sharedListFilter = "all";
     sharedRecovered.clear();
@@ -2913,8 +2958,9 @@
   // Quitar un pase puede desbloquear uno compartido: repintar conservando lo marcado.
   function refreshSharedScreen() {
     if (document.querySelector("#screen-shared").hidden) return;
+    if (sharedListsOnly) { renderSharedFilmsOnly(); return; }
     const kept = new Set(sharedSelection);
-    renderSharedScreen(sharedPasses, sharedAlias);
+    renderSharedScreen(sharedPasses, sharedAlias, { preserveFilter: true });
     sharedSelection.clear();
     sharedPasses.forEach((id) => {
       const input = document.querySelector(`input[data-shared-pass="${CSS.escape(id)}"]`);
@@ -2930,6 +2976,7 @@
     if (!button) return;
     button.textContent = sharedSelection.size ? `Añadir ${sharedSelection.size} ${sharedSelection.size === 1 ? "pase" : "pases"}` : "Añadir pases";
     button.disabled = sharedSelection.size === 0;
+    syncSharedPassFilterSummary();
   }
   function addSharedPasses() {
     // Cambiar un pase propio por otro de la misma película se avisa antes de tocarlo.
@@ -3989,7 +4036,7 @@
     // Captura la lista visible y su orden al abrir, incluidos los filtros activos.
     filmNavigationIds = sharedListsOnly
       ? [...document.querySelectorAll("#shared-list [data-shared-row]")].map((row) => row.dataset.sharedRow)
-      : [...new Set(sharedPasses.flatMap((id) => findScreening(id)?.filmIds || []))];
+      : [...new Set([...document.querySelectorAll("#shared-list .shared-pass:not([hidden]) [data-open-film]")].map(item => item.dataset.openFilm))];
     activeSections.clear(); excludedSubfilters.clear();
     search.value = "";
     moreSections.value = "";
@@ -4008,7 +4055,7 @@
   });
   document.querySelector("#shared-mark-fitting").addEventListener("click", () => {
     sharedPasses.forEach((candidateId) => {
-      if (sharedPassState(candidateId).disabled) return;
+      if (!sharedPassMatchesFilter(candidateId) || sharedPassState(candidateId).disabled) return;
       sharedSelection.add(candidateId);
       const input = document.querySelector(`input[data-shared-pass="${CSS.escape(candidateId)}"]`);
       if (input) input.checked = true;
@@ -4049,6 +4096,13 @@
     // Se repinta solo la botonera, no la tarjeta entera (que lleva el estado y el aviso).
     button.parentElement.outerHTML = suggestions(filmId, filmById.get(filmId), sharedListState(filmId));
     syncSharedListCount();
+  });
+  document.querySelector("#shared-pass-filters").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-shared-pass-filter]");
+    if (!button || sharedListsOnly) return;
+    sharedPassFilter = button.dataset.sharedPassFilter;
+    renderSharedPassFilters();
+    document.querySelector(`[data-shared-pass-filter="${sharedPassFilter}"]`)?.focus({ preventScroll: true });
   });
   document.querySelector("#shared-list-filters").addEventListener("click", (event) => {
     const button = event.target.closest("[data-shared-filter]");
@@ -4175,6 +4229,7 @@
     readSharedPasses().then((shared) => {
     if (shared === null) return;
     if (!shared.passes.length) {
+      for (const id of ["shared-pass-filters", "shared-pass-filter-summary", "shared-list-filters", "shared-filter-empty"]) document.getElementById(id).hidden = true;
       switchScreen("shared");
       document.querySelector("#shared-title").innerHTML = `Te han compartido <span>un itinerario.</span>`;
       document.querySelector("#shared-count").hidden = true;

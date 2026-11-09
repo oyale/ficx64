@@ -395,6 +395,8 @@
           <p id="shared-summary">—</p>
         </header>
         <div class="shared-tools"><button type="button" class="text-button" id="shared-mark-fitting">Marcar todos los que encajan</button><button type="button" class="text-button" id="shared-clear">Desmarcar todos</button></div>
+        <div id="shared-pass-filters" class="shared-list-filters" role="group" aria-label="Filtrar pases del itinerario compartido" hidden></div>
+        <p id="shared-pass-filter-summary" class="shared-pass-filter-summary" role="status" hidden></p>
         <div id="shared-list-filters" class="shared-list-filters" role="group" aria-label="Filtrar películas compartidas" hidden></div>
         <p id="shared-filter-empty" class="empty-state" hidden>No hay películas en este filtro.</p>
         <ul class="shared-list" id="shared-list" aria-live="polite"></ul>
@@ -468,7 +470,7 @@
             <li><b>La estrella</b> vive junto al título y convive con las dos listas. Se apaga si descartas la película o te quedas sin lista.</li>
             <li><b>Descartar</b> es excluyente con todo: sale del listado, de las listas y de la parrilla. Se recupera desde el interruptor «Descartadas» de Explorar.</li>
             <li><b>Tengo entrada</b> se marca por pase en «Mi programa». Es una nota personal: no reserva ni compra la entrada y no se comparte con otras personas.</li>
-            <li><b>Compartir</b> genera un enlace con los pases dentro, o con tus listas desde «Mis listas». Quien lo abre elige qué añadir: en el itinerario marca como «Coincidimos» el que ya tiene, «Choca con tu pase» el que solapa y «Ya la tienes en otro horario» la misma película en otro pase; en las listas, ve qué películas quiere ver y cuáles está dudando.</li>
+            <li><b>Compartir</b> genera un enlace con los pases dentro, o con tus listas desde «Mis listas». Quien lo abre elige qué añadir: en el itinerario marca como «Coincidimos» el que ya tiene, «Choca con tu pase» el que solapa y «Ya la tienes en otro horario» la misma película en otro pase; en las listas, ve qué películas quiere ver y cuáles está dudando. El itinerario se abre completo y puedes filtrarlo por el mismo pase, tus listas, otro horario o los que te encajan; filtrar conserva lo marcado y avisa de las selecciones que queden ocultas.</li>
             <li><b>Calendario</b>: el fichero <code>.ics</code> vale para Google, Apple, Outlook y cualquier app que lo importe.</li>
             <li><b>Itinerario PDF</b>: en «Mi programa → Exportar y compartir» puedes descargar todos tus días para consultar o imprimir, también sin conexión. Es una copia: descárgala de nuevo si cambias los pases. Para recuperar tus datos en la app, usa la exportación de Ajustes.</li>
           </ul>

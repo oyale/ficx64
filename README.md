@@ -334,3 +334,9 @@ FICX_PDF_SAMPLE=/tmp/ficx-itinerary.pdf node tests/test_itinerary_pdf_browser.cj
 The manifest exposes **Películas**, **Mis listas**, **Pases**, and **Mi parrilla** with individual 96×96 icons. Their URLs use `#seccion=peliculas`, `#seccion=mis-listas`, `#seccion=pases`, and `#seccion=mi-parrilla`, respectively. These fragment destinations also work when the app is already open and keep the document URL available to the offline cache. Existing shared-list and shared-itinerary links retain their own handling.
 
 Supported launchers expose shortcuts through the installed app icon's context menu (for example, long-press on Android). Availability, the number shown, and refresh timing for existing installations depend on the browser and operating system.
+
+### Receiving an itinerary
+
+A shared itinerary opens with all passes in the received order. Personal filters distinguish the exact same screening, films in Mi lista or Quizás, films planned at another time, and passes eligible to add. A screening containing several films matches a film-list filter if any of its films belongs to that list. Categories can overlap.
+
+Filtering does not change saved data or selected checkboxes. The add button counts all selected passes, and the view reports selections outside the active filter. The bulk mark action only marks visible eligible passes; “Desmarcar todos” clears every selection. Film-detail arrows follow the visible films, and returning from a detail refreshes the filter using the latest personal choices. A newly opened itinerary starts again with Todos.
