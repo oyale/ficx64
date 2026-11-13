@@ -3223,11 +3223,13 @@
     return String(value || "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
   }
   function icsLocal(date, time, addMinutes = 0) {
+    const [year, month, day] = date.split("-").map(Number);
     const [hour, minute] = String(time || "0:0").split(":").map(Number);
-    const total = hour * 60 + minute + addMinutes;
-    const day = Number(date.slice(8, 10)) + Math.floor(total / 1440);
-    const stamp = `${date.slice(0, 7)}-${String(day).padStart(2, "0")}T${formatClock(((total % 1440) + 1440) % 1440).replace(":", "")}00`;
-    return stamp;
+    const local = new Date(Date.UTC(year, month - 1, day, hour, minute + addMinutes));
+    const part = (value) => String(value).padStart(2, "0");
+    // iCalendar and Google Calendar's TEMPLATE dates both require the basic
+    // format (YYYYMMDDTHHmmss); extended ISO dates can be parsed as legacy dates.
+    return `${String(local.getUTCFullYear()).padStart(4, "0")}${part(local.getUTCMonth() + 1)}${part(local.getUTCDate())}T${part(local.getUTCHours())}${part(local.getUTCMinutes())}00`;
   }
   function calendarTransferNote(from, to) {
     const minutes = plannedMinutes(from);
