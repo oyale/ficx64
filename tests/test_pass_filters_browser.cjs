@@ -52,7 +52,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     const screenings = JSON.parse(fs.readFileSync('data/screenings.json', 'utf8')).screenings;
     const chosen = screenings.find(s => s.accessType === 'public' && s.filmIds?.length && screenings.some(other => other.candidateId !== s.candidateId && other.accessType === 'public' && other.date === s.date && other.time === s.time));
     await send('Page.enable');
-    await send('Page.addScriptToEvaluateOnNewDocument', {source: `localStorage.setItem('ficx64-planned-screenings-v1', ${JSON.stringify(JSON.stringify(Object.fromEntries(chosen.filmIds.map(id => [id, chosen.candidateId]))))}); localStorage.setItem('ficx64-discarded-v1', ${JSON.stringify(JSON.stringify(chosen.filmIds))});`});
+    await send('Page.addScriptToEvaluateOnNewDocument', {source: `Date.now = () => Date.parse("2026-11-12T12:00:00Z"); localStorage.setItem('ficx64-planned-screenings-v1', ${JSON.stringify(JSON.stringify(Object.fromEntries(chosen.filmIds.map(id => [id, chosen.candidateId]))))}); localStorage.setItem('ficx64-discarded-v1', ${JSON.stringify(JSON.stringify(chosen.filmIds))});`});
     await send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true});
     await send('Page.navigate', {url:pathToFileURL(path.resolve('dist/index.html')).href});
     for (let i=0;i<100;i++) {
@@ -113,6 +113,6 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     if (ws) ws.close();
     browser.kill();
     if (browser.exitCode === null && browser.signalCode === null) await new Promise(resolve => browser.once('exit', resolve));
-    fs.rmSync(profile, { recursive: true, force: true });
+    fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });

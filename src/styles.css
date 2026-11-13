@@ -2559,3 +2559,12 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
   .film-detail-metadata { display: flex; flex-direction: column; padding-top: 16px; border-top: 1px solid var(--line); }
   .film-metadata-source { order: 1; justify-content: flex-start; margin: 12px 0 0; }
 }
+
+/* Temporal view: selections and calculations retain their complete history. */
+.choice-chip:disabled, .program-day-chip:disabled { opacity: .45; cursor: default; text-decoration: line-through; }
+.temporal-note { color: var(--muted, #777); font-size: .9rem; padding: .5rem 0; }
+.shared-past { list-style: none; grid-column: 1 / -1; }
+.shared-past > details > summary { cursor: pointer; padding: .8rem; font-weight: 600; }
+.shared-past ul { list-style: none; padding: 0; margin: 0; }
+
+.temporal-in-progress { font-weight: 700; }

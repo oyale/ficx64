@@ -29,6 +29,7 @@ test('failed writes warn, allow export, and only recover when every failed key i
   assert.equal(warning.hidden, false);
   assert.match(warning.children[0].textContent, /antes de cerrar/);
   save('plan');
+  save('ficx64-hide-past-v1');
   warning.children[1].click();
   assert.equal(exported, 1);
   assert.equal(warning.hidden, false, 'export does not repair persistence');
@@ -38,5 +39,15 @@ test('failed writes warn, allow export, and only recover when every failed key i
   save('lists');
   assert.equal(warning.hidden, false);
   save('plan');
+  assert.equal(warning.hidden, false, 'temporal preference failure also keeps warning visible');
+  save('ficx64-hide-past-v1');
   assert.equal(warning.hidden, true);
 });
+
+ test('temporal preference works for the session on failed writes and recovers its own warning', () => {
+ const writes=[]; let refreshes=0;
+ const context=vm.createContext({ hidePast:true,temporalStorageKey:'ficx64-hide-past-v1',saveLocalValue:(key,value)=>{writes.push([key,value]);return false;},refreshTemporalView:()=>refreshes++ });
+ vm.runInContext(extract('setHidePast'),context);
+ vm.runInContext('setHidePast(false)',context);
+ assert.equal(context.hidePast,false);assert.equal(refreshes,1);assert.deepEqual(writes,[['ficx64-hide-past-v1','false']]);
+ });

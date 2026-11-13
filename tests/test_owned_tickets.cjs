@@ -86,3 +86,10 @@ test('plan buttons distinguish planned passes with and without an owned ticket',
   assert.match(standalone, /✓ Con entrada/);
   assert.match(standalone, /disabled/);
 });
+
+ test('temporal presentation never changes ticket marks or the complete selected events', () => {
+ const ticketSet=new Set(['pass-a']);const plans=new Map([['film-a','pass-a']]);
+ const ctx=vm.createContext({plannedScreenings:plans,plannedStandalone:new Set(),findScreening:id=>({candidateId:id,date:'2026-11-13',time:'09:00'}),ownedTickets:ticketSet});
+ vm.runInContext(extract('selectedPlanEvents'),ctx);
+ assert.equal(vm.runInContext('selectedPlanEvents()[0].candidateId',ctx),'pass-a');assert.deepEqual([...ticketSet],['pass-a']);assert.deepEqual([...plans],[['film-a','pass-a']]);
+ });

@@ -1,0 +1,9 @@
+**Resultado: NOT CLEAN.** Un hallazgo Major y un Nit. Alcance limitado a presentación; no se propone alterar encaje ni conflictos.
+
+- **design_critic-2-1 — Major — SPEC-FILTRO-TEMPORAL.md:74–80, 143, 176.** Falta definir el vacío de Mi programa cuando todos los eventos guardados han terminado, pero el festival continúa. El renderizador actual distingue únicamente entre selección vacía y ausencia de resultados por filtros, y en este último caso recomienda cambiar día o entradas (`src/app.js:1529–1533`). Esa recomendación no recuperaría los eventos ocultos temporalmente. **Remedio:** especificar un vacío que explique que se conservan los pases anteriores y permita desactivar el filtro; distinguirlo del vacío causado por día/entradas y añadir su prueba de aceptación. Mantener intactos selección y cálculos.
+
+- **design_critic-2-2 — Nit — SPEC-FILTRO-TEMPORAL.md:129.** La sincronización contempla eliminación individual mediante `newValue === null`, pero no `storage` con `key === null`, correspondiente al vaciado completo del almacenamiento desde otra pestaña. Una implementación que escuche exclusivamente la nueva clave conservaría una preferencia obsoleta en memoria. **Remedio:** incluir explícitamente ese evento como restablecimiento al valor predeterminado, sin escritura de vuelta, y probarlo.
+
+**Lecturas efectivas:** completos `agents/design_critic.md`, `resources/document_standards/feature-spec-standard.md` y las 184 líneas de la especificación; fragmentos de `src/app.js`: 335–390, 940–960, 1100–1145, 1473–1550, 2719–2820, 2990–3025 y 4068–4095, además de búsqueda de símbolos en ese archivo.
+
+Sin memoria, historial, informes anteriores, escrituras, delegación ni ejecución de pruebas. Las afirmaciones sobre el catálogo de datos no se verificaron: ese archivo queda fuera del baseline permitido.

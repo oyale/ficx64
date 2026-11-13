@@ -17,7 +17,7 @@ for (const [mode, expected] of [
     const context=vm.createContext({films, search:{value:''}, sort:{value:mode},
       activeSections:new Set(), excludedSubfilters:new Set(), discarded:new Set(),
       showDiscarded:false, discardAck:null, intentions:new Map(), onlyMyLists:false,
-      directorText:()=>''});
+      hidePast:false, filmHasUpcomingPass:()=>true, directorText:()=>''});
     vm.runInContext(matching,context);
     assert.deepEqual(Array.from(vm.runInContext('matchingFilms()',context),film=>film.title), expected);
   });

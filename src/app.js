@@ -53,6 +53,111 @@
 
   const films = Array.isArray(window.FICX_FILMS) ? window.FICX_FILMS : [];
   const screeningRecords = Array.isArray(window.FICX_SCREENINGS) ? window.FICX_SCREENINGS : [];
+  // Temporal model: pure, independent of personal selections.
+  function validProgramDate(value) {
+    if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    const date = new Date(`${value}T12:00:00Z`);
+    return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+  }
+  function screeningDateTimeAttribute(screening) {
+    return validProgramDate(screening.date) && /^([01]\d|2[0-3]):[0-5]\d$/.test(screening.time || "")
+      ? ` datetime="${screening.date}T${screening.time}"` : "";
+  }
+  function screeningTiming(screening) {
+    const unknown = { startMs: null, endMs: null };
+    if (!validProgramDate(screening.date) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(screening.time || "")) return unknown;
+    if (typeof Temporal !== "undefined" && Temporal.ZonedDateTime) {
+      try {
+        const startMs = Number(Temporal.ZonedDateTime.from(`${screening.date}T${screening.time}[Europe/Madrid]`, { disambiguation: "reject" }).epochMilliseconds);
+        const duration = Number(screening.durationMinutes), meeting = Number(screening.meetingMinutes ?? 0);
+        return { startMs, endMs: Number.isFinite(duration) && duration > 0 && Number.isFinite(meeting) && meeting >= 0 ? startMs + (duration + meeting) * 60000 : null };
+      } catch (_) { return unknown; }
+    }
+    const wall = Date.parse(`${screening.date}T${screening.time}:00Z`);
+    const formatter = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", calendar: "gregory", numberingSystem: "latn", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" });
+    const partsAt = ms => Object.fromEntries(formatter.formatToParts(ms).filter(p => p.type !== "literal").map(p => [p.type, p.value]));
+    const wallAt = ms => { const p = partsAt(ms); return Date.parse(`${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}Z`); };
+    const offsets = new Set([-86400000, 86400000].map(delta => wallAt(wall + delta) - (wall + delta)));
+    const matches = [...offsets].map(offset => wall - offset).filter(ms => wallAt(ms) === wall);
+    if (matches.length !== 1) return unknown;
+    const startMs = matches[0];
+    const duration = Number(screening.durationMinutes);
+    const meeting = Number(screening.meetingMinutes ?? 0);
+    const minutes = duration + meeting;
+    const endMs = Number.isFinite(duration) && duration > 0 && Number.isFinite(meeting) && meeting >= 0 && Number.isFinite(startMs + minutes * 60000)
+      ? startMs + minutes * 60000 : null;
+    return { startMs, endMs };
+  }
+  function screeningTemporalState(timing, nowMs) {
+    if (timing.startMs === null) return "unknown";
+    if (nowMs < timing.startMs) return "future";
+    if (timing.endMs === null) return "startedUnknownEnd";
+    return nowMs < timing.endMs ? "ongoing" : "ended";
+  }
+  function buildTemporalView(records, nowMs, timings = new Map(records.map(record => [record.candidateId, screeningTiming(record)]))) {
+    const states = new Map();
+    const days = new Map();
+    let nextBoundary = Infinity;
+    let complete = records.length > 0;
+    for (const record of records) {
+      const timing = timings.get(record.candidateId);
+      states.set(record.candidateId, screeningTemporalState(timing, nowMs));
+      for (const ms of [timing.startMs, timing.endMs]) if (ms !== null && ms > nowMs) nextBoundary = Math.min(nextBoundary, ms);
+      if (!validProgramDate(record.date) || timing.endMs === null) complete = false;
+      if (validProgramDate(record.date)) {
+        const day = days.get(record.date) || { known: true, endMs: 0 };
+        day.known &&= timing.endMs !== null;
+        day.endMs = Math.max(day.endMs, timing.endMs || 0);
+        days.set(record.date, day);
+      }
+    }
+    const closedDates = new Set([...days].filter(([, day]) => day.known && nowMs >= day.endMs).map(([date]) => date));
+    return { states, closedDates, festivalEnded: complete && days.size === closedDates.size, nextBoundary };
+  }
+  // End temporal model.
+
+  const temporalStorageKey = "ficx64-hide-past-v1";
+  function readHidePast() {
+    try { return localStorage.getItem(temporalStorageKey) !== "false"; } catch (_) { return true; }
+  }
+  let hidePast = readHidePast();
+  const screeningTimings = new Map(screeningRecords.map(record => [record.candidateId, screeningTiming(record)]));
+  const screeningsByFilm = new Map();
+  for (const screening of screeningRecords) for (const filmId of screening.filmIds || []) {
+    if (!screeningsByFilm.has(filmId)) screeningsByFilm.set(filmId, []);
+    screeningsByFilm.get(filmId).push(screening);
+  }
+  let temporalView = buildTemporalView(screeningRecords, Date.now(), screeningTimings);
+  let filmDialogTemporalExempt = false;
+  function passHasStarted(screening) {
+    const state = temporalView.states.get(screening.candidateId);
+    return state === "ongoing" || state === "ended" || state === "startedUnknownEnd";
+  }
+  function showUpcomingPass(screening) { return !hidePast || temporalView.states.get(screening.candidateId) !== "ended"; }
+  function showAgendaPass(screening) { return !hidePast || temporalView.states.get(screening.candidateId) !== "ended"; }
+  function filmHasUpcomingPass(film) {
+    const records = screeningsByFilm.get(film.id) || [];
+    return !records.length || records.some(showUpcomingPass);
+  }
+  function temporalStatusMarkup(screening) {
+    const state = temporalView.states.get(screening.candidateId);
+    if (state === "startedUnknownEnd") return '<span class="screening-event-tag temporal-in-progress">Iniciado · fin sin confirmar</span>';
+    if (state !== "ongoing") return "";
+    const endMs = screeningTimings.get(screening.candidateId)?.endMs;
+    if (!Number.isFinite(endMs)) return "";
+    const endTime = new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(endMs);
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(endMs).map(part => [part.type, part.value]));
+    const endDate = `${parts.year}-${parts.month}-${parts.day}`;
+    const dayNote = endDate !== screening.date ? ` · ${parts.day}/${parts.month}` : "";
+    return `<span class="screening-event-tag temporal-in-progress">En curso · hasta las ${endTime}${dayNote}</span>`;
+  }
+  function temporalEmptyMessage() {
+    return temporalView.festivalEnded ? 'El festival ha terminado. Desactiva «Ocultar lo que ya ha pasado» en Ajustes para consultar el programa completo.' : 'No quedan pases pendientes o en curso con estos filtros. Puedes consultar los anteriores en Ajustes.';
+  }
+  function temporalNotice(message) {
+    return `<p class="temporal-note">${escapeHtml(message)} <button type="button" class="text-button" data-show-past>Ver anteriores</button></p>`;
+  }
+
   const venueTransfers = window.FICX_VENUE_TRANSFERS || {};
   const busTransfers = window.FICX_BUS_TRANSFERS || {};
   const primarySections = Array.isArray(window.FICX_PRIMARY_SECTIONS) ? window.FICX_PRIMARY_SECTIONS : [];
@@ -112,6 +217,8 @@
   let showDiscarded = false;
   let expandedId = null;
   let filmNavigationIds = [];
+  let filmNavigationOriginIds = [];
+  function setFilmNavigation(ids) { filmNavigationIds = ids; filmNavigationOriginIds = [...ids]; }
   // Pass lists stay folded until the person opens them; the fold is re-rendered
   // on every paint, so this carries the user's open state across renders.
   let openPassesId = null;
@@ -269,9 +376,10 @@
   }
   function compactPassLabel(screening) {
     if (!screening) return "";
+    if (!validProgramDate(screening.date)) return "Fecha sin confirmar";
     const date = new Date(`${screening.date}T12:00:00`);
-    const weekdayName = new Intl.DateTimeFormat("es-ES", { weekday: "long" }).format(date).toLocaleLowerCase("es");
-    const day = new Intl.DateTimeFormat("es-ES", { day: "2-digit" }).format(date);
+    const weekdayName = validProgramDate(screening.date) ? new Intl.DateTimeFormat("es-ES", { weekday: "long" }).format(date).toLocaleLowerCase("es") : "";
+    const day = (validProgramDate(screening.date) ? new Intl.DateTimeFormat("es-ES", { day: "2-digit" }).format(date) : "—");
     const venue = { "escuela-comercio": "EC", "ocine": "OC", "yelmo": "Y", "teatro-jovellanos": "TJ", "laboral": "LAB", "antiguo-instituto": "AI", "pumarin": "SUR" }[screening.venueGroup] || "";
     const time = String(screening.time || "").replace(":00", "h").replace(":", "h");
     return `${WEEKDAY_INITIALS[weekdayName] || "?"}${day} · ${time} · ${venue}`;
@@ -291,9 +399,9 @@
   }
   function screeningCard(screening) {
     const date = new Date(`${screening.date}T12:00:00`);
-    const weekday = new Intl.DateTimeFormat("es-ES", { weekday: "short" }).format(date).replace(/\.$/, "").toLocaleUpperCase("es");
-    const day = new Intl.DateTimeFormat("es-ES", { day: "2-digit" }).format(date);
-    const month = new Intl.DateTimeFormat("es-ES", { month: "short" }).format(date).replace(/\.$/, "").toLocaleUpperCase("es");
+    const weekday = (validProgramDate(screening.date) ? new Intl.DateTimeFormat("es-ES", { weekday: "short" }).format(date) : "Fecha sin confirmar").replace(/\.$/, "").toLocaleUpperCase("es");
+    const day = (validProgramDate(screening.date) ? new Intl.DateTimeFormat("es-ES", { day: "2-digit" }).format(date) : "—");
+    const month = (validProgramDate(screening.date) ? new Intl.DateTimeFormat("es-ES", { month: "short" }).format(date) : "").replace(/\.$/, "").toLocaleUpperCase("es");
     const sharedProgram = screening.filmIds?.length > 1
       ? `<span class="screening-program-tag">Pase compartido · ${screening.filmIds.length} películas</span>`
       : "";
@@ -303,15 +411,15 @@
     const labels = eventLabelsFor(screening);
     const meetingNote = screening.meetingMinutes ? `<p class="screening-meeting"><span class="meeting-icon" aria-hidden="true">🎙</span>Encuentro con el equipo</p>` : "";
     // reviewStatus stays in the data; the UI no longer flags pending passes.
-    return `<li class="cinema-card screening-card">
-      <time class="screening-date" datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}"><span>${escapeHtml(weekday)}</span><b>${escapeHtml(day)}</b><small>${escapeHtml(month)}</small></time>
+    return `<li data-temporal-candidate="${escapeHtml(screening.candidateId)}" class="cinema-card screening-card">
+      <time class="screening-date"${screeningDateTimeAttribute(screening)}><span>${escapeHtml(weekday)}</span><b>${escapeHtml(day)}</b><small>${escapeHtml(month)}</small></time>
       <div class="screening-info">
-        <p class="screening-time"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 5.5V10l3.2 2"/></svg><time datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}">${escapeHtml(screening.time)}</time></p>
+        <p class="screening-time"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 5.5V10l3.2 2"/></svg><time${screeningDateTimeAttribute(screening)}>${escapeHtml(screening.time)}</time></p>
         <p class="screening-place"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 8.2c0 4.4-6 9.3-6 9.3S4 12.6 4 8.2a6 6 0 1 1 12 0Z"/><circle cx="10" cy="8" r="2"/></svg><span>${escapeHtml(screening.venue)}${screening.room ? `<b>${escapeHtml(screening.room)}</b>` : ""}</span></p>
         ${busStopLine(screening.venueGroup)}
         ${screening.meetingMinutes ? `<p class="screening-meeting"><span class="meeting-icon" aria-hidden="true">🎙</span>Encuentro con el equipo</p>` : ""}
         ${blockTitle}
-        <div class="screening-tags">${sharedProgram}${labels}</div>
+        <div class="screening-tags">${temporalStatusMarkup(screening)}${sharedProgram}${labels}</div>
         ${renderPassQuickActions(screening, { planOnly: true })}
       </div>
     </li>`;
@@ -327,11 +435,11 @@
   }
   function renderFilmScreenings(film) {
     const screenings = (Array.isArray(film.screenings) ? film.screenings : [])
-      .filter((screening) => !discarded.has(film.id))
+      .filter((screening) => !discarded.has(film.id) && (filmDialogTemporalExempt || showUpcomingPass(screening)))
       .sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`));
     const publicScreenings = screenings.filter((screening) => screening.accessType === "public");
     const specialScreenings = screenings.filter((screening) => screening.accessType !== "public");
-    const emptyMessage = !screenings.length ? `<p class="screenings-empty">${discarded.has(film.id) ? "Los pases están ocultos porque has descartado esta película." : "No hay pases para esta película."}</p>` : "";
+    const emptyMessage = !screenings.length ? `<p class="screenings-empty">${discarded.has(film.id) ? "Los pases están ocultos porque has descartado esta película." : (!(film.screenings || []).length ? "Sin pases publicados" : hidePast && !filmDialogTemporalExempt ? "No quedan pases pendientes o en curso. Consulta los anteriores en Ajustes." : "No hay pases para esta película.")}</p>` : "";
     const specialList = specialScreenings.length ? `<details class="special-screenings"><summary>Pases con acceso especial <span>${specialScreenings.length}</span></summary><p>Incluye pases escolares o reservados a prensa y acreditados.</p><ul class="screening-list">${specialScreenings.map(screeningCard).join("")}</ul></details>` : "";
     // Passes start folded. Only an explicit Mi lista / Quizás click opens them;
     // marking the opposite intent again closes them.
@@ -340,11 +448,12 @@
     return `<section class="film-screenings" aria-label="Pases de ${escapeHtml(film.title)}"><details class="film-screenings-foldout"${open}><summary><span>Pases</span>${filmPlanBadge(film)}<b>${screenings.length}</b></summary><div class="film-screenings-content">${passContent}</div></details></section>`;
   }
   function filmsForSection(sectionName) {
-    return films.filter((film) => !discarded.has(film.id) && (!sectionName || (film.sections || []).includes(sectionName)));
+    return films.filter((film) => (!hidePast || onlyMyLists || showDiscarded || filmHasUpcomingPass(film)) && !discarded.has(film.id) && (!sectionName || (film.sections || []).includes(sectionName)));
   }
   function matchingFilms(applySubfilters = true) {
     const query = search.value.trim().toLocaleLowerCase("es");
     return films.filter((film) => {
+      if (hidePast && !onlyMyLists && !showDiscarded && !filmHasUpcomingPass(film)) return false;
       // Mientras dura el acuse, la recién descartada sigue ocupando su sitio.
       if (discarded.has(film.id) !== showDiscarded && !(discardAck && discardAck.film.id === film.id)) return false;
       const names = film.sections || [];
@@ -486,13 +595,13 @@
     document.querySelector("#browse-count").textContent = String(visible.length);
     document.querySelector("#active-section-label").textContent = sectionLabel || "Todas las secciones";
     document.querySelector("#empty-state").hidden = visible.length > 0;
-    document.querySelector("#empty-state").textContent = showDiscarded ? "No has descartado ninguna película." : "No encontramos películas con esos filtros. Prueba otro título o sección.";
+    document.querySelector("#empty-state").textContent = showDiscarded ? "No has descartado ninguna película." : (hidePast && temporalView.festivalEnded && !onlyMyLists ? temporalEmptyMessage() : "No encontramos películas con esos filtros. Prueba otro título o sección.");
     renderSubfilters();
     const expandedIndex = expandedId ? visible.findIndex((film) => film.id === expandedId) : -1;
     const renderCount = mobileFilmViewport.matches
       ? Math.min(visible.length, Math.max(filmRenderLimit, expandedIndex + 1))
       : visible.length;
-    list.innerHTML = visible.slice(0, renderCount).map((film) => {
+    const renderRow = (film, includeDetails = false) => {
       const status = intentions.get(film.id);
       const isExpanded = expandedId === film.id;
       const tags = (film.sections || []).filter((name) => !["otras secciones", "cortometrajes"].includes(name.toLocaleLowerCase("es"))).map((name) => `<span class="film-section">${escapeHtml(name)}</span>`).join("");
@@ -528,7 +637,7 @@
         <div class="film-detail-sticky-actions">
           <nav class="film-detail-navigation" aria-label="Navegación entre películas">${[-1, 1].map((direction) => {
             const index = filmNavigationIds.indexOf(film.id);
-            const adjacent = films.find((item) => item.id === filmNavigationIds[index + direction]);
+            const adjacent = index < 0 ? null : films.find((item) => item.id === filmNavigationIds[index + direction]);
             const label = direction < 0 ? "anterior" : "siguiente";
             const action = direction < 0 ? "previous" : "next";
             return `<button class="film-detail-nav" type="button" data-action="film-${action}"${adjacent ? ` aria-label="Película ${label}: ${escapeHtml(adjacent.title)}" title="${escapeHtml(adjacent.title)}"` : ` aria-label="No hay película ${label}" title="No hay película ${label}" disabled`}><svg viewBox="0 0 20 20" aria-hidden="true"><path d="${direction < 0 ? "m12.5 3.5-6.5 6.5 6.5 6.5" : "m7.5 3.5 6.5 6.5-6.5 6.5"}"/></svg></button>`;
@@ -536,7 +645,7 @@
           <button class="film-detail-close" type="button" data-action="expand" data-id="${escapeHtml(film.id)}" aria-label="Cerrar ficha de ${escapeHtml(film.title)}"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button>
         </div>
       </header>`;
-      const details = isExpanded ? `<dialog class="film-expanded" id="film-detail-${escapeHtml(film.id)}" aria-labelledby="film-detail-title-${escapeHtml(film.id)}">
+      const details = isExpanded && includeDetails ? `<dialog class="film-expanded" id="film-detail-${escapeHtml(film.id)}" aria-labelledby="film-detail-title-${escapeHtml(film.id)}">
         ${expandedHeader}
         <div class="film-expanded-main">
         <div class="film-detail-poster poster-tone-${toneIndex}${remoteImagesEnabled && film.imageUrl ? " poster-has-image" : ""}" aria-label="Imagen de ${escapeHtml(film.title)}">
@@ -586,7 +695,34 @@
         </div>` : ""}
         ${details}
       </li>`;
-    }).join("");
+    };
+    const dialogHost = document.querySelector("#film-dialog-host");
+    const oldDialog = dialogHost.querySelector("dialog");
+    const template = document.createElement("template");
+    list.innerHTML = visible.slice(0, renderCount).map(film => renderRow(film)).join("");
+    if (expandedId && filmById.has(expandedId)) {
+      template.innerHTML = renderRow(filmById.get(expandedId), true);
+      const nextDialog = template.content.querySelector("dialog");
+      nextDialog.dataset.filmId = expandedId;
+      if (oldDialog && oldDialog.dataset.filmId === expandedId) {
+        // Preserve dialog identity, reading position and open modal state.
+        const oldPoster = oldDialog.querySelector(".film-detail-poster"), newPoster = nextDialog.querySelector(".film-detail-poster");
+        if (oldPoster.className !== newPoster.className) {
+          oldPoster.className = newPoster.className;
+          oldPoster.innerHTML = newPoster.innerHTML;
+        }
+        oldDialog.querySelector(".film-expanded-screenings").innerHTML = nextDialog.querySelector(".film-expanded-screenings").innerHTML;
+        oldDialog.querySelector(".film-expanded-actions").innerHTML = nextDialog.querySelector(".film-expanded-actions").innerHTML;
+        for (const selector of [".film-detail-sticky h2", ".poster-mobile-metadata h2"]) {
+          const current = oldDialog.querySelector(selector), next = nextDialog.querySelector(selector);
+          if (current && next && current.innerHTML !== next.innerHTML) current.innerHTML = next.innerHTML;
+        }
+        oldDialog.querySelector(".film-detail-navigation").innerHTML = nextDialog.querySelector(".film-detail-navigation").innerHTML;
+      } else {
+        if (oldDialog) oldDialog.remove();
+        dialogHost.append(nextDialog);
+      }
+    } else if (oldDialog) oldDialog.remove();
     filmListProgress.textContent = mobileFilmViewport.matches && visible.length > filmBatchSize
       ? `Mostrando ${renderCount} de ${visible.length} películas.`
       : visible.length ? `${visible.length} ${visible.length === 1 ? "película" : "películas"}.` : "";
@@ -596,14 +732,15 @@
     filmListMore.textContent = remaining > 0
       ? `Ver ${Math.min(filmBatchSize, remaining)} ${remaining === 1 ? "película" : "películas"} más`
       : "Ver más películas";
-    const detailDialog = list.querySelector("dialog.film-expanded");
+    const detailDialog = document.querySelector("#film-dialog-host dialog.film-expanded");
     if (detailDialog) {
-      detailDialog.addEventListener("cancel", (event) => {
+      if (!detailDialog.dataset.boundCancel) detailDialog.addEventListener("cancel", (event) => {
         event.preventDefault();
         // Con el acuse de descartar abierto, Escape lo cierra a él y no la ficha.
         if (discardAck) { closeDiscardAck(); return; }
         closeFilmDetails();
       });
+      detailDialog.dataset.boundCancel = "true";
       syncFilmDialog();
     }
     scheduleSynopsisFit();
@@ -658,6 +795,7 @@
     if (typeof updateMobileTabState === "function") updateMobileTabState();
     if (scrollTop) window.scrollTo({ top: 0, behavior: "smooth" });
     if (name === "explore") syncFilmDialog();
+    queueMicrotask(() => refreshTemporalView());
   }
   let backgroundScrollY = 0;
   let backgroundScrollStyles = null;
@@ -689,7 +827,7 @@
     requestAnimationFrame(() => window.scrollTo({ top: backgroundScrollY, behavior: "auto" }));
   }
   function syncFilmDialog() {
-    const dialog = list.querySelector("dialog.film-expanded");
+    const dialog = document.querySelector("#film-dialog-host dialog.film-expanded");
     if (!dialog || activeScreen !== "explore" || dialog.open) return;
     lockBackgroundScroll();
     dialog.showModal();
@@ -707,7 +845,7 @@
     synopsisFitFrame = requestAnimationFrame(fitFilmSynopsis);
   }
   function fitFilmSynopsis() {
-    const dialog = list.querySelector("dialog.film-expanded[open]");
+    const dialog = document.querySelector("#film-dialog-host dialog.film-expanded[open]");
     if (dialog !== synopsisObservedDialog) {
       synopsisResizeObserver?.disconnect();
       if (dialog) synopsisResizeObserver?.observe(dialog);
@@ -757,8 +895,9 @@
     const wasFromSession = returnToSessionSearch;
     unlockBackgroundScroll();
     expandedId = null;
+    filmDialogTemporalExempt = false;
     returnToSessionSearch = false;
-    filmNavigationIds = [];
+    setFilmNavigation([]);
     // Leer antes de repintar: renderFilms puede cerrar la ficha y volver aquí.
     const backToProgram = returnToProgram;
     returnToProgram = false;
@@ -785,7 +924,7 @@
   document.addEventListener("toggle", (event) => {
     const foldout = event.target.closest?.("details.film-screenings-foldout");
     if (!foldout) return;
-    const row = foldout.closest(".film-row");
+    const row = foldout.closest("[data-film-id]");
     if (!row) return;
     openPassesId = foldout.open ? row.dataset.filmId : null;
   }, true);
@@ -793,6 +932,7 @@
   function navigateFilm(direction) {
     openPassesId = null;
     const currentIndex = filmNavigationIds.indexOf(expandedId);
+    if (currentIndex < 0) return;
     const filmId = filmNavigationIds[currentIndex + direction];
     if (!filmId) return;
     expandedId = filmId;
@@ -830,12 +970,8 @@
   }, { passive: true });
 
   function renderDateChoices() {
-    const dates = [
-      ["2026-11-13", "Vie", "13"], ["2026-11-14", "Sáb", "14"], ["2026-11-15", "Dom", "15"],
-      ["2026-11-16", "Lun", "16"], ["2026-11-17", "Mar", "17"], ["2026-11-18", "Mié", "18"],
-      ["2026-11-19", "Jue", "19"], ["2026-11-20", "Vie", "20"], ["2026-11-21", "Sáb", "21"],
-    ];
-    document.querySelector("#date-options").innerHTML = `<button type="button" class="choice-chip${activeDates.size ? "" : " is-selected"}" data-date="" aria-pressed="${activeDates.size === 0}">Todos</button>` + dates.map(([value, day, number]) => `<button type="button" class="choice-chip${activeDates.has(value) ? " is-selected" : ""}" data-date="${value}" aria-pressed="${activeDates.has(value)}">${day} ${number}</button>`).join("");
+    const dates = [...new Set(screeningRecords.map(s => s.date).filter(validProgramDate))].sort().map(value => [value, formatProgramDate(value, { weekday: "short" }), value.slice(8)]);
+    document.querySelector("#date-options").innerHTML = `<button type="button" class="choice-chip${activeDates.size ? "" : " is-selected"}" data-date="" aria-pressed="${activeDates.size === 0}">Todos</button>` + dates.map(([value, day, number]) => `<button type="button" class="choice-chip${activeDates.has(value) ? " is-selected" : ""}" data-date="${value}"${hidePast && temporalView.closedDates.has(value) ? ' disabled title="Este día ha terminado"' : ""} aria-pressed="${activeDates.has(value)}">${day} ${number}</button>`).join("");
   }
   function updateSessionSummary() {
     const dateText = activeDates.size
@@ -857,7 +993,7 @@
     document.querySelector("#session-filter-count").textContent = activeFilterCount ? `${activeFilterCount} ${activeFilterCount === 1 ? "activo" : "activos"}` : "Sin filtros activos";
     const plannedEvents = selectedPlanEvents();
     const plannedFilmIds = selectedFilmIds(plannedEvents);
-    const filtered = screeningRecords.filter((screening) => {
+    const matching = screeningRecords.filter((screening) => {
       const linkedFilms = (screening.filmIds || []).map((id) => filmById.get(id)).filter(Boolean);
       const searchable = normalizeQuery([screening.title, ...(screening.films || []).map((film) => film.title),
         ...linkedFilms.map((film) => `${film.title} ${directorText(film)} ${(film.countries || []).join(" ")}`)].join(" "));
@@ -875,6 +1011,13 @@
         && (includeSpecial || screening.accessType === "public")
         && (!onlySaved || (screening.filmIds || []).some((id) => intentions.has(id)));
     });
+    const filtered = matching.filter(showUpcomingPass);
+    const emptyMessage = !screeningRecords.length ? "No hay horarios publicados"
+      : !hidePast || !matching.length ? "No hay pases con estos filtros. Prueba con más días, franjas u otras sedes."
+      : temporalView.festivalEnded ? temporalEmptyMessage()
+      : activeDates.size && [...activeDates].some(date => !temporalView.closedDates.has(date)) && matching.every(passHasStarted)
+        ? "Ya han terminado los pases que coinciden con estos filtros" : temporalEmptyMessage();
+    filtered.sort((a, b) => Number(!validProgramDate(a.date)) - Number(!validProgramDate(b.date)));
     const resultList = document.querySelector("#session-results-list");
     resultList.innerHTML = filtered.length ? filtered.map((screening) => {
       const filmIds = screening.filmIds || [];
@@ -891,9 +1034,9 @@
       }).filter(Boolean).join("");
       const sections = sectionChips([...liveIds].map((id) => filmById.get(id)).filter(Boolean));
       const date = new Date(`${screening.date}T12:00:00`);
-      const weekday = new Intl.DateTimeFormat("es-ES", { weekday: "short" }).format(date).replace(/\.$/, "").toLocaleUpperCase("es");
-      const day = new Intl.DateTimeFormat("es-ES", { day: "2-digit" }).format(date);
-      const month = new Intl.DateTimeFormat("es-ES", { month: "short" }).format(date).replace(/\.$/, "").toLocaleUpperCase("es");
+      const weekday = (validProgramDate(screening.date) ? new Intl.DateTimeFormat("es-ES", { weekday: "short" }).format(date) : "Fecha sin confirmar").replace(/\.$/, "").toLocaleUpperCase("es");
+      const day = (validProgramDate(screening.date) ? new Intl.DateTimeFormat("es-ES", { day: "2-digit" }).format(date) : "—");
+      const month = (validProgramDate(screening.date) ? new Intl.DateTimeFormat("es-ES", { month: "short" }).format(date) : "").replace(/\.$/, "").toLocaleUpperCase("es");
       const review = "";
       const access = screening.accessType !== "public" ? `<span class="screening-event-tag">${screening.accessType === "restricted" ? "PRENSA Y ACREDITADOS" : "ESCOLARES"}</span>` : "";
       // "ENCUENTRO" is not a category chip: it is a coloquio around the film.
@@ -903,12 +1046,12 @@
 
       const slotMinutes = plannedMinutes(screening);
       const durationText = slotMinutes ? `<span class="finder-duration">${slotMinutes} min</span>` : "";
-      const passDetails = `${screening.meetingMinutes ? `<p class="screening-meeting"><span class="meeting-icon" aria-hidden="true">🎙</span>Encuentro con el equipo</p>` : ""}${blockTitle}<div class="finder-film-titles${filmIds.length > 1 ? " is-multi" : ""}">${names || `<span class="screening-film-unlinked">Título por identificar</span>`}</div>${sections}<div class="screening-tags">${access}${shared}${labels}${plannedNotes ? `<div class="finder-planned-notes">${plannedNotes}</div>` : ""}${renderPassQuickActions(screening, { planOnly: true })}</div>`;
+      const passDetails = `${screening.meetingMinutes ? `<p class="screening-meeting"><span class="meeting-icon" aria-hidden="true">🎙</span>Encuentro con el equipo</p>` : ""}${blockTitle}<div class="finder-film-titles${filmIds.length > 1 ? " is-multi" : ""}">${names || `<span class="screening-film-unlinked">Título por identificar</span>`}</div>${sections}<div class="screening-tags">${temporalStatusMarkup(screening)}${access}${shared}${labels}${plannedNotes ? `<div class="finder-planned-notes">${plannedNotes}</div>` : ""}${renderPassQuickActions(screening, { planOnly: true })}</div>`;
       const passContent = hasDiscardedFilm
         ? `<details class="finder-pass-foldout"><summary><span class="finder-fold-titles">${summaryNames || "Título por identificar"}</span><span class="finder-discarded-note">${discardedFilmCount === 1 ? "Incluye 1 película descartada" : `Incluye ${discardedFilmCount} películas descartadas`} · Ver detalles</span></summary><div class="finder-pass-foldout-content">${passDetails}</div></details>`
         : passDetails;
-      return `<li class="cinema-card finder-screening${hasDiscardedFilm ? " has-discarded-film" : ""}${hasFilmAlreadyPlanned ? " has-film-in-plan" : ""}"><time class="finder-date" datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}"><span>${weekday}</span><b>${day}</b><small>${month}</small></time><div class="finder-screening-content"><div class="finder-screening-heading"><time datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}">${escapeHtml(screening.time)}</time><span>${escapeHtml(screening.venue)}${screening.room ? ` · ${escapeHtml(screening.room)}` : ""}</span>${durationText}${passTicketMarker(screening)}</div>${passContent}</div></li>`;
-    }).join("") : `<li class="finder-no-results">No hay pases con estos filtros. Prueba con más días, franjas u otras sedes.</li>`;
+      return `<li data-temporal-candidate="${escapeHtml(screening.candidateId)}" class="cinema-card finder-screening${hasDiscardedFilm ? " has-discarded-film" : ""}${hasFilmAlreadyPlanned ? " has-film-in-plan" : ""}"><time class="finder-date"${screeningDateTimeAttribute(screening)}><span>${weekday}</span><b>${day}</b><small>${month}</small></time><div class="finder-screening-content"><div class="finder-screening-heading"><time${screeningDateTimeAttribute(screening)}>${escapeHtml(screening.time)}</time><span>${escapeHtml(screening.venue)}${screening.room ? ` · ${escapeHtml(screening.room)}` : ""}</span>${durationText}${passTicketMarker(screening)}</div>${passContent}</div></li>`;
+    }).join("") : `<li class="finder-no-results">${escapeHtml(emptyMessage)}</li>`;
     document.querySelector("#session-results-title").textContent = `${filtered.length} ${filtered.length === 1 ? "pase" : "pases"} · ${dateText} · ${timeText}${venueText}`;
   }
 
@@ -925,7 +1068,7 @@
     return new Set(events.flatMap((screening) => screening.filmIds || []));
   }
   function formatProgramDate(value, options = { weekday: "long", day: "numeric", month: "long" }) {
-    return new Intl.DateTimeFormat("es-ES", options).format(new Date(`${value}T12:00:00`));
+    return validProgramDate(value) ? new Intl.DateTimeFormat("es-ES", { ...options, timeZone: "UTC" }).format(new Date(`${value}T12:00:00Z`)) : "Fecha sin confirmar";
   }
   const VENUE_CODES = {
     "ocine": "OCINE", "yelmo": "YELMO", "teatro-jovellanos": "TJ", "escuela-comercio": "AEC",
@@ -933,9 +1076,10 @@
   };
   const WEEKDAY_INITIALS = { "lunes": "L", "martes": "M", "miércoles": "X", "jueves": "J", "viernes": "V", "sábado": "S", "domingo": "D" };
   function shortPassLabel(screening) {
+    if (!validProgramDate(screening.date)) return "Fecha sin confirmar";
     const date = new Date(`${screening.date}T12:00:00`);
-    const weekday = new Intl.DateTimeFormat("es-ES", { weekday: "long" }).format(date).toLocaleLowerCase("es");
-    const day = new Intl.DateTimeFormat("es-ES", { day: "numeric" }).format(date);
+    const weekday = validProgramDate(screening.date) ? new Intl.DateTimeFormat("es-ES", { weekday: "long" }).format(date).toLocaleLowerCase("es") : "";
+    const day = validProgramDate(screening.date) ? new Intl.DateTimeFormat("es-ES", { day: "numeric" }).format(date) : "—";
     const code = VENUE_CODES[screening.venueGroup] || screening.venueGroup;
     const fullVenue = `${screening.venue}${screening.room ? ` · ${screening.room}` : ""}`;
     return `<span class="program-pass-brief" title="${escapeHtml(fullVenue)}">${WEEKDAY_INITIALS[weekday] || "?"}${day} - ${escapeHtml(screening.time)} @ ${escapeHtml(code)}</span>`;
@@ -1140,6 +1284,7 @@
     return `<span class="program-fit-badge is-clear">Encaja con tu parrilla</span>`;
   }
   function renderProgramChoice(screening, film, selectedId, events, suggestion = false) {
+    if (!showUpcomingPass(screening)) return "";
     const selected = selectedId === screening.candidateId;
     const review = "";
     const special = screening.accessType === "public" ? "" : `<span class="program-access-tag">${screening.accessType === "restricted" ? "Prensa/acreditados" : "Escolares"}</span>`;
@@ -1153,10 +1298,10 @@
     const currentOtherId = plannedScreenings.get(film.id);
     const choiceText = suggestion ? "Elegir este pase" : selected ? "Elegido" : currentOtherId ? "Cambiar pase" : screening.filmIds.length > 1 ? "Elegir programa" : "Elegir este pase";
     const action = suggestion ? "add-maybe-suggestion" : "choose-program-screening";
-    return `<article class="cinema-card program-pass-option${selected ? " is-selected" : ""}">
-      <div class="program-pass-topline"><time datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}">${escapeHtml(formatProgramDate(screening.date, { weekday: "short", day: "numeric", month: "short" }))} · ${escapeHtml(screening.time)}</time>${review}</div>
+    return `<article data-temporal-candidate="${escapeHtml(screening.candidateId)}" class="cinema-card program-pass-option${selected ? " is-selected" : ""}">
+      <div class="program-pass-topline"><time${screeningDateTimeAttribute(screening)}>${escapeHtml(formatProgramDate(screening.date, { weekday: "short", day: "numeric", month: "short" }))} · ${escapeHtml(screening.time)}</time>${review}</div>
       <p class="program-pass-venue">${escapeHtml(screening.venue)}${screening.room ? ` <b>${escapeHtml(screening.room)}</b>` : ""}</p>
-      <div class="program-pass-meta">${duration}${fitBadge(screening, film.id, events)}${shared}${special}${labels}</div>
+      <div class="program-pass-meta">${temporalStatusMarkup(screening)}${duration}${fitBadge(screening, film.id, events)}${shared}${special}${labels}</div>
       ${screening.meetingMinutes ? `<p class="screening-meeting"><span class="meeting-icon" aria-hidden="true">🎙</span>Encuentro con el equipo</p>` : ""}
       ${screening.filmIds.length > 1 ? `<div class="program-pass-films">${filmTitlesSeparated(screening.films, "program-pass-film")}</div>` : ""}
       <button class="program-choice-button${selected ? " is-selected" : ""}" type="button" data-program-action="${action}" data-film-id="${escapeHtml(film.id)}" data-candidate-id="${escapeHtml(screening.candidateId)}"${selected && !suggestion ? " disabled" : ""}>${selected && !suggestion ? "✓ " : ""}${choiceText}</button>
@@ -1225,15 +1370,15 @@
         ? (best.fit.conflicts.length ? "Choca" : best.fit.uncertain ? "Datos por confirmar" : "Encaja")
         : `${options.length} ${options.length === 1 ? "pase" : "pases"}`;
     const summaryClass = current ? "is-selected" : best?.fit.conflicts.length ? "is-conflict" : best?.fit.uncertain ? "is-uncertain" : best ? "is-clear" : "";
-    const detailsLine = current
+    const detailsLine = current && showUpcomingPass(current)
       ? `<small class="program-film-details">${escapeHtml(formatProgramDate(current.date, { weekday: "short", day: "numeric", month: "short" }))} · ${escapeHtml(current.time)} · ${escapeHtml(current.venue)}</small>`
       : "";
     const passCountText = `${options.length} ${options.length === 1 ? "pase" : "pases"}`;
     // Without a chosen pass, show when the film is scheduled so the list is
     // useful at a glance (e.g. "· 2 pases (M17 - 19:30 @ LAB)").
-    const briefInfo = !current && options.length ? ` (${options.map((screening) => shortPassLabel(screening)).join(" | ")})` : "";
+    const briefInfo = !current && options.length ? ` (${options.filter(showUpcomingPass).map((screening) => shortPassLabel(screening)).join(" | ")})` : "";
     const filmDuration = current ? (current.durationMinutes ? ` · ${current.durationMinutes} min` : "") : (film.durationMinutes ? ` · ${film.durationMinutes} min` : "");
-    const picks = options.length
+    const picks = options.length && !options.some(showUpcomingPass) ? temporalNotice("No quedan pases pendientes o en curso.") : options.length
       ? options.map((screening) => renderProgramChoice(screening, film, selectedId, events)).join("")
       : `<p class="program-no-options">${screeningRecords.some((screening) => screening.filmIds.includes(film.id)) ? "Solo tiene pases escolares o de prensa. Actívalos para verlos." : "No encontramos pases enlazados a esta película."}</p>`;
     const includedByShared = selectedFilmIds(events).has(film.id);
@@ -1241,7 +1386,7 @@
       ? `<button class="program-unselect-action" type="button" data-program-action="unselect-film" data-film-id="${escapeHtml(film.id)}">Quitar selección</button>`
       : "";
     const intentAction = `<button class="program-intent-remove" type="button" data-program-action="remove-intent" data-film-id="${escapeHtml(film.id)}" aria-label="Quitar ${escapeHtml(film.title)} de las listas" title="Quitar de Mis listas">✕</button>`;
-    return `<details class="program-film-pick${current || includedByShared ? " has-choice" : ""}">${filmPickSummary({ film, duration: filmDuration, passText: `${passCountText}${briefInfo}`, detailsLine, badgeText: summaryState, badgeClass: summaryClass, removeButton: intentAction })}<div class="program-film-options">${unselectAction}${picks}</div></details>`;
+    return `<details data-temporal-film="${escapeHtml(film.id)}" class="program-film-pick${current || includedByShared ? " has-choice" : ""}">${filmPickSummary({ film, duration: filmDuration, passText: `${passCountText}${briefInfo}`, detailsLine, badgeText: summaryState, badgeClass: summaryClass, removeButton: intentAction })}<div class="program-film-options">${unselectAction}${picks}</div></details>`;
   }
   function renderGroupedProgramFilms(container, pending, selected, events, renderFilm) {
     const openRanks = new Map([...container.querySelectorAll(".program-subtype-fold")].map((fold) => [fold.dataset.fitRank, fold.open]));
@@ -1337,8 +1482,11 @@
     const blockTitle = screening.title && (screening.filmIds || []).length > 1 ? `<div class="screening-program-title">${escapeHtml(screening.title)}</div>` : "";
     const duration = plannedMinutes(screening);
     const endClock = duration ? formatClock(Math.ceil((startMinute(screening) + duration) / 5) * 5) : "";
-    const endMeta = endClock ? `<span class="program-event-end">hasta ${endClock} · ${duration} min</span>` : "";
+    const endMeta = temporalView.states.get(screening.candidateId) === "ongoing"
+      ? `<span class="program-event-end">${duration} min</span>`
+      : endClock ? `<span class="program-event-end">hasta ${endClock} · ${duration} min</span>` : "";
     const flags = [
+      temporalStatusMarkup(screening),
       // reviewState is kept in the data but no longer shown as a warning.
       conflictList.length ? `<span class="program-conflict-tag">${conflictList.some((item) => item.reason === "transfer") ? "No da tiempo al traslado" : "Solapa con " + conflictList.map((item) => escapeHtml(item.screening.time)).join(", ")}</span>` : "",
       uncertain.has(screening.candidateId) || !screening.durationMinutes ? `<span class="program-duration-unknown">Duración por confirmar</span>` : "",
@@ -1347,7 +1495,7 @@
         ? `<span class="program-access-tag">Entrada libre</span>` : "",
     ].filter(Boolean).join("");
     const actionName = (screening.films || []).map((film) => film.title).join(", ") || screening.title || "este pase";
-    return `<article class="cinema-card program-event${conflictList.length ? " has-conflict" : ""}${screening.candidateId === chosenId ? " is-demo-chosen" : ""}"><time class="program-event-time" datetime="${escapeHtml(screening.date)}T${escapeHtml(screening.time)}">${escapeHtml(screening.time)}</time><div class="program-event-body"><div class="program-event-venue">${escapeHtml(screening.venue)}${screening.room ? ` · ${screening.room}` : ""}${endMeta}</div>${blockTitle}<div class="program-event-films">${demoChosenTag(screening, chosenId)}${eventTitles(screening)}</div>${sectionChips((screening.filmIds || []).map((id) => filmById.get(id)).filter(Boolean), "screening-section-line program-section-line")}<div class="program-event-flags">${flags}</div></div><div class="program-event-control">${programEntryControl(screening)}</div><div class="program-event-actions"><button class="program-calendar-event" type="button" data-program-action="calendar-event" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-haspopup="menu" aria-expanded="false" aria-label="Añadir ${escapeHtml(actionName)} al calendario" title="Añadir al calendario"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg></button><button class="program-share-event" type="button" data-program-action="share-screening" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-label="Compartir este pase" title="Compartir este pase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.6 6.8-4M8.6 13.4l6.8 4"/></svg></button><button class="program-remove-event" type="button" data-program-action="remove-program-screening" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-label="Quitar pase de ${escapeHtml(actionName)}" title="Quitar pase"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div></article>`;
+    return `<article data-temporal-candidate="${escapeHtml(screening.candidateId)}" class="cinema-card program-event${conflictList.length ? " has-conflict" : ""}${screening.candidateId === chosenId ? " is-demo-chosen" : ""}"><time class="program-event-time"${screeningDateTimeAttribute(screening)}>${escapeHtml(screening.time)}</time><div class="program-event-body"><div class="program-event-venue">${escapeHtml(screening.venue)}${screening.room ? ` · ${screening.room}` : ""}${endMeta}</div>${blockTitle}<div class="program-event-films">${demoChosenTag(screening, chosenId)}${eventTitles(screening)}</div>${sectionChips((screening.filmIds || []).map((id) => filmById.get(id)).filter(Boolean), "screening-section-line program-section-line")}<div class="program-event-flags">${flags}</div></div><div class="program-event-control">${programEntryControl(screening)}</div><div class="program-event-actions"><button class="program-calendar-event" type="button" data-program-action="calendar-event" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-haspopup="menu" aria-expanded="false" aria-label="Añadir ${escapeHtml(actionName)} al calendario" title="Añadir al calendario"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg></button><button class="program-share-event" type="button" data-program-action="share-screening" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-label="Compartir este pase" title="Compartir este pase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.6 6.8-4M8.6 13.4l6.8 4"/></svg></button><button class="program-remove-event" type="button" data-program-action="remove-program-screening" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-label="Quitar pase de ${escapeHtml(actionName)}" title="Quitar pase"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div></article>`;
   }
   // Etiqueta del pase elegido en la demo del asistente (ver renderWizardTransfers). En la
   // parrilla real nunca hay pase elegido y no pinta nada.
@@ -1417,6 +1565,7 @@
   function renderDayEvents(dayEvents, conflicts, uncertain, chosenId) {
     return dayEvents.map((screening, index) => {
       const event = renderProgramEvent(screening, conflicts, uncertain, chosenId);
+      if (!validProgramDate(screening.date)) return event;
       if (index === dayEvents.length - 1) return event;
       const next = dayEvents[index + 1];
       const currentEnd = startMinute(screening) + (Number(screening.durationMinutes) || 0);
@@ -1433,15 +1582,15 @@
     const planned = plannedId ? findScreening(plannedId) : null;
     if (planned) {
       const duration = planned.durationMinutes ? ` · ${planned.durationMinutes} min` : "";
-      const detailsLine = `<small class="program-film-details">${escapeHtml(formatProgramDate(planned.date, { weekday: "short", day: "numeric", month: "short" }))} · ${escapeHtml(planned.time)} · ${escapeHtml(planned.venue)}</small>`;
+      const detailsLine = !showUpcomingPass(planned) ? "" : `<small class="program-film-details">${escapeHtml(formatProgramDate(planned.date, { weekday: "short", day: "numeric", month: "short" }))} · ${escapeHtml(planned.time)} · ${escapeHtml(planned.venue)}</small>`;
       const options = screeningRecords.filter((screening) => screening.filmIds.includes(film.id) && (screening.accessType === "public" || includeSpecialInProgram));
-      const picks = options.map((screening) => renderProgramChoice(screening, film, plannedId, events)).join("");
-      return `<details class="program-film-pick program-maybe-pick has-choice">${filmPickSummary({ film, duration, passText: `${options.length} ${options.length === 1 ? "pase" : "pases"}`, detailsLine, badgeText: "Seleccionada", badgeClass: "is-selected", removeButton: maybeRemove })}<div class="program-film-options"><button class="program-unselect-action" type="button" data-program-action="unselect-film" data-film-id="${escapeHtml(film.id)}">Quitar selección</button>${picks}</div></details>`;
+      const picks = options.some(showUpcomingPass) ? options.map((screening) => renderProgramChoice(screening, film, plannedId, events)).join("") : temporalNotice("No quedan pases pendientes o en curso.");
+      return `<details data-temporal-film="${escapeHtml(film.id)}" class="program-film-pick program-maybe-pick has-choice">${filmPickSummary({ film, duration, passText: `${options.length} ${options.length === 1 ? "pase" : "pases"}`, detailsLine, badgeText: "Seleccionada", badgeClass: "is-selected", removeButton: maybeRemove })}<div class="program-film-options"><button class="program-unselect-action" type="button" data-program-action="unselect-film" data-film-id="${escapeHtml(film.id)}">Quitar selección</button>${picks}</div></details>`;
     }
     const options = screeningRecords.filter((screening) => screening.filmIds.includes(film.id)
       && (screening.accessType === "public" || includeSpecialInProgram));
     const foldSuggestion = (content, badgeText, badgeClass = "", detailsLine = "") =>
-      `<details class="program-film-pick program-maybe-pick">${filmPickSummary({
+      `<details data-temporal-film="${escapeHtml(film.id)}" class="program-film-pick program-maybe-pick">${filmPickSummary({
         film, duration: film.durationMinutes ? ` · ${film.durationMinutes} min` : "",
         passText: `${options.length} ${options.length === 1 ? "pase" : "pases"}`,
         detailsLine, badgeText, badgeClass, removeButton: maybeRemove,
@@ -1450,6 +1599,7 @@
       .map((item) => ({ ...item, conflicts: item.fit.conflicts, uncertain: item.fit.uncertain }));
     const recommendation = evaluated.filter((item) => !item.conflicts.length)
       .sort((a, b) => Number(a.uncertain) - Number(b.uncertain) || `${a.screening.date}T${a.screening.time}`.localeCompare(`${b.screening.date}T${b.screening.time}`))[0];
+    if (recommendation && !showUpcomingPass(recommendation.screening)) return foldSuggestion(temporalNotice("La sugerencia calculada ya ha terminado."), "");
     if (!recommendation) {
       const hasAny = options.length > 0;
       const hasSpecial = screeningRecords.some((screening) => screening.filmIds.includes(film.id) && screening.accessType !== "public");
@@ -1459,6 +1609,7 @@
         return foldSuggestion(`<p class="program-empty-note">${message}</p>${hasSpecial && !includeSpecialInProgram ? enableSpecial : ""}`, "Sin pases disponibles");
       }
       const blocked = [...evaluated].sort((a, b) => a.conflicts.length - b.conflicts.length || `${a.screening.date}T${a.screening.time}`.localeCompare(`${b.screening.date}T${b.screening.time}`))[0];
+      if (!showUpcomingPass(blocked.screening)) return foldSuggestion(temporalNotice("La alternativa calculada ya ha terminado."), "");
       const conflicts = [...new Map(blocked.conflicts.map((item) => [`${item.screening.candidateId}:${item.reason}`, item])).values()];
       const blockers = conflicts.map(({ screening, reason }) => {
         const titles = (screening.films || []).map((item) => item.title).join(", ") || "Otro pase";
@@ -1478,9 +1629,10 @@
     const maybes = films.filter((film) => intentions.get(film.id) === "maybe");
     const { conflicts, uncertain, conflictPairs } = analyzeProgram(allEvents);
 
-    const dateOptions = [...new Set(allEvents.map((item) => item.date))].sort();
+    const dateOptions = [...new Set(allEvents.map((item) => item.date).filter(validProgramDate))].sort();
     if (activeProgramDate && !dateOptions.includes(activeProgramDate)) activeProgramDate = "";
-    const visibleEvents = allEvents.filter((item) => (!activeProgramDate || item.date === activeProgramDate)
+    if (hidePast && temporalView.closedDates.has(activeProgramDate)) activeProgramDate = "";
+    const visibleEvents = allEvents.filter((item) => showAgendaPass(item) && (!activeProgramDate || item.date === activeProgramDate)
       && (programTicketFilter === "all" || ownedTickets.has(item.candidateId) === (programTicketFilter === "owned")));
     const ticketFilterButton = document.querySelector("#program-ticket-filter");
     const ticketFilterLabels = { all: "todas", owned: "con entrada", missing: "sin entrada" };
@@ -1489,8 +1641,9 @@
     ticketFilterButton.setAttribute("aria-label", `Mostrando ${ticketFilterLabels[programTicketFilter]}. Mostrar ${ticketFilterLabels[nextTicketFilter]}`);
     ticketFilterButton.classList.toggle("is-filtered", programTicketFilter !== "all");
     document.querySelector("#program-day-options").innerHTML = dateOptions.length > 1 || activeProgramDate
-      ? `<button type="button" class="program-day-chip${activeProgramDate ? "" : " is-selected"}" data-program-date="">Todos los días</button>${dateOptions.map((date) => `<button type="button" class="program-day-chip${activeProgramDate === date ? " is-selected" : ""}" data-program-date="${date}">${escapeHtml(formatProgramDate(date, { weekday: "short", day: "numeric" }))}</button>`).join("")}`
+      ? `<button type="button" class="program-day-chip${activeProgramDate ? "" : " is-selected"}" data-program-date="">Todos los días</button>${dateOptions.map((date) => `<button type="button" class="program-day-chip${activeProgramDate === date ? " is-selected" : ""}" data-program-date="${date}"${hidePast && temporalView.closedDates.has(date) ? ' disabled title="Este día ha terminado"' : ""}>${escapeHtml(formatProgramDate(date, { weekday: "short", day: "numeric" }))}</button>`).join("")}`
       : "";
+    document.querySelector("#temporal-program-count").textContent = visibleEvents.length !== allEvents.length ? `${visibleEvents.length} visibles de ${allEvents.length} guardados · Los cálculos incluyen tu programa completo` : "";
     document.querySelector("#program-pass-count").textContent = String(allEvents.length);
     document.querySelector("#program-conflict-count").textContent = String(conflictPairs);
     document.querySelector("#program-conflict-label").textContent = conflictPairs === 1 ? "conflicto" : "conflictos";
@@ -1524,12 +1677,13 @@
     document.querySelector("#nav-plan-count").textContent = String(allEvents.length);
     document.querySelector("#clear-planned-screenings").hidden = allEvents.length === 0;
     const grouped = new Map();
-    visibleEvents.forEach((screening) => {
-      if (!grouped.has(screening.date)) grouped.set(screening.date, []);
-      grouped.get(screening.date).push(screening);
+    visibleEvents.sort((a, b) => Number(!validProgramDate(a.date)) - Number(!validProgramDate(b.date))).forEach((screening) => {
+      const date = validProgramDate(screening.date) ? screening.date : "";
+      if (!grouped.has(date)) grouped.set(date, []);
+      grouped.get(date).push(screening);
     });
     document.querySelector("#program-agenda").innerHTML = grouped.size      ? [...grouped].map(([date, dayEvents]) => `<section class="program-day"><header><h3>${escapeHtml(formatProgramDate(date))}</h3><span>${dayEvents.length} ${dayEvents.length === 1 ? "pase" : "pases"}</span></header><div class="program-day-events">${renderDayEvents(dayEvents, conflicts, uncertain)}</div></section>`).join("")
-      : allEvents.length
+      : allEvents.length && !allEvents.some(showAgendaPass) ? temporalNotice("Tus pases anteriores siguen guardados. Desactiva el filtro para verlos.") : allEvents.length
         ? `<div class="cinema-card program-empty"><h3>No hay pases con estos filtros</h3><p>Prueba otro día o cambia el filtro de entradas para ver tu selección.</p></div>`
         : `<div class="cinema-card program-empty"><h3>Tu parrilla empieza con un pase</h3><p>Elige sesiones de las películas que has añadido. Si todavía no has guardado ninguna, vuelve a explorar.</p><button type="button" data-program-action="explore-films">Explorar películas</button></div>`;
     const sortedWanted = sortPlanFilms(wanted, allEvents);
@@ -1579,7 +1733,7 @@
       const title = (planned.films || []).map((film) => film.title).join(", ") || planned.title || "otro pase";
       return `<li><b>${escapeHtml(title)}</b>, ${escapeHtml(planned.time)} · ${escapeHtml(planned.venue)}: ${reason}.</li>`;
     }).join("");
-    return `<details class="pass-conflict-warning"><summary aria-label="Ver con qué pases chocaría" title="Ver conflictos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 22 21H2L12 3Z"/><path d="M12 9v5m0 3h.01"/></svg></summary><div class="pass-conflict-popover" role="status"><b>Chocaría con tu parrilla</b><ul>${details}</ul></div></details>`;
+    return `<details class="pass-conflict-warning"><summary aria-label="Ver con qué pases chocaría" title="Ver conflictos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 22 21H2L12 3Z"/><path d="M12 9v5m0 3h.01"/></svg></summary><div class="pass-conflict-popover"><b>Chocaría con tu parrilla</b><ul>${details}</ul></div></details>`;
   }
   function screeningIsPlanned(screening) {
     const ids = Array.isArray(screening.filmIds) ? screening.filmIds : [];
@@ -1714,7 +1868,7 @@
   // El acuse se pinta donde se descartó: en la barra de la ficha (que ya saltó a la siguiente) o
   // en la tarjeta del listado, que se repinta y sigue en su sitio mientras dura el acuse.
   function discardAckHosts() {
-    const bar = discardAck.fromDialog ? list.querySelector("dialog.film-expanded .film-expanded-actions") : null;
+    const bar = discardAck.fromDialog ? document.querySelector("#film-dialog-host dialog.film-expanded .film-expanded-actions") : null;
     const id = String(discardAck.film.id);
     const row = [...list.querySelectorAll(".film-row")]
       .find((item) => item.getAttribute("data-film-id") === id) || null;
@@ -1817,7 +1971,8 @@
   document.addEventListener("click", (event) => {
     if (discardAck && !discardAck.overlay.contains(event.target)) closeDiscardAck();
   }, true);
-  list.addEventListener("click", (event) => {
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest("#film-list, #film-dialog-host")) return;
     const quick = event.target.closest("button[data-quick-action]");
     if (quick && handleQuickAction(quick)) { event.stopPropagation(); return; }
   }, true);
@@ -1835,7 +1990,8 @@
     search.value = "";
     moreSections.value = "";
     // Las flechas recorren las películas de la parrilla, en el orden en que se ven.
-    filmNavigationIds = [...new Set(selectedPlanEvents().flatMap((screening) => screening.filmIds || []))];
+    setFilmNavigation([...new Set(selectedPlanEvents().flatMap((screening) => screening.filmIds || []))]);
+    filmDialogTemporalExempt = false;
     expandedId = film.id;
     renderSectionPicker();
     renderFilms();
@@ -1911,7 +2067,8 @@
     setRefinementEnabled(input.dataset.subfilter, input.checked);
     renderFilms();
   });
-  list.addEventListener("click", (event) => {
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest("#film-list, #film-dialog-host")) return;
     const dialog = event.target.closest("dialog.film-expanded");
     if (dialog && event.target === dialog) {
       const bounds = dialog.getBoundingClientRect();
@@ -1938,13 +2095,14 @@
       handlePrioritize(button.dataset.id);
       return;
     }
-    const row = event.target.closest(".film-row");
+    const row = event.target.closest("[data-film-id]");
     if (!row || event.target.closest("a, input, select, textarea, summary")) return;
     // Inside the open card only its close button toggles the film.
     if (event.target.closest(".film-expanded") && event.target.closest('button:not([data-action="expand"])')) return;
     const filmId = row.dataset.filmId;
     if (expandedId === filmId) { closeFilmDetails(filmId); return; }
-    filmNavigationIds = matchingFilms().map((film) => film.id);
+    setFilmNavigation(matchingFilms().map((film) => film.id));
+    filmDialogTemporalExempt = onlyMyLists || showDiscarded;
     expandedId = filmId;
     renderFilms();
   });
@@ -1955,12 +2113,13 @@
     search.value = "";
     moreSections.value = "";
     // Las flechas se quedan dentro de la lista desde la que se abrió.
-    filmNavigationIds = films.filter((item) => intentions.get(item.id) === listStatus).map((item) => item.id);
+    setFilmNavigation(films.filter((item) => intentions.get(item.id) === listStatus).map((item) => item.id));
+    filmDialogTemporalExempt = true;
     expandedId = film.id;
     renderSectionPicker();
     renderFilms();
     switchScreen("explore");
-    requestAnimationFrame(() => list.querySelector("dialog.film-expanded .film-detail-sticky .film-title")?.focus({ preventScroll: true }));
+    requestAnimationFrame(() => document.querySelector("#film-dialog-host dialog.film-expanded .film-detail-sticky .film-title")?.focus({ preventScroll: true }));
   }
   function removeFromList(event) {
     const open = event.target.closest('button[data-action="open-film"]');
@@ -2173,17 +2332,18 @@
     if (!button) return;
     const film = films.find((item) => item.id === button.dataset.openFilm);
     if (!film) return;
-    filmNavigationIds = [...new Set([...document.querySelectorAll("#session-results-list button[data-open-film]")].map((item) => item.dataset.openFilm))];
+    setFilmNavigation([...new Set([...document.querySelectorAll("#session-results-list button[data-open-film]")].map((item) => item.dataset.openFilm))]);
     sessionSearchScrollY = window.scrollY;
     returnToSessionSearch = true;
     activeSections.clear(); excludedSubfilters.clear();
     search.value = "";
     moreSections.value = "";
+    filmDialogTemporalExempt = false;
     expandedId = film.id;
     renderSectionPicker();
     renderFilms();
     switchScreen("explore");
-    requestAnimationFrame(() => list.querySelector("dialog.film-expanded .film-detail-sticky .film-title")?.focus({ preventScroll: true }));
+    requestAnimationFrame(() => document.querySelector("#film-dialog-host dialog.film-expanded .film-detail-sticky .film-title")?.focus({ preventScroll: true }));
   });
   document.querySelector("#program-ticket-filter").addEventListener("click", () => {
     programTicketFilter = { all: "owned", owned: "missing", missing: "all" }[programTicketFilter];
@@ -2221,8 +2381,8 @@
       const film = filmById.get(filmId);
       if (!film) return;
       const source = button.closest(".program-film-picks");
-      filmNavigationIds = [...source.querySelectorAll('[data-program-action="open-picker-film"]')]
-        .map((item) => item.dataset.filmId);
+      setFilmNavigation([...source.querySelectorAll('[data-program-action="open-picker-film"]')]
+        .map((item) => item.dataset.filmId));
       programScrollY = window.scrollY;
       returnToProgram = true;
       returnToSessionSearch = false;
@@ -2230,6 +2390,7 @@
       activeSections.clear(); excludedSubfilters.clear();
       search.value = "";
       moreSections.value = "";
+      filmDialogTemporalExempt = false;
       expandedId = film.id;
       renderSectionPicker();
       renderFilms();
@@ -2616,8 +2777,9 @@
   // Etiqueta corta del pase propio: "L21 · 19:30" se lee de un vistazo en el aviso.
   function shortOwnPass(screening) {
     if (!screening) return "";
+    if (!validProgramDate(screening.date)) return "Fecha sin confirmar";
     const day = new Intl.DateTimeFormat("es-ES", { weekday: "short" }).format(new Date(`${screening.date}T12:00:00`)).replace(/\.$/, "");
-    return `${day} ${Number(screening.date.slice(8, 10))} · ${screening.time}`;
+    return `${day} ${(validProgramDate(screening.date) ? Number(screening.date.slice(8, 10)) : "—")} · ${screening.time}`;
   }
   function sharedPassState(candidateId) {
     const screening = findScreening(candidateId);
@@ -2726,9 +2888,9 @@
     candidateIds = candidateIds.filter(findScreening);
     sharedPasses = candidateIds;
     sharedAlias = alias;
-    sharedSelection.clear();
+    if (!preserveFilter) sharedSelection.clear();
     // Opened by a link: land on the heading, not wherever the old page was scrolled to.
-    if (!document.querySelector("#screen-shared").hidden) window.scrollTo(0, 0);
+    if (!preserveFilter && !document.querySelector("#screen-shared").hidden) window.scrollTo(0, 0);
     const feedback = document.querySelector("#shared-feedback");
     feedback.textContent = "";
     document.querySelector("#shared-explore").hidden = true;
@@ -2788,16 +2950,16 @@
       const screening = findScreening(candidateId);
       const state = sharedPassState(candidateId);
       // Solo se marca sola la que ya está en tus listas y este pase la encaja.
-      if (state.listed) sharedSelection.add(candidateId);
+      if (!preserveFilter && state.listed && !passHasStarted(screening)) sharedSelection.add(candidateId);
       const note = state.reason
         ? `<p class="shared-${state.kind || "blocked"}">${escapeHtml(state.reason)}</p>`
         : state.note ? `<p class="shared-note${state.listed ? " is-listed" : ""}">${escapeHtml(state.note)}</p>` : "";
-      const day = Number(screening.date.slice(8, 10));
+      const day = (validProgramDate(screening.date) ? Number(screening.date.slice(8, 10)) : "—");
       const month = formatProgramDate(screening.date, { month: "short" }).replace(/\.$/, "");
       const weekday = formatProgramDate(screening.date, { weekday: "short" }).replace(/\.$/, "");
       return `<li class="shared-pass${state.disabled ? " is-blocked" : ""}${state.listed ? " is-listed" : ""}" data-shared-candidate="${escapeHtml(candidateId)}">
         <label>
-          <input type="checkbox" data-shared-pass="${escapeHtml(candidateId)}"${state.disabled ? " disabled" : state.listed ? " checked" : ""}>
+          <input type="checkbox" data-shared-pass="${escapeHtml(candidateId)}"${state.disabled ? " disabled" : sharedSelection.has(candidateId) ? " checked" : ""}>
           <span class="shared-pass-date" aria-hidden="true"><small>${escapeHtml(weekday)}</small><b>${day}</b><small>${escapeHtml(month)}</small></span>
           <span class="shared-pass-body">
             <span class="shared-pass-titles">${sharedPassTitles(screening)}</span>
@@ -2807,9 +2969,18 @@
         </label>
       </li>`;
     }).join("");
+    const sharedList = document.querySelector("#shared-list");
+    const pastRows = [...sharedList.querySelectorAll("[data-shared-candidate]")].filter(row => passHasStarted(findScreening(row.dataset.sharedCandidate)));
+    if (pastRows.length) {
+      const group = document.createElement("li");
+      group.className = "shared-past";
+      group.innerHTML = `<details data-temporal-fold="shared-past"><summary>Eventos pasados · ${pastRows.length}</summary><ul></ul></details>`;
+      pastRows.forEach(row => group.querySelector("ul").append(row));
+      sharedList.append(group);
+    }
     renderSharedPassFilters();
     syncSharedCount();
-    switchScreen("shared");
+    if (!preserveFilter) switchScreen("shared");
   }
   // ---- Pantalla de listas compartidas ----
   let sharedListFilms = [];
@@ -4053,12 +4224,13 @@
     sharedScrollY = window.scrollY;
     returnToShared = true;
     // Captura la lista visible y su orden al abrir, incluidos los filtros activos.
-    filmNavigationIds = sharedListsOnly
+    setFilmNavigation(sharedListsOnly
       ? [...document.querySelectorAll("#shared-list [data-shared-row]")].map((row) => row.dataset.sharedRow)
-      : [...new Set([...document.querySelectorAll("#shared-list .shared-pass:not([hidden]) [data-open-film]")].map(item => item.dataset.openFilm))];
+      : [...new Set([...document.querySelectorAll("#shared-list .shared-pass:not([hidden]) [data-open-film]")].map(item => item.dataset.openFilm))]);
     activeSections.clear(); excludedSubfilters.clear();
     search.value = "";
     moreSections.value = "";
+    filmDialogTemporalExempt = false;
     expandedId = film.id;
     renderSectionPicker();
     renderFilms();
@@ -4073,8 +4245,9 @@
     syncSharedCount();
   });
   document.querySelector("#shared-mark-fitting").addEventListener("click", () => {
+    temporalView = buildTemporalView(screeningRecords, Date.now(), screeningTimings);
     sharedPasses.forEach((candidateId) => {
-      if (!sharedPassMatchesFilter(candidateId) || sharedPassState(candidateId).disabled) return;
+      if (passHasStarted(findScreening(candidateId)) || !sharedPassMatchesFilter(candidateId) || sharedPassState(candidateId).disabled) return;
       sharedSelection.add(candidateId);
       const input = document.querySelector(`input[data-shared-pass="${CSS.escape(candidateId)}"]`);
       if (input) input.checked = true;
@@ -4351,6 +4524,7 @@
   document.querySelector("#settings-clear").addEventListener("click", () => {
     if (!hasUserData()) return;
     if (!window.confirm("¿Borrar tus listas, la parrilla, las marcas de entrada, las películas descartadas, las prioridades y las secciones fijadas? Esta acción no se puede deshacer.")) return;
+    setHidePast(true);
     intentions.clear();
     plannedScreenings.clear();
     ownedTickets.clear();
@@ -4375,4 +4549,108 @@
   renderSaved();
   renderFilms();
   showOnboardingIfNeeded();
+  // Preserve interaction state across a temporal paint; ordinary user actions
+  // continue using their existing renderers and selection handlers.
+  const resultControls = "#section-picker, #featured-sections, #more-sections, #show-all-sections, #section-subfilters, #search-input, #sort-order, #only-my-lists, #show-discarded, #clear-filters, #film-list-more, #session-search, #session-filter-fold, #date-options, #time-options, #venue-options, #reset-session-filters, #program-day-options, #program-ticket-filter, #shared-pass-filters";
+  function announceUserResults(event) {
+    if (!event.target.closest(resultControls)) return;
+    queueMicrotask(() => {
+      document.querySelector("#temporal-status").textContent = activeScreen === "sessions"
+        ? document.querySelector("#session-results-title").textContent
+        : activeScreen === "shared" ? document.querySelector("#shared-pass-filter-summary").textContent
+        : activeScreen === "program" ? `${document.querySelectorAll("#program-agenda .program-event").length} pases visibles en tu parrilla`
+        : document.querySelector("#film-list-progress").textContent;
+    });
+  }
+  for (const type of ["click", "input", "change"]) document.addEventListener(type, announceUserResults);
+  let temporalTimer = null;
+  let temporalSignature = "";
+  function temporalElementKey(element) {
+    if (element.id) return `id:${element.id}`;
+    const parent = element.closest("[data-temporal-candidate], [data-temporal-film], [data-film-id], [data-shared-candidate]");
+    const region = element.closest("#program-wanted-list, #program-maybe-list, #film-dialog-host, #film-list, #session-results-list, #program-agenda, #shared-list")?.id || "";
+    return `${region}:${parent?.dataset.temporalCandidate || parent?.dataset.temporalFilm || parent?.dataset.filmId || parent?.dataset.sharedCandidate || ""}:${element.tagName}:${JSON.stringify({...element.dataset})}:${element.className}`;
+  }
+  function refreshTemporalView(force = false) {
+    clearTimeout(temporalTimer);
+    temporalTimer = null;
+    const now = Date.now();
+    const next = buildTemporalView(screeningRecords, now, screeningTimings);
+    const signature = JSON.stringify([hidePast, [...next.states], [...next.closedDates]]);
+    temporalView = next;
+    if (force || signature !== temporalSignature) {
+      const x = window.scrollX, y = window.scrollY;
+      const focused = document.activeElement;
+      const focusKey = focused && temporalElementKey(focused);
+      const focusRegion = focused?.closest("#film-dialog-host, #film-list, #session-results-list, #program-agenda, #shared-list, #date-options");
+      const regionId = focusRegion?.id;
+      const peers = focusRegion ? [...focusRegion.querySelectorAll("button, input, summary, a")].filter(el => !el.disabled) : [];
+      const focusedIndex = peers.indexOf(focused);
+      const opens = new Map([...document.querySelectorAll("details")].map(el => [temporalElementKey(el), el.open]));
+      const scrolls = [...document.querySelectorAll("dialog[open], .film-expanded-main")].map(el => [el, el.scrollTop]);
+      const removedProgramDate = hidePast && temporalView.closedDates.has(activeProgramDate);
+      const resultSelector = activeScreen === "sessions" ? "#session-results-list .finder-screening" : activeScreen === "program" ? "#program-agenda .program-event" : activeScreen === "explore" && !expandedId ? "#film-list .film-row" : null;
+      const hadVisibleResults = resultSelector && Boolean(document.querySelector(resultSelector));
+      const removedDate = hidePast && [...activeDates].some(date => temporalView.closedDates.has(date));
+      if (hidePast) for (const date of activeDates) if (temporalView.closedDates.has(date)) activeDates.delete(date);
+      if (expandedId && !filmDialogTemporalExempt) {
+        filmNavigationIds = returnToSessionSearch || returnToProgram || returnToShared
+          ? filmNavigationOriginIds.filter(id => filmById.has(id) && filmHasUpcomingPass(filmById.get(id)))
+          : matchingFilms().map(film => film.id);
+      }
+      renderDateChoices();
+      renderSectionPicker();
+      renderFilms();
+      updateSessionSummary();
+      renderProgram();
+      countVisibleFilms();
+      if (activeScreen === "shared" && !sharedListsOnly && sharedPasses.length) renderSharedScreen(sharedPasses, sharedAlias, { preserveFilter: true });
+      for (const el of document.querySelectorAll("details")) if (opens.has(temporalElementKey(el))) el.open = opens.get(temporalElementKey(el));
+      for (const [el, top] of scrolls) if (el.isConnected) el.scrollTop = top;
+      if (focusKey && focused !== document.body) {
+        const replacement = [...document.querySelectorAll("button, input, summary, a, [tabindex]")].find(el => temporalElementKey(el) === focusKey && !el.disabled);
+        if (replacement) replacement.focus({ preventScroll: true });
+        else if (regionId) {
+          const region = document.getElementById(regionId);
+          const available = [...region.querySelectorAll("button, input, summary, a")].filter(el => !el.disabled);
+          const fallback = available[Math.max(0, focusedIndex)] || region;
+          if (fallback === region) fallback.setAttribute("tabindex", "-1");
+          fallback.focus({ preventScroll: true });
+        }
+      }
+      window.scrollTo(x, y);
+      if (removedDate && activeScreen === "sessions" || removedProgramDate && activeScreen === "program") document.querySelector("#temporal-status").textContent = "El día seleccionado ha terminado. Mostramos los días disponibles.";
+      else if (hadVisibleResults && !document.querySelector(resultSelector)) document.querySelector("#temporal-status").textContent = activeScreen === "program" ? "Tus pases anteriores siguen guardados. Puedes verlos desactivando el filtro en Ajustes." : temporalEmptyMessage();
+      temporalSignature = signature;
+    }
+    document.querySelector("#hide-past").checked = hidePast;
+    if (!document.hidden && (hidePast || activeScreen === "shared" && !sharedListsOnly)) {
+      temporalTimer = setTimeout(refreshTemporalView, Math.max(1, Math.min(30000, temporalView.nextBoundary - now)));
+    }
+  }
+  function setHidePast(value) {
+    hidePast = value;
+    saveLocalValue(temporalStorageKey, String(value));
+    refreshTemporalView(true);
+  }
+  document.querySelector("#hide-past").checked = hidePast;
+  document.querySelector("#hide-past").addEventListener("change", event => setHidePast(event.target.checked));
+  document.querySelector("#reset-temporal-filter").addEventListener("click", () => setHidePast(true));
+  document.addEventListener("click", event => {
+    if (event.target.closest("[data-show-past]")) setHidePast(false);
+  });
+  window.addEventListener("storage", event => {
+    if (event.key === temporalStorageKey || event.key === null) {
+      hidePast = event.newValue !== "false";
+      refreshTemporalView(true);
+    }
+  });
+  window.addEventListener("focus", () => refreshTemporalView());
+  window.addEventListener("pageshow", () => refreshTemporalView());
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { clearTimeout(temporalTimer); temporalTimer = null; }
+    else refreshTemporalView();
+  });
+  refreshTemporalView(true);
+
 })();
