@@ -93,3 +93,29 @@ test('plan buttons distinguish planned passes with and without an owned ticket',
  vm.runInContext(extract('selectedPlanEvents'),ctx);
  assert.equal(vm.runInContext('selectedPlanEvents()[0].candidateId',ctx),'pass-a');assert.deepEqual([...ticketSet],['pass-a']);assert.deepEqual([...plans],[['film-a','pass-a']]);
  });
+
+test('special access combines persistent instructions and an explicit reversible ticket mark', () => {
+  const ownedTickets = new Set();
+  const sandbox = vm.createContext({ownedTickets, escapeHtml:String,
+    accessGuidance:()=>({label:'Prensa y acreditados',text:'Retira tu entrada.',officialUrl:'https://ficx.tv/entradas'})});
+  vm.runInContext(extract('programEntryControl'),sandbox);
+  const render=()=>vm.runInContext("programEntryControl({candidateId:'special',films:[{title:'Sesión'}]})",sandbox);
+  assert.match(render(),/Ya tengo entrada/);
+  assert.match(render(),/Retira tu entrada/);
+  ownedTickets.add('special');
+  assert.match(render(),/Con entrada/);
+  assert.match(render(),/Has marcado que tienes entrada/);
+  assert.match(render(),/Quitar marca/);
+  assert.match(render(),/Retira tu entrada/);
+  sandbox.accessGuidance=()=>({label:'Acceso libre',text:'Sin retirada de entrada.',requiresTicket:false,officialUrl:'https://ficx.tv/entradas'});
+  assert.doesNotMatch(render(),/toggle-owned-ticket/);
+  assert.doesNotMatch(render(),/Con entrada/);
+});
+
+test('only access without ticket withdrawal omits the ownership action', () => {
+ const sandbox=vm.createContext({ownedTickets:new Set(),escapeHtml:String,formatProgramDate:()=> 'jueves 12'});
+ vm.runInContext(extract('accessGuidance')+'\n'+extract('programEntryControl'),sandbox);
+ const render=screening=>{sandbox.screening={candidateId:'s',films:[],eventLabels:[],...screening};return vm.runInContext('programEntryControl(screening)',sandbox)};
+ assert.doesNotMatch(render({venueGroup:'antiguo-instituto',eventLabels:['ENTRADA LIBRE']}),/toggle-owned-ticket/);
+ for(const screening of [{venueGroup:'ocine',eventLabels:['ENTRADA LIBRE']},{accessType:'restricted'},{accessType:'conditional'},{date:'2026-11-13',eventLabels:['ACTO DE INAUGURACIÓN']},{date:'2026-11-21',eventLabels:['ACTO DE CLAUSURA']}])assert.match(render(screening),/Ya tengo entrada/);
+});

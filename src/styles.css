@@ -2568,3 +2568,11 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .shared-past ul { list-style: none; padding: 0; margin: 0; }
 
 .temporal-in-progress { font-weight: 700; }
+
+/* Entry ownership lives inside special-access instructions. */
+.program-access-help.is-owned > summary { border-color: var(--green-deep); background: var(--green-pale); color: var(--green-deep); }
+.access-ticket-state { margin-top: 12px; padding-top: 10px; border-top: 1px solid currentColor; }
+.program-access-help > div .access-ticket-state p { margin: 0 0 8px; font-weight: 700; }
+.access-ticket-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid currentColor; border-radius: 6px; color: inherit; background: transparent; font: inherit; font-weight: 700; cursor: pointer; }
+.access-ticket-toggle svg { width: 20px; height: 20px; }
+.access-ticket-toggle:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }

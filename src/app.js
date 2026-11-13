@@ -1455,7 +1455,7 @@
         note: sections ? `Es obligatorio retirar o canjear entrada.${freeRule}` : "", officialUrl };
     }
     if (free && screening.venueGroup === "antiguo-instituto") {
-      return { label: "Acceso libre", text: "Acceso libre sin necesidad de retirar entrada y hasta completar aforo.", officialUrl };
+      return { label: "Acceso libre", text: "Acceso libre sin necesidad de retirar entrada y hasta completar aforo.", requiresTicket: false, officialUrl };
     }
     if (free) {
       return { label: labels.includes("ENTRADA LIBRE") ? "Entrada libre" : "Acceso libre", text: "Aunque sea gratuita, es imprescindible retirar la entrada en taquilla el mismo día de la sesión: máximo 4 por persona.", officialUrl };
@@ -1464,13 +1464,18 @@
   }
   function programEntryControl(screening) {
     const guidance = accessGuidance(screening);
+    const owned = ownedTickets.has(screening.candidateId);
     if (guidance) {
       const instructions = guidance.sections
         ? `<dl class="access-instructions">${guidance.sections.map((section) => `<div><dt>${escapeHtml(section.label)}</dt><dd>${escapeHtml(section.text)}</dd></div>`).join("")}</dl><p class="access-instructions-note">${escapeHtml(guidance.note)}</p>`
         : `<p>${escapeHtml(guidance.text)}</p>`;
-      return `<details class="program-access-help" name="program-access-instructions"><summary aria-label="Cómo acceder: ${escapeHtml(guidance.label)}" title="Cómo acceder"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v5m0-8h.01"/></svg><span>Entradas</span></summary><div>${guidance.label === "Prensa y acreditados" ? "" : `<strong class="access-instructions-title">${escapeHtml(guidance.label)}</strong>`}${instructions}<a class="access-instructions-link" href="${guidance.officialUrl}" target="_blank" rel="noopener">Normas oficiales del FICX</a></div></details>`;
+      const canMark = guidance.requiresTicket !== false;
+      const marked = canMark && owned;
+      const ticketIcon = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4V5Z"/><path d="M10 6.5v7"/></svg>';
+      const infoIcon = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v5m0-8h.01"/></svg>';
+      const ticketAction = canMark ? `<div class="access-ticket-state">${marked ? '<p>Has marcado que tienes entrada</p>' : ""}<button type="button" class="access-ticket-toggle${marked ? " is-owned" : ""}" data-program-action="toggle-owned-ticket" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-pressed="${marked}">${marked ? "Quitar marca" : `${ticketIcon}Ya tengo entrada`}</button></div>` : "";
+      return `<details class="program-access-help${marked ? " is-owned" : ""}" name="program-access-instructions"><summary aria-label="${marked ? "Con entrada. " : ""}Cómo acceder: ${escapeHtml(guidance.label)}" title="${marked ? "Con entrada · Cómo acceder" : "Cómo acceder"}">${marked ? ticketIcon : infoIcon}<span>${marked ? "Con entrada" : "Entradas"}</span></summary><div>${guidance.label === "Prensa y acreditados" ? "" : `<strong class="access-instructions-title">${escapeHtml(guidance.label)}</strong>`}${instructions}<a class="access-instructions-link" href="${guidance.officialUrl}" target="_blank" rel="noopener">Normas oficiales del FICX</a>${ticketAction}</div></details>`;
     }
-    const owned = ownedTickets.has(screening.candidateId);
     const name = (screening.films || []).map((film) => film.title).join(", ") || screening.title || "este pase";
     return `<button class="program-ticket-toggle${owned ? " is-owned" : ""}" type="button" data-program-action="toggle-owned-ticket" data-candidate-id="${escapeHtml(screening.candidateId)}" aria-pressed="${owned}" aria-label="${owned ? "Quitar la marca Tengo entrada de" : "Marcar que tienes entrada para"} ${escapeHtml(name)}" title="${owned ? "Tienes entrada" : "Tengo entrada"}"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4V5Z"/><path d="M10 6.5v7"/></svg><span>Tengo entrada</span></button>`;
   }
@@ -2421,13 +2426,28 @@
     if (programAction === "toggle-owned-ticket") {
       if (!toggleOwnedTicket(candidateId)) return;
       const owned = ownedTickets.has(candidateId);
-      button.classList.toggle("is-owned", owned);
-      button.setAttribute("aria-pressed", String(owned));
-      const passName = (findScreening(candidateId)?.films || []).map((film) => film.title).join(", ") || findScreening(candidateId)?.title || "este pase";
-      button.setAttribute("aria-label", `${owned ? "Quitar la marca Tengo entrada de" : "Marcar que tienes entrada para"} ${passName}`);
+      const specialHelp = button.closest(".program-access-help");
+      if (specialHelp) {
+        const panelScrollTop = specialHelp.querySelector(":scope > div").scrollTop;
+        const control = specialHelp.parentElement;
+        const screening = findScreening(candidateId);
+        control.innerHTML = programEntryControl(screening);
+        const replacement = control.querySelector(".program-access-help");
+        replacement.open = true;
+        replacement.querySelector(":scope > div").scrollTop = panelScrollTop;
+        replacement.querySelector(".access-ticket-toggle")?.focus({ preventScroll: true });
+      } else {
+        button.classList.toggle("is-owned", owned);
+        button.setAttribute("aria-pressed", String(owned));
+        const passName = (findScreening(candidateId)?.films || []).map((film) => film.title).join(", ") || findScreening(candidateId)?.title || "este pase";
+        button.setAttribute("aria-label", `${owned ? "Quitar la marca Tengo entrada de" : "Marcar que tienes entrada para"} ${passName}`);
+      }
       renderFilms();
       updateSessionSummary();
-      if (programTicketFilter !== "all") renderProgram();
+      if (programTicketFilter !== "all") {
+        renderProgram();
+        document.querySelector("#program-ticket-filter").focus({ preventScroll: true });
+      }
       return;
     }
     if (programAction === "remove-program-screening") {
