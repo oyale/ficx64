@@ -1,6 +1,6 @@
 **NO CLEAN** — un hallazgo accionable.
 
-**implementation_readiness-5-1 · Major**  
+**implementation_readiness-5-1 · Major**
 **Líneas:** `docs/SPEC-FILTRO-TEMPORAL.md:125` y `139`.
 
 **Motivo:** La centralización de anuncios enumera las regiones que deben perder `aria-live` o `role=status`, pero omite `.pass-conflict-popover`, generado con `role="status"` por `passConflictWarning()` (`src/app.js:1582`) y utilizado por `renderPassQuickActions()`. Retirar únicamente el atributo de la lista contenedora mantiene regiones vivas implícitas dentro de los resultados. Al repintar y restaurar desplegables abiertos, queda una vía de anuncios fuera de los dos cambios temporales permitidos. Las instrucciones enumeradas no bastan para cumplir el contrato de región única.

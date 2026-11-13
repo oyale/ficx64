@@ -28,7 +28,7 @@ También son mitigaciones pertinentes, **todavía propuestas y no verificadas**,
 
 **Hallazgos priorizados**
 
-**1. [Major] Falta una política única para incertidumbre y cierre administrativo.**  
+**1. [Major] Falta una política única para incertidumbre y cierre administrativo.**
 Ámbito: líneas 21–35, 57–61, 66 y aceptación 116/125.
 
 La misma sesión puede conservarse como visible por incertidumbre, pertenecer a un día deshabilitado y coexistir con el mensaje «El festival ha terminado». El cierre administrativo tampoco determina si deja de intervenir en conflictos. Una fecha inválida añade otro caso: no tiene una medianoche válida de referencia.
@@ -39,7 +39,7 @@ La misma sesión puede conservarse como visible por incertidumbre, pertenecer a 
 
 El grupo «Horario sin confirmar» sugerido por Catalyst es una opción con coste de interfaz y contadores; **no debe incorporarse automáticamente**. Primero debe decidirse si se necesita conservar esa consulta operativa o si basta el histórico, revisando expresamente la promesa de «mantener visible».
 
-**2. [Major] La frontera operativa sigue siendo insuficiente para evitar cálculos divergentes.**  
+**2. [Major] La frontera operativa sigue siendo insuficiente para evitar cálculos divergentes.**
 Ámbito: líneas 65–72 y 98.
 
 La propuesta distingue datos completos y vista temporal, pero no fija qué selección alimenta cobertura, encaje, sugerencias y conflictos en cada modo. Falta resolver, entre otros, el caso de una película con elección pasada y otro pase futuro.
@@ -52,7 +52,7 @@ La lectura actual confirma que `evaluatePlanChoice()` reconstruye una selección
 
 Añadir un escenario conjunto: elección pasada → candidato futuro → sugerencia/encaje → resumen → exportación. La conservación de IDs no basta para verificar los resultados operativos.
 
-**3. [Major] La recuperación histórica tiene tres fronteras pendientes.**  
+**3. [Major] La recuperación histórica tiene tres fronteras pendientes.**
 Ámbito: líneas 49–53, 67–72 y aceptación 122–123.
 
 Quedan sin decidir:
@@ -69,7 +69,7 @@ Quedan sin decidir:
 
 El acceso local al histórico propuesto por Catalyst puede posponerse si se acepta expresamente el cambio global de contexto. No es necesario añadir un segundo modo de consulta para cerrar el contrato actual.
 
-**4. [Major] El universo temporal y la cobertura de medianoche necesitan una decisión de alcance.**  
+**4. [Major] El universo temporal y la cobertura de medianoche necesitan una decisión de alcance.**
 Ámbito: líneas 24–28, 61, 65–69 y 97.
 
 Falta identificar qué eventos participan en el cierre global, de dónde proceden fecha completa y edición y qué sucede con un programa vacío o incompleto. Derivar fechas desde «datos/edición» expresa una intención, pero no establece la precedencia.
@@ -80,7 +80,7 @@ Además, `compareScreenings()` devuelve `separate` cuando las fechas difieren. M
 
 **Mitigación prioritaria:** definir el conjunto de eventos y elegir entre incluir los conflictos entre fechas —con intervalos absolutos y revisión de traslados— o declarar esa limitación fuera del cambio. Si se excluyen, no presentar los avisos operativos como cobertura de esos solapes.
 
-**5. [Major] Falta comparar las decisiones arquitectónicas que todavía son opcionales.**  
+**5. [Major] Falta comparar las decisiones arquitectónicas que todavía son opcionales.**
 Ámbito: líneas 76–80 y 93–101.
 
 Las restricciones del producto no obligan a elegir conversión horaria en cliente, caché invalidable ni un determinado mecanismo de temporización. Los informes convergen en pedir alternativas, pero la especificación mantiene una sola ruta.
@@ -97,7 +97,7 @@ Las restricciones del producto no obligan a elegir conversión horaria en client
 
 No hace falta construir prototipos de todas las opciones. Sí explicar mantenimiento, empaquetado offline, precisión y validación. Actualizar únicamente al interactuar no satisface la actualización automática requerida; puede descartarse por ese motivo.
 
-**6. [Major] La entrega carece de presupuesto y criterio explícito de recorte.**  
+**6. [Major] La entrega carece de presupuesto y criterio explícito de recorte.**
 Ámbito: líneas 93–101 y 130–133.
 
 El plan abarca catálogo, fichas, días, listas, compartidos, recomendaciones, conflictos, almacenamiento y accesibilidad. Su secuencia es útil, pero no permite determinar qué puede entregarse y verificarse con los recursos disponibles.
@@ -106,14 +106,14 @@ El plan abarca catálogo, fichas, días, listas, compartidos, recomendaciones, c
 
 **Mitigación:** estimar por rangos el modelo temporal, la integración y la validación; identificar disponibilidad de Chromium y fijar qué ampliaciones son prescindibles. Mantener como puertas de avance el modelo temporal probado y, después, el HTML generado verificado en navegador. No recortar conservación de datos, coherencia de acciones o accesibilidad para ganar plazo.
 
-**7. [Nit] Sigue prescrita una caché con invalidación sin evidencia de necesidad.**  
+**7. [Nit] Sigue prescrita una caché con invalidación sin evidencia de necesidad.**
 Ámbito: línea 95.
 
 El empaquetado consultado incrusta los datos. No se ha demostrado aquí una actualización de horarios en caliente que justifique introducir invalidación.
 
 **Mitigación:** retirar esa obligación. Permitir cálculo directo o derivación única al cargar los datos; medir antes de añadir más estado. Reutilizar `plannedMinutes()` para la duración ocupada, acompañándolo de validación: su implementación actual no constituye por sí sola una política completa para datos inválidos.
 
-**8. [Nit] Reunir riesgos y límites requiere documentación breve, no infraestructura nueva.**  
+**8. [Nit] Reunir riesgos y límites requiere documentación breve, no infraestructura nueva.**
 Ámbito: líneas 28–34, 43 y 74–80.
 
 El hallazgo estructural es pertinente, pero no justifica añadir monitorización, servicios remotos ni un sistema de rendimiento. Basta explicitar riesgos aplicables: reloj manipulable, entrada temporal inválida, errores de persistencia, coste de recálculo y renderizado.
