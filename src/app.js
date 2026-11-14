@@ -588,6 +588,7 @@
   function renderFilms() {
     // El repintado rehace las tarjetas: el acuse abierto se recoloca al final del pintado.
     if (discardAck && !discardAck.fromDialog) { const ack = discardAck; requestAnimationFrame(() => discardAck === ack && keepDiscardAck()); }
+    document.querySelector("#temporal-explore-note").hidden = !hidePast || onlyMyLists || showDiscarded;
     const visible = matchingFilms();
     const sectionLabel = [...activeSections].join(", ");
     const title = showDiscarded ? "Películas descartadas" : (sectionLabel ? `Películas en ${sectionLabel}` : "Todas las películas");
@@ -974,6 +975,7 @@
     document.querySelector("#date-options").innerHTML = `<button type="button" class="choice-chip${activeDates.size ? "" : " is-selected"}" data-date="" aria-pressed="${activeDates.size === 0}">Todos</button>` + dates.map(([value, day, number]) => `<button type="button" class="choice-chip${activeDates.has(value) ? " is-selected" : ""}" data-date="${value}"${hidePast && temporalView.closedDates.has(value) ? ' disabled title="Este día ha terminado"' : ""} aria-pressed="${activeDates.has(value)}">${day} ${number}</button>`).join("");
   }
   function updateSessionSummary() {
+    document.querySelector("#temporal-sessions-note").hidden = !hidePast;
     const dateText = activeDates.size
       ? [...activeDates].sort().map((date) => document.querySelector(`#date-options [data-date="${date}"]`)?.textContent).filter(Boolean).join(", ")
       : "Todos los días";
@@ -1070,6 +1072,7 @@
   function formatProgramDate(value, options = { weekday: "long", day: "numeric", month: "long" }) {
     return validProgramDate(value) ? new Intl.DateTimeFormat("es-ES", { ...options, timeZone: "UTC" }).format(new Date(`${value}T12:00:00Z`)) : "Fecha sin confirmar";
   }
+  function dayToneClass(index) { return index % 2 ? "day-tone-b" : "day-tone-a"; }
   const VENUE_CODES = {
     "ocine": "OCINE", "yelmo": "YELMO", "teatro-jovellanos": "TJ", "escuela-comercio": "AEC",
     "laboral": "LAB", "antiguo-instituto": "CCAI", "pumarin": "SUR",
@@ -1627,6 +1630,7 @@
     return foldSuggestion(`${renderProgramChoice(recommendation.screening, film, "", events, true)}${uncertainNote}`, recommendation.uncertain ? "Posible hueco" : "Encaja", recommendation.uncertain ? "is-uncertain" : "is-clear");
   }
   function renderProgram() {
+    document.querySelector("#temporal-program-note").hidden = !hidePast;
     const allEvents = selectedPlanEvents();
     const coverage = selectedFilmIds(allEvents);
     const wanted = films.filter((film) => intentions.get(film.id) === "want");
@@ -1687,7 +1691,7 @@
       if (!grouped.has(date)) grouped.set(date, []);
       grouped.get(date).push(screening);
     });
-    document.querySelector("#program-agenda").innerHTML = grouped.size      ? [...grouped].map(([date, dayEvents]) => `<section class="program-day"><header><h3>${escapeHtml(formatProgramDate(date))}</h3><span>${dayEvents.length} ${dayEvents.length === 1 ? "pase" : "pases"}</span></header><div class="program-day-events">${renderDayEvents(dayEvents, conflicts, uncertain)}</div></section>`).join("")
+    document.querySelector("#program-agenda").innerHTML = grouped.size      ? [...grouped].map(([date, dayEvents], index) => `<section class="program-day ${dayToneClass(index)}"><header><h3>${escapeHtml(formatProgramDate(date))}</h3><span>${dayEvents.length} ${dayEvents.length === 1 ? "pase" : "pases"}</span></header><div class="program-day-events">${renderDayEvents(dayEvents, conflicts, uncertain)}</div></section>`).join("")
       : allEvents.length && !allEvents.some(showAgendaPass) ? temporalNotice("Tus pases anteriores siguen guardados. Desactiva el filtro para verlos.") : allEvents.length
         ? `<div class="cinema-card program-empty"><h3>No hay pases con estos filtros</h3><p>Prueba otro día o cambia el filtro de entradas para ver tu selección.</p></div>`
         : `<div class="cinema-card program-empty"><h3>Tu parrilla empieza con un pase</h3><p>Elige sesiones de las películas que has añadido. Si todavía no has guardado ninguna, vuelve a explorar.</p><button type="button" data-program-action="explore-films">Explorar películas</button></div>`;
@@ -2966,6 +2970,8 @@
     document.querySelector("#shared-count").textContent = `${candidateIds.length} ${candidateIds.length === 1 ? "pase" : "pases"} · ${filmCount} ${filmCount === 1 ? "película" : "películas"}`;
     document.querySelector("#shared-count").hidden = false;
     document.querySelector("#shared-summary").textContent = summary;
+    const sharedDates = [...new Set(candidateIds.map((candidateId) => findScreening(candidateId)?.date).filter(validProgramDate))].sort();
+    const sharedDayTones = new Map(sharedDates.map((date, index) => [date, dayToneClass(index)]));
     document.querySelector("#shared-list").innerHTML = candidateIds.map((candidateId) => {
       const screening = findScreening(candidateId);
       const state = sharedPassState(candidateId);
@@ -2980,7 +2986,7 @@
       return `<li class="shared-pass${state.disabled ? " is-blocked" : ""}${state.listed ? " is-listed" : ""}" data-shared-candidate="${escapeHtml(candidateId)}">
         <label>
           <input type="checkbox" data-shared-pass="${escapeHtml(candidateId)}"${state.disabled ? " disabled" : sharedSelection.has(candidateId) ? " checked" : ""}>
-          <span class="shared-pass-date" aria-hidden="true"><small>${escapeHtml(weekday)}</small><b>${day}</b><small>${escapeHtml(month)}</small></span>
+          <span class="shared-pass-date ${sharedDayTones.get(screening.date) || "day-tone-a"}" aria-hidden="true"><small>${escapeHtml(weekday)}</small><b>${day}</b><small>${escapeHtml(month)}</small></span>
           <span class="shared-pass-body">
             <span class="shared-pass-titles">${sharedPassTitles(screening)}</span>
             <span class="shared-pass-meta"><b>${escapeHtml(screening.time)}</b>${escapeHtml(screening.venue)}${screening.room ? ` · ${escapeHtml(screening.room)}` : ""}</span>
@@ -4234,6 +4240,116 @@
   document.querySelector("#share-itinerary").addEventListener("click", () => {
     sharePassLink(selectedPlanEvents().map((screening) => screening.candidateId)).catch(() => {});
   });
+  function festivalToday() {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Madrid", calendar: "gregory", numberingSystem: "latn",
+      year: "numeric", month: "2-digit", day: "2-digit",
+    }).formatToParts(new Date());
+    const values = Object.fromEntries(parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]));
+    return `${values.year}-${values.month}-${values.day}`;
+  }
+  function drawTodayItinerary(events, date) {
+    const width = 1080, margin = 68, rowHeight = 206, headerHeight = 340, footerHeight = 112;
+    const height = Math.max(780, headerHeight + events.length * rowHeight + footerHeight + 60);
+    const canvas = document.createElement("canvas");
+    canvas.width = width; canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("No se pudo preparar la imagen.");
+    const colors = { navy: "#101722", paper: "#fbf9f3", blue: "#0753dc", cyan: "#00c5b2", ink: "#101722", muted: "#526171", line: "#dce2e9", white: "#ffffff" };
+    context.fillStyle = colors.paper; context.fillRect(0, 0, width, height);
+    context.fillStyle = colors.navy; context.fillRect(0, 0, width, headerHeight);
+    context.fillStyle = colors.cyan; context.fillRect(0, headerHeight - 8, width, 8);
+    context.fillStyle = colors.blue; context.beginPath(); context.arc(width - 8, 32, 168, 0, Math.PI * 2); context.fill();
+    context.fillStyle = colors.cyan; context.beginPath(); context.arc(width - 8, 32, 96, 0, Math.PI * 2); context.fill();
+    context.textBaseline = "alphabetic";
+    context.fillStyle = colors.cyan; context.font = "700 26px Arial, sans-serif"; context.fillText("FICX 64  /  GIJÓN", margin, 78);
+    context.fillStyle = colors.white; context.font = "700 68px Arial, sans-serif"; context.fillText("Mi FICX hoy", margin, 172);
+    context.fillStyle = colors.white; context.font = "400 34px Arial, sans-serif";
+    context.fillText(new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Madrid", weekday: "long", day: "numeric", month: "long" }).format(new Date(`${date}T12:00:00Z`)), margin, 230);
+    context.fillStyle = "#c9d3df"; context.font = "600 24px Arial, sans-serif";
+    context.fillText(`${events.length} ${events.length === 1 ? "PASE" : "PASES"} · MI PROGRAMA`, margin, 286);
+
+    const textX = margin + 190, textWidth = width - textX - margin;
+    const drawWrapped = (text, x, y, maxWidth, lineHeight, maxLines) => {
+      const words = String(text || "").split(/\s+/).filter(Boolean), lines = [];
+      let line = "";
+      for (const word of words) {
+        const candidate = line ? `${line} ${word}` : word;
+        if (line && context.measureText(candidate).width > maxWidth) { lines.push(line); line = word; }
+        else line = candidate;
+      }
+      if (line) lines.push(line);
+      const visible = lines.slice(0, maxLines);
+      if (lines.length > maxLines && visible.length) {
+        let last = visible.at(-1);
+        while (last && context.measureText(`${last}…`).width > maxWidth) last = last.slice(0, -1);
+        visible[visible.length - 1] = `${last.trimEnd()}…`;
+      }
+      visible.forEach((part, index) => context.fillText(part, x, y + index * lineHeight));
+      return visible.length;
+    };
+    events.forEach((screening, index) => {
+      const top = headerHeight + index * rowHeight + 30;
+      const minutes = plannedMinutes(screening), endMinute = startMinute(screening) + minutes;
+      context.fillStyle = colors.blue; context.font = "700 42px Arial, sans-serif";
+      context.fillText(screening.time, margin, top + 36);
+      context.fillStyle = colors.muted; context.font = "400 22px Arial, sans-serif";
+      context.fillText(minutes ? `hasta ${formatClock(endMinute % 1440)}${endMinute >= 1440 ? " +1" : ""}` : "fin por confirmar", margin, top + 72);
+      context.fillStyle = colors.cyan; context.fillRect(margin + 150, top - 4, 4, 112);
+      context.fillStyle = colors.ink; context.font = "700 38px Arial, sans-serif";
+      const titles = (screening.films || []).map((film) => film.title).filter(Boolean);
+      const title = screening.title || (titles.length > 1 ? `Programa · ${titles.length} películas` : titles[0]) || "Actividad del festival";
+      const titleLines = drawWrapped(title, textX, top + 34, textWidth, 43, 2);
+      let detailY = top + 38 + titleLines * 43;
+      if (titles.length > 1 && title !== titles.join(" · ")) {
+        context.fillStyle = colors.muted; context.font = "400 20px Arial, sans-serif";
+        const names = drawWrapped(titles.join(" · "), textX, detailY, textWidth, 25, 1);
+        detailY += names ? 29 : 0;
+      }
+      context.fillStyle = colors.muted; context.font = "600 23px Arial, sans-serif";
+      drawWrapped(`${screening.venue || "Sede por confirmar"}${screening.room ? ` · ${screening.room}` : ""}`, textX, detailY + 4, textWidth, 28, 1);
+      context.fillStyle = colors.line; context.fillRect(margin, top + 174, width - margin * 2, 1);
+    });
+    context.fillStyle = colors.navy; context.fillRect(0, height - footerHeight, width, footerHeight);
+    context.fillStyle = colors.cyan; context.font = "700 22px Arial, sans-serif"; context.fillText("FICX 64", margin, height - 58);
+    context.fillStyle = "#c9d3df"; context.font = "400 20px Arial, sans-serif"; context.textAlign = "right";
+    context.fillText("Mi programa · ficx64", width - margin, height - 58); context.textAlign = "left";
+    return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("No se pudo codificar la imagen.")), "image/png"));
+  }
+  document.querySelector("#share-today-image").addEventListener("click", async (event) => {
+    const button = event.currentTarget, feedback = document.querySelector("#settings-calendar-feedback");
+    const date = festivalToday();
+    const events = selectedPlanEvents().filter((screening) => screening.date === date);
+    if (!events.length) {
+      feedback.textContent = "No tienes pases elegidos para hoy. Añádelos a tu parrilla y vuelve a intentarlo.";
+      feedback.classList.add("is-error");
+      return;
+    }
+    button.disabled = true; button.querySelector("span").textContent = "Preparando imagen…";
+    feedback.textContent = ""; feedback.classList.remove("is-error");
+    try {
+      const blob = await drawTodayItinerary(events, date);
+      const file = new File([blob], `mi-ficx-hoy-${date}.png`, { type: "image/png" });
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: "Mi FICX hoy", text: "Mi itinerario de hoy en FICX 64." });
+          feedback.textContent = "Imagen lista para compartir.";
+        } catch (error) {
+          if (error?.name === "AbortError") { feedback.textContent = "No se ha compartido la imagen."; return; }
+          downloadBlob(blob, "image/png", file.name);
+          feedback.textContent = "No se pudo abrir el menú de compartir; la imagen se ha descargado.";
+        }
+      } else {
+        downloadBlob(blob, "image/png", file.name);
+        feedback.textContent = "Imagen descargada. Ya puedes adjuntarla en tu mensajería o red social.";
+      }
+    } catch (_) {
+      feedback.textContent = "No se ha podido generar la imagen. Tus pases siguen guardados; puedes intentarlo de nuevo.";
+      feedback.classList.add("is-error");
+    } finally {
+      button.disabled = false; button.querySelector("span").textContent = "Compartir imagen · Mi FICX hoy";
+    }
+  });
 
   document.querySelector("#shared-list").addEventListener("click", (event) => {
     // El título abre la ficha; desde ella las flechas recorren las películas de este enlace.
@@ -4593,6 +4709,12 @@
     const region = element.closest("#program-wanted-list, #program-maybe-list, #film-dialog-host, #film-list, #session-results-list, #program-agenda, #shared-list")?.id || "";
     return `${region}:${parent?.dataset.temporalCandidate || parent?.dataset.temporalFilm || parent?.dataset.filmId || parent?.dataset.sharedCandidate || ""}:${element.tagName}:${JSON.stringify({...element.dataset})}:${element.className}`;
   }
+  function syncTemporalFilterControl() {
+    document.querySelector("#hide-past").checked = hidePast;
+    const status = document.querySelector("#hide-past-status");
+    status.textContent = hidePast ? "Activo" : "Desactivado";
+    status.classList.toggle("is-off", !hidePast);
+  }
   function refreshTemporalView(force = false) {
     clearTimeout(temporalTimer);
     temporalTimer = null;
@@ -4645,7 +4767,7 @@
       else if (hadVisibleResults && !document.querySelector(resultSelector)) document.querySelector("#temporal-status").textContent = activeScreen === "program" ? "Tus pases anteriores siguen guardados. Puedes verlos desactivando el filtro en Ajustes." : temporalEmptyMessage();
       temporalSignature = signature;
     }
-    document.querySelector("#hide-past").checked = hidePast;
+    syncTemporalFilterControl();
     if (!document.hidden && (hidePast || activeScreen === "shared" && !sharedListsOnly)) {
       temporalTimer = setTimeout(refreshTemporalView, Math.max(1, Math.min(30000, temporalView.nextBoundary - now)));
     }
@@ -4655,7 +4777,7 @@
     saveLocalValue(temporalStorageKey, String(value));
     refreshTemporalView(true);
   }
-  document.querySelector("#hide-past").checked = hidePast;
+  syncTemporalFilterControl();
   document.querySelector("#hide-past").addEventListener("change", event => setHidePast(event.target.checked));
   document.querySelector("#reset-temporal-filter").addEventListener("click", () => setHidePast(true));
   document.addEventListener("click", event => {

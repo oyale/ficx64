@@ -728,6 +728,25 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 .screening-review-badge.is-reviewed { background: #e7f5ed; color: var(--ok); }
 .include-special-access { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; color: var(--ink); font-size: 10px; font-weight: 700; }
 .include-special-access input { accent-color: var(--blue); }
+.temporal-filter-toggle { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 76px; margin-bottom: 9px; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-float); color: var(--ink); cursor: pointer; transition: border-color .15s, background-color .15s; }
+.temporal-filter-toggle:hover { border-color: var(--green); background: var(--green-pale); }
+.temporal-filter-copy { display: grid; gap: 7px; }
+.temporal-filter-copy strong { font-size: 13px; line-height: 1.3; }
+.temporal-filter-status { width: fit-content; padding: 3px 7px; border-radius: 4px; background: var(--green-pale); color: var(--green-ink); font-size: 10px; font-weight: 700; }
+.temporal-filter-status.is-off { background: var(--surface); color: var(--text-muted); }
+.temporal-filter-toggle input { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.temporal-switch-track { position: relative; flex: 0 0 48px; width: 48px; height: 28px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); transition: background-color .18s, border-color .18s; }
+.temporal-switch-track::after { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--surface-float); box-shadow: 0 1px 3px rgba(16, 23, 34, .25); content: ""; transition: transform .18s ease; }
+.temporal-filter-toggle input:checked + .temporal-switch-track { border-color: var(--green-deep); background: var(--green-deep); }
+.temporal-filter-toggle input:checked + .temporal-switch-track::after { transform: translateX(20px); }
+.temporal-filter-toggle input:focus-visible + .temporal-switch-track { outline: 3px solid var(--cyan); outline-offset: 3px; }
+.temporal-filter-help { margin: 0 0 8px; color: var(--text-body); font-size: 11px; line-height: 1.5; }
+@media (forced-colors: active) {
+  .temporal-switch-track { border: 1px solid ButtonText; background: Canvas; }
+  .temporal-switch-track::after { background: CanvasText; box-shadow: none; }
+  .temporal-filter-toggle input:checked + .temporal-switch-track { border-color: Highlight; background: Highlight; }
+  .temporal-filter-toggle input:checked + .temporal-switch-track::after { background: HighlightText; }
+}
 .session-data-note { margin: 0 0 13px; padding: 9px 11px; background: #fff6e8; color: #694900; font-size: 9px; line-height: 1.45; }
 .session-data-note b { font-size: 8px; letter-spacing: .06em; }
 .screening-results { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
@@ -855,7 +874,6 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 #shared-list .shared-film { display: grid; grid-template-columns: minmax(0, 1fr); padding: 10px 11px 10px 20px; border: 1px solid var(--line); border-radius: 0; background: var(--surface-raised); }
 #shared-list .shared-film::before { position: absolute; z-index: 0; inset: 0 auto 0 0; width: 14px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='16' viewBox='0 0 14 16' preserveAspectRatio='none'%3E%3Cpath fill='%2300c5b2' fill-rule='evenodd' d='M0 0H14V16H0Z M3 4.5H11V10.5H3Z'/%3E%3C/svg%3E") center top / 14px 16px repeat-y; content: ""; pointer-events: none; }
 #shared-list .shared-film > * { position: relative; z-index: 1; }
-#shared-list .shared-pass-meta { display: none; }
 /* «Propone» va encima de la botonera: en escritorio, justo sobre la columna de acciones. */
 #shared-list .film-actions .shared-suggest { margin: 0 0 4px; color: var(--text-muted); font-size: 11px; text-align: right; }
 #shared-list .film-actions .shared-suggest b { color: var(--text); }
@@ -1940,6 +1958,12 @@ kbd { padding: 2px 5px; border: 1px solid var(--line); color: var(--gray); font-
 :root[data-theme="dark"] .intent-maybe.is-selected:hover { color: #0e1218; }
 :root[data-theme="dark"] .pass-quick.is-plan { background: var(--green-pale); border-color: var(--green-deep); color: var(--green-deep); }
 :root[data-theme="dark"] .pass-quick.is-plan:hover { background: var(--green-deep); color: #ffffff; }
+
+/* Los días alternan dos tonos del festival; cada fecha conserva el mismo tono. */
+.program-day.day-tone-a > header h3 { padding: 5px 10px; border-radius: 5px; background: var(--cyan); color: #101722; }
+.program-day.day-tone-b > header h3 { padding: 5px 10px; border-radius: 5px; background: var(--blue); color: #ffffff; }
+:root .shared-pass-date.day-tone-a { background: var(--cyan); color: #101722; }
+:root .shared-pass-date.day-tone-b { background: var(--blue); color: #ffffff; }
 
 
 /* Sol/luna en la cabecera: alterna claro y oscuro sin abrir Ajustes. */
