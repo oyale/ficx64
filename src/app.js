@@ -118,7 +118,7 @@
 
   const temporalStorageKey = "ficx64-hide-past-v1";
   function readHidePast() {
-    try { return localStorage.getItem(temporalStorageKey) !== "false"; } catch (_) { return true; }
+    try { return localStorage.getItem(temporalStorageKey) === "true"; } catch (_) { return false; }
   }
   let hidePast = readHidePast();
   const screeningTimings = new Map(screeningRecords.map(record => [record.candidateId, screeningTiming(record)]));
@@ -4779,13 +4779,13 @@
   }
   syncTemporalFilterControl();
   document.querySelector("#hide-past").addEventListener("change", event => setHidePast(event.target.checked));
-  document.querySelector("#reset-temporal-filter").addEventListener("click", () => setHidePast(true));
+  document.querySelector("#reset-temporal-filter").addEventListener("click", () => setHidePast(false));
   document.addEventListener("click", event => {
     if (event.target.closest("[data-show-past]")) setHidePast(false);
   });
   window.addEventListener("storage", event => {
     if (event.key === temporalStorageKey || event.key === null) {
-      hidePast = event.newValue !== "false";
+      hidePast = event.newValue === "true";
       refreshTemporalView(true);
     }
   });
